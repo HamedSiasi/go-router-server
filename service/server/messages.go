@@ -39,6 +39,7 @@ type DisplayRow struct {
 }
 
 type Connection struct {
+	DeviceUuid string
     Status string
 }
 
@@ -48,7 +49,6 @@ type Connection struct {
 
 // DateTime
 type DateTime struct {
-    Timestamp         time.Time
     UtmTime           time.Time
     TimeSetBy         TimeSetByEnum
 }
@@ -57,7 +57,6 @@ func (value *DateTime) DeepCopy() *DateTime {
         return nil
     }
     result := &DateTime {
-        Timestamp:         value.Timestamp,
         UtmTime:           value.UtmTime,
         TimeSetBy:         value.TimeSetBy,
     }
@@ -66,7 +65,6 @@ func (value *DateTime) DeepCopy() *DateTime {
 
 // GNSS
 type GnssPosition struct {
-    Timestamp time.Time
     Latitude  int32
     Longitude int32
     Elevation int32
@@ -76,7 +74,6 @@ func (value *GnssPosition) DeepCopy() *GnssPosition {
         return nil
     }
     result := &GnssPosition{
-        Timestamp:   value.Timestamp,
         Latitude:    value.Latitude,
         Longitude:   value.Longitude,
         Elevation:   value.Elevation,
@@ -84,21 +81,11 @@ func (value *GnssPosition) DeepCopy() *GnssPosition {
     return result
 }
 
+// CellId
+type CellId uint16
+
 // RSSI
-type Rssi struct {
-    Timestamp time.Time
-    Rssi      int16
-}
-func (value *Rssi) DeepCopy() *Rssi {
-    if value == nil {
-        return nil
-    }
-    result := &Rssi{
-        Timestamp: value.Timestamp,
-        Rssi:      value.Rssi,
-    }
-    return result
-}
+type Rssi int16
 
 // RSRP
 type Rsrp struct {
@@ -116,9 +103,11 @@ func (value *Rsrp) DeepCopy() *Rsrp {
     return result
 }
 
+// Temperature
+type Temperature int8
+
 // Power/State
 type PowerState struct {
-    Timestamp    time.Time
     ChargerState ChargerStateEnum
     BatteryMv    uint16
     EnergyMwh    uint32
@@ -128,7 +117,6 @@ func (value *PowerState) DeepCopy() *PowerState {
         return nil
     }
     result := &PowerState{
-        Timestamp:    value.Timestamp,
         ChargerState: value.ChargerState,
         BatteryMv:    value.BatteryMv,
         EnergyMwh:    value.EnergyMwh,
@@ -143,13 +131,13 @@ type MeasurementData struct {
     GnssPositionPresent bool
     GnssPosition        GnssPosition
     CellIdPresent       bool
-    CellId              uint16
+    CellId              CellId
     RsrpPresent         bool
     Rsrp                Rsrp
     RssiPresent         bool
     Rssi                Rssi
     TemperaturePresent  bool
-    Temperature         int8
+    Temperature         Temperature
     PowerStatePresent   bool
     PowerState          PowerState
 }
@@ -187,7 +175,6 @@ func (value *MeasurementData) DeepCopy() *MeasurementData {
 
 // TransparentUlDatagram
 type TransparentUlDatagram struct {
-    Timestamp    time.Time
     Contents     [MaxDatagramSizeRaw - 1]byte
 }
 func (value *TransparentUlDatagram) DeepCopy() *TransparentUlDatagram {
@@ -195,7 +182,6 @@ func (value *TransparentUlDatagram) DeepCopy() *TransparentUlDatagram {
         return nil
     }
     result := &TransparentUlDatagram {
-        Timestamp:   value.Timestamp,
         Contents:    value.Contents,
     }
     return result
@@ -217,7 +203,6 @@ func (value *TransparentDlDatagram) DeepCopy() *TransparentDlDatagram {
 
 // InitIndUlMsg
 type InitIndUlMsg struct {
-    Timestamp         time.Time
     WakeUpCode        WakeUpEnum
     RevisionLevel     uint8
     SdCardNotRequired bool
@@ -230,7 +215,6 @@ func (value *InitIndUlMsg) DeepCopy() *InitIndUlMsg {
         return nil
     }
     result := &InitIndUlMsg {
-        Timestamp:         value.Timestamp,
         WakeUpCode:        value.WakeUpCode,
         RevisionLevel:     value.RevisionLevel,
         SdCardNotRequired: value.SdCardNotRequired,
@@ -279,7 +263,6 @@ func (value *DateTimeSetReqDlMsg) DeepCopy() *DateTimeSetReqDlMsg {
 
 // DateTimeSetCnfUlMsg
 type DateTimeSetCnfUlMsg struct {
-    Timestamp         time.Time
     UtmTime           time.Time
     TimeSetBy         TimeSetByEnum
 }
@@ -288,7 +271,6 @@ func (value *DateTimeSetCnfUlMsg) DeepCopy() *DateTimeSetCnfUlMsg {
         return nil
     }
     result := &DateTimeSetCnfUlMsg {
-        Timestamp:         value.Timestamp,
         UtmTime:           value.UtmTime,
         TimeSetBy:         value.TimeSetBy,
     }
@@ -297,7 +279,6 @@ func (value *DateTimeSetCnfUlMsg) DeepCopy() *DateTimeSetCnfUlMsg {
 
 // DateTimeGetCnfUlMsg
 type DateTimeGetCnfUlMsg struct {
-    Timestamp         time.Time
     UtmTime           time.Time
     TimeSetBy         TimeSetByEnum
 }
@@ -306,7 +287,6 @@ func (value *DateTimeGetCnfUlMsg) DeepCopy() *DateTimeGetCnfUlMsg {
         return nil
     }
     result := &DateTimeGetCnfUlMsg {
-        Timestamp:         value.Timestamp,
         UtmTime:           value.UtmTime,
         TimeSetBy:         value.TimeSetBy,
     }
@@ -315,7 +295,6 @@ func (value *DateTimeGetCnfUlMsg) DeepCopy() *DateTimeGetCnfUlMsg {
 
 // DateTimeIndUlMsg
 type DateTimeIndUlMsg struct {
-    Timestamp         time.Time
     UtmTime           time.Time
     TimeSetBy         TimeSetByEnum
 }
@@ -324,7 +303,6 @@ func (value *DateTimeIndUlMsg) DeepCopy() *DateTimeIndUlMsg {
         return nil
     }
     result := &DateTimeIndUlMsg {
-        Timestamp:         value.Timestamp,
         UtmTime:           value.UtmTime,
         TimeSetBy:         value.TimeSetBy,
     }
@@ -347,7 +325,6 @@ func (value *ModeSetReqDlMsg) DeepCopy() *ModeSetReqDlMsg {
 
 // ModeSetCnfUlMsg
 type ModeSetCnfUlMsg struct {
-    Timestamp   time.Time
     Mode        ModeEnum
 }
 func (value *ModeSetCnfUlMsg) DeepCopy() *ModeSetCnfUlMsg {
@@ -355,7 +332,6 @@ func (value *ModeSetCnfUlMsg) DeepCopy() *ModeSetCnfUlMsg {
         return nil
     }
     result := &ModeSetCnfUlMsg {
-        Timestamp:    value.Timestamp,
         Mode:         value.Mode,
     }
     return result
@@ -363,7 +339,6 @@ func (value *ModeSetCnfUlMsg) DeepCopy() *ModeSetCnfUlMsg {
 
 // ModeGetCnfUlMsg
 type ModeGetCnfUlMsg struct {
-    Timestamp   time.Time
     Mode        ModeEnum
 }
 func (value *ModeGetCnfUlMsg) DeepCopy() *ModeGetCnfUlMsg {
@@ -371,7 +346,6 @@ func (value *ModeGetCnfUlMsg) DeepCopy() *ModeGetCnfUlMsg {
         return nil
     }
     result := &ModeGetCnfUlMsg {
-        Timestamp:    value.Timestamp,
         Mode:         value.Mode,
     }
     return result
@@ -395,7 +369,6 @@ func (value *HeartbeatSetReqDlMsg) DeepCopy() *HeartbeatSetReqDlMsg {
 
 // HeartbeatSetCnfUlMsg
 type HeartbeatSetCnfUlMsg struct {
-    Timestamp          time.Time
     HeartbeatSeconds   uint32
     HeartbeatSnapToRtc bool
 }
@@ -404,7 +377,6 @@ func (value *HeartbeatSetCnfUlMsg) DeepCopy() *HeartbeatSetCnfUlMsg {
         return nil
     }
     result := &HeartbeatSetCnfUlMsg {
-        Timestamp:          value.Timestamp,
         HeartbeatSeconds:   value.HeartbeatSeconds,
         HeartbeatSnapToRtc: value.HeartbeatSnapToRtc,
     }
@@ -427,7 +399,6 @@ func (value *ReportingIntervalSetReqDlMsg) DeepCopy() *ReportingIntervalSetReqDl
 
 // ReportingIntervalSetCnfUlMsg
 type ReportingIntervalSetCnfUlMsg struct {
-    Timestamp         time.Time
     ReportingInterval uint32
 }
 func (value *ReportingIntervalSetCnfUlMsg) DeepCopy() *ReportingIntervalSetCnfUlMsg {
@@ -435,7 +406,6 @@ func (value *ReportingIntervalSetCnfUlMsg) DeepCopy() *ReportingIntervalSetCnfUl
         return nil
     }
     result := &ReportingIntervalSetCnfUlMsg {
-        Timestamp:          value.Timestamp,
         ReportingInterval:  value.ReportingInterval,
     }
     return result
@@ -443,7 +413,6 @@ func (value *ReportingIntervalSetCnfUlMsg) DeepCopy() *ReportingIntervalSetCnfUl
 
 // IntervalsGetCnfUlMsg
 type IntervalsGetCnfUlMsg struct {
-    Timestamp          time.Time
     ReportingInterval  uint32
     HeartbeatSeconds   uint32
     HeartbeatSnapToRtc bool
@@ -453,7 +422,6 @@ func (value *IntervalsGetCnfUlMsg) DeepCopy() *IntervalsGetCnfUlMsg {
         return nil
     }
     result := &IntervalsGetCnfUlMsg {
-        Timestamp:          value.Timestamp,
         ReportingInterval:  value.ReportingInterval,
         HeartbeatSeconds:   value.HeartbeatSeconds,
         HeartbeatSnapToRtc: value.HeartbeatSnapToRtc,
@@ -463,7 +431,6 @@ func (value *IntervalsGetCnfUlMsg) DeepCopy() *IntervalsGetCnfUlMsg {
 
 // PollIndUlMsg
 type PollIndUlMsg struct {
-    Timestamp     time.Time
     Mode          ModeEnum
     EnergyLeft    EnergyLeftEnum
     DiskSpaceLeft DiskSpaceLeftEnum
@@ -473,7 +440,6 @@ func (value *PollIndUlMsg) DeepCopy() *PollIndUlMsg {
         return nil
     }
     result := &PollIndUlMsg {
-        Timestamp:     value.Timestamp,
         Mode:          value.Mode,
         EnergyLeft:    value.EnergyLeft,
         DiskSpaceLeft: value.DiskSpaceLeft,
@@ -483,7 +449,6 @@ func (value *PollIndUlMsg) DeepCopy() *PollIndUlMsg {
 
 // MeasurementsIndUlMsg
 type MeasurementsIndUlMsg struct {
-    Timestamp     time.Time
     Measurements  MeasurementData
 }
 func (value *MeasurementsIndUlMsg) DeepCopy() *MeasurementsIndUlMsg {
@@ -491,7 +456,6 @@ func (value *MeasurementsIndUlMsg) DeepCopy() *MeasurementsIndUlMsg {
         return nil
     }
     result := &MeasurementsIndUlMsg {
-        Timestamp:     value.Timestamp,
         Measurements:  value.Measurements,
     }
     return result
@@ -499,7 +463,6 @@ func (value *MeasurementsIndUlMsg) DeepCopy() *MeasurementsIndUlMsg {
 
 // MeasurementsGetCnfUlMsg
 type MeasurementsGetCnfUlMsg struct {
-    Timestamp     time.Time
     Measurements  MeasurementData
 }
 func (value *MeasurementsGetCnfUlMsg) DeepCopy() *MeasurementsGetCnfUlMsg {
@@ -507,7 +470,6 @@ func (value *MeasurementsGetCnfUlMsg) DeepCopy() *MeasurementsGetCnfUlMsg {
         return nil
     }
     result := &MeasurementsGetCnfUlMsg {
-        Timestamp:     value.Timestamp,
         Measurements:  value.Measurements,
     }
     return result
@@ -521,7 +483,6 @@ func (value *MeasurementsGetCnfUlMsg) DeepCopy() *MeasurementsGetCnfUlMsg {
 
 // TrafficReportIndUlMsg
 type TrafficReportIndUlMsg struct {
-    Timestamp                 time.Time
     NumDatagramsUl            uint32
     NumBytesUl                uint32
     NumDatagramsDl            uint32
@@ -533,7 +494,6 @@ func (value *TrafficReportIndUlMsg) DeepCopy() *TrafficReportIndUlMsg {
         return nil
     }
     result := &TrafficReportIndUlMsg {
-        Timestamp:                  value.Timestamp,
         NumDatagramsUl:             value.NumDatagramsUl,
         NumBytesUl:                 value.NumBytesUl,
         NumDatagramsDl:             value.NumDatagramsDl,
@@ -545,7 +505,6 @@ func (value *TrafficReportIndUlMsg) DeepCopy() *TrafficReportIndUlMsg {
 
 // TrafficReportGetCnfUlMsg
 type TrafficReportGetCnfUlMsg struct {
-    Timestamp                 time.Time
     NumDatagramsUl            uint32
     NumBytesUl                uint32
     NumDatagramsDl            uint32
@@ -557,7 +516,6 @@ func (value *TrafficReportGetCnfUlMsg) DeepCopy() *TrafficReportGetCnfUlMsg {
         return nil
     }
     result := &TrafficReportGetCnfUlMsg {
-        Timestamp:                  value.Timestamp,
         NumDatagramsUl:             value.NumDatagramsUl,
         NumBytesUl:                 value.NumBytesUl,
         NumDatagramsDl:             value.NumDatagramsDl,
@@ -569,7 +527,6 @@ func (value *TrafficReportGetCnfUlMsg) DeepCopy() *TrafficReportGetCnfUlMsg {
 
 // DebugIndUlMsg
 type DebugIndUlMsg struct {
-    Timestamp     time.Time
     SizeOfString  uint8
     String        [MaxDatagramSizeRaw]byte
 }
@@ -578,7 +535,6 @@ func (value *DebugIndUlMsg) DeepCopy() *DebugIndUlMsg {
         return nil
     }
     result := &DebugIndUlMsg {
-        Timestamp:      value.Timestamp,
         SizeOfString:   value.SizeOfString,
         String:         value.String,
     }
@@ -611,7 +567,6 @@ func (value *TrafficTestModeParametersSetReqDlMsg) DeepCopy() *TrafficTestModePa
 
 // TrafficTestModeParametersSetCnfUlMsg
 type TrafficTestModeParametersSetCnfUlMsg struct {
-    Timestamp           time.Time
     NumUlDatagrams      uint32
     LenUlDatagram       uint32
     NumDlDatagrams      uint32
@@ -624,7 +579,6 @@ func (value *TrafficTestModeParametersSetCnfUlMsg) DeepCopy() *TrafficTestModePa
         return nil
     }
     result := &TrafficTestModeParametersSetCnfUlMsg {
-        Timestamp:           value.Timestamp,
         NumUlDatagrams:      value.NumUlDatagrams,
         LenUlDatagram:       value.LenUlDatagram,
         NumDlDatagrams:      value.NumDlDatagrams,
@@ -637,7 +591,6 @@ func (value *TrafficTestModeParametersSetCnfUlMsg) DeepCopy() *TrafficTestModePa
 
 // TrafficTestModeParametersGetCnfUlMsg
 type TrafficTestModeParametersGetCnfUlMsg struct {
-    Timestamp           time.Time
     NumUlDatagrams      uint32
     LenUlDatagram       uint32
     NumDlDatagrams      uint32
@@ -650,7 +603,6 @@ func (value *TrafficTestModeParametersGetCnfUlMsg) DeepCopy() *TrafficTestModePa
         return nil
     }
     result := &TrafficTestModeParametersGetCnfUlMsg {
-        Timestamp:           value.Timestamp,
         NumUlDatagrams:      value.NumUlDatagrams,
         LenUlDatagram:       value.LenUlDatagram,
         NumDlDatagrams:      value.NumDlDatagrams,
@@ -663,7 +615,6 @@ func (value *TrafficTestModeParametersGetCnfUlMsg) DeepCopy() *TrafficTestModePa
 
 // TrafficTestModeRuleBreakerUlDatagram
 type TrafficTestModeRuleBreakerUlDatagram struct {
-    Timestamp  time.Time
     Fill       byte
     Length     uint32
 }
@@ -672,7 +623,6 @@ func (value *TrafficTestModeRuleBreakerUlDatagram) DeepCopy() *TrafficTestModeRu
         return nil
     }
     result := &TrafficTestModeRuleBreakerUlDatagram {
-        Timestamp:   value.Timestamp,
         Fill:        value.Fill,
         Length:      value.Length,
     }
@@ -697,7 +647,6 @@ func (value *TrafficTestModeRuleBreakerDlDatagram) DeepCopy() *TrafficTestModeRu
 
 // TrafficTestModeReportIndUlMsg
 type TrafficTestModeReportIndUlMsg struct {
-    Timestamp                            time.Time
     NumTrafficTestDatagramsUl            uint32
     NumTrafficTestBytesUl                uint32
     NumTrafficTestDatagramsDl            uint32
@@ -712,7 +661,6 @@ func (value *TrafficTestModeReportIndUlMsg) DeepCopy() *TrafficTestModeReportInd
         return nil
     }
     result := &TrafficTestModeReportIndUlMsg {
-        Timestamp:                           value.Timestamp,
         NumTrafficTestDatagramsUl:           value.NumTrafficTestDatagramsUl,
         NumTrafficTestBytesUl:               value.NumTrafficTestBytesUl,
         NumTrafficTestDatagramsDl:           value.NumTrafficTestDatagramsDl,
@@ -727,7 +675,6 @@ func (value *TrafficTestModeReportIndUlMsg) DeepCopy() *TrafficTestModeReportInd
 
 // TrafficTestModeReportGetCnfUlMsg
 type TrafficTestModeReportGetCnfUlMsg struct {
-    Timestamp                            time.Time
     NumTrafficTestDatagramsUl            uint32
     NumTrafficTestBytesUl                uint32
     NumTrafficTestDatagramsDl            uint32
@@ -742,7 +689,6 @@ func (value *TrafficTestModeReportGetCnfUlMsg) DeepCopy() *TrafficTestModeReport
         return nil
     }
     result := &TrafficTestModeReportGetCnfUlMsg {
-        Timestamp:                           value.Timestamp,
         NumTrafficTestDatagramsUl:           value.NumTrafficTestDatagramsUl,
         NumTrafficTestBytesUl:               value.NumTrafficTestBytesUl,
         NumTrafficTestDatagramsDl:           value.NumTrafficTestDatagramsDl,
@@ -757,7 +703,6 @@ func (value *TrafficTestModeReportGetCnfUlMsg) DeepCopy() *TrafficTestModeReport
 
 // ActivityReportIndUlMsg
 type ActivityReportIndUlMsg struct {
-    Timestamp                   time.Time
     TotalTransmitMilliseconds   uint32
     TotalReceiveMilliseconds    uint32
     UpTimeSeconds               uint32
@@ -773,7 +718,6 @@ func (value *ActivityReportIndUlMsg) DeepCopy() *ActivityReportIndUlMsg {
         return nil
     }
     result := &ActivityReportIndUlMsg {
-        Timestamp:                  value.Timestamp,
         TotalTransmitMilliseconds:  value.TotalTransmitMilliseconds,
         TotalReceiveMilliseconds:   value.TotalReceiveMilliseconds,
         UpTimeSeconds:              value.UpTimeSeconds,
@@ -789,7 +733,6 @@ func (value *ActivityReportIndUlMsg) DeepCopy() *ActivityReportIndUlMsg {
 
 // ActivityReportGetCnfUlMsg
 type ActivityReportGetCnfUlMsg struct {
-    Timestamp                   time.Time
     TotalTransmitMilliseconds   uint32
     TotalReceiveMilliseconds    uint32
     UpTimeSeconds               uint32
@@ -805,7 +748,6 @@ func (value *ActivityReportGetCnfUlMsg) DeepCopy() *ActivityReportGetCnfUlMsg {
         return nil
     }
     result := &ActivityReportGetCnfUlMsg {
-        Timestamp:                  value.Timestamp,
         TotalTransmitMilliseconds:  value.TotalTransmitMilliseconds,
         TotalReceiveMilliseconds:   value.TotalReceiveMilliseconds,
         UpTimeSeconds:              value.UpTimeSeconds,

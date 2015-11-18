@@ -14,7 +14,6 @@ package server
 
 import (
     "github.com/davecgh/go-spew/spew"
-    "log"
 )
 
 type LatestState struct {
@@ -36,200 +35,233 @@ type LatestState struct {
     LatestDisplayRow                        *DisplayRow                       `json:"LatestDisplayRow,omitempty"`
 }
 
-// To update the latest values send any received message into this channel; a copy
-// their contents will be stored in a displayable form
+type DeviceLatestState struct {
+	DeviceUuid   string
+	Latest       chan LatestState
+}
 
-// To get the latest state send a '*chan LatestState' into this channel; a LatestState struct containing
-// a copy of all quantities (the memory contents pointed to will never be changed by the
-// state table) will be put onto the channel and then the channel closed
+// To update the latest values send a MessageContainer into this channel
+// containing the received message; a copy their contents will be stored
+// in a displayable form
 
-// To terminate execution simply close chan
+// To get the latest state send a '*chan DeviceLatestState' into this channel
+// containing the device UUID and a pointer to a channel down which to send
+// the LatestState struct; a copy of all quantities will be copied into the
+// struct and then the channel will be closed.
+
+// To terminate execution simply close the channel
+
 var stateTableCmds chan<- interface{}
 
-func operateStateTable() {
+func OperateStateTable() {
     cmds := make(chan interface{})
     stateTableCmds = cmds
-    log.Printf("%s --> datatable command channel created and now being serviced.\n", logTag)
+    Dbg.PrintfTrace("%s --> datatable command channel created and now being serviced.\n", logTag)
     
     go func() {
-        state := LatestState{}
+    	deviceLatestStateList := make(map[string]*LatestState)
+    	
         for msg := range cmds {
-            log.Printf("%#v --> datatable command:\n\n%+v\n\n", logTag, msg)
+            Dbg.PrintfTrace("%s --> datatable command:\n\n%+v\n\n", logTag, msg)
 
             switch value := msg.(type) {
-	            case *Connection:
-	                state.Connection = *value
-	                log.Printf("%s --> setting connection state in datatable: %+v\n", logTag, value)
-	
-	            case *InitIndUlMsg:
-	                data := value.DeepCopy()
-	                if data != nil {
-	                    state.LatestInitIndDisplay = makeInitIndDisplay(data)
-	                }
-	
-	            case *IntervalsGetCnfUlMsg:
-	                data := value.DeepCopy()
-	                if data != nil {
-	                    state.LatestIntervalsDisplay = makeIntervalsDisplay0(data)
-	                }
-	
-	            case *ReportingIntervalSetCnfUlMsg:
-	                data := value.DeepCopy()
-	                if data != nil {
-	                    state.LatestIntervalsDisplay = makeIntervalsDisplay1(data)
-	                }
-	
-	            case *HeartbeatSetCnfUlMsg:
-	                data := value.DeepCopy()
-	                if data != nil {
-	                    state.LatestIntervalsDisplay = makeIntervalsDisplay2(data)
-	                }
-	
-	            case *DateTimeIndUlMsg:
-	                data := value.DeepCopy()
-	                if data != nil {
-	                    state.LatestDateTimeDisplay = makeDateTimeDisplay0(data)
-	                }
-	
-	            case *DateTimeSetCnfUlMsg:
-	                data := value.DeepCopy()
-	                if data != nil {
-	                    state.LatestDateTimeDisplay = makeDateTimeDisplay1(data)
-	                }
-	
-	            case *DateTimeGetCnfUlMsg:
-	                data := value.DeepCopy()
-	                if data != nil {
-	                    state.LatestDateTimeDisplay = makeDateTimeDisplay2(data)
-	                }
-	
-	            case *ModeSetCnfUlMsg:
-	                data := value.DeepCopy()
-	                if data != nil {
-	                    state.LatestModeDisplay = makeModeDisplay0(data)
-	                }
-	
-	            case *ModeGetCnfUlMsg:
-	                data := value.DeepCopy()
-	                if data != nil {
-	                    state.LatestModeDisplay = makeModeDisplay1(data)
-	                }
-	                
-	            case *PollIndUlMsg:
-	                data := value.DeepCopy()
-	                if data != nil {
-	                    state.LatestUtmStatusDisplay = makeUtmStatusDisplay(data)
-	                    state.LatestModeDisplay = makeModeDisplay2(data)
-	                }
-	
-	            case *MeasurementsIndUlMsg:
-	                data := value.Measurements.DeepCopy()
-	                if data != nil {
-	                    state.LatestSignalStrengthDisplay = makeSignalStrengthDisplay(data)
-	                    if (data.GnssPositionPresent) {
-	                    	state.LatestGnssDisplay = makeGnssDisplay(data)
-	                    }
-	                    if (data.CellIdPresent) {
-	                    	state.LatestCellIdDisplay = makeCellIdDisplay(data)
-	                    }
-	                    if (data.TemperaturePresent) {
-	                    	state.LatestTemperatureDisplay = makeTemperatureDisplay(data)
-	                    }
-	                    if (data.PowerStatePresent) {
-	                    	state.LatestPowerStateDisplay = makePowerStateDisplay(data)
-	                    }
-	                }
-	
-	            case *MeasurementsGetCnfUlMsg:
-	                data := value.Measurements.DeepCopy()
-	                if data != nil {
-	                    state.LatestSignalStrengthDisplay = makeSignalStrengthDisplay(data)
-	                    if (data.GnssPositionPresent) {
-	                    	state.LatestGnssDisplay = makeGnssDisplay(data)
-	                    }
-	                    if (data.CellIdPresent) {
-	                    	state.LatestCellIdDisplay = makeCellIdDisplay(data)
-	                    }
-	                    if (data.TemperaturePresent) {
-	                    	state.LatestTemperatureDisplay = makeTemperatureDisplay(data)
-	                    }
-	                    if (data.PowerStatePresent) {
-	                    	state.LatestPowerStateDisplay = makePowerStateDisplay(data)
-	                    }
-	                }
-	
-	            case *TrafficReportIndUlMsg:
-	                data := value.DeepCopy()
-	                if data != nil {
-	                    state.LatestTrafficReportDisplay = makeTrafficReportDisplay0(data)
-	                }
-	
-	            case *TrafficReportGetCnfUlMsg:
-	                data := value.DeepCopy()
-	                if data != nil {
-	                    state.LatestTrafficReportDisplay = makeTrafficReportDisplay1(data)
-	                }
-	
-	            case *TrafficTestModeParametersSetCnfUlMsg:
-	                data := value.DeepCopy()
-	                if data != nil {
-	                    state.LatestTrafficTestModeParametersDisplay = makeTrafficTestModeParametersDisplay0(data)
-	                }
-	
-	            case *TrafficTestModeParametersGetCnfUlMsg:
-	                data := value.DeepCopy()
-	                if data != nil {
-	                    state.LatestTrafficTestModeParametersDisplay = makeTrafficTestModeParametersDisplay1(data)
-	                }
-	
-	            case *ActivityReportIndUlMsg:
-	                data := value.DeepCopy()
-	                if data != nil {
-	                    state.LatestActivityReportDisplay = makeActivityReportDisplay0(data)
-	                }
-	
-	            case *ActivityReportGetCnfUlMsg:
-	                data := value.DeepCopy()
-	                if data != nil {
-	                    state.LatestActivityReportDisplay = makeActivityReportDisplay1(data)
-	                }
-	
-	            case *chan LatestState:
-	                // Duplicate the memory pointed to into a new LatestState struct,
-	                // post it and close the channel
-	                log.Printf("%s --> datatable fetching latest state.\n", logTag)
-	                latest := LatestState{}
-	                latest.Connection = state.Connection
-	                latest.LatestInitIndDisplay = state.LatestInitIndDisplay.DeepCopy()
-	                latest.LatestIntervalsDisplay = state.LatestIntervalsDisplay.DeepCopy()
-	                latest.LatestModeDisplay = state.LatestModeDisplay.DeepCopy()
-	                latest.LatestDateTimeDisplay = state.LatestDateTimeDisplay.DeepCopy()
-	                latest.LatestUtmStatusDisplay = state.LatestUtmStatusDisplay.DeepCopy()
-	                latest.LatestGnssDisplay = state.LatestGnssDisplay.DeepCopy()
-	                latest.LatestCellIdDisplay = state.LatestCellIdDisplay.DeepCopy()
-	                latest.LatestSignalStrengthDisplay = state.LatestSignalStrengthDisplay.DeepCopy()
-	                latest.LatestTemperatureDisplay = state.LatestTemperatureDisplay.DeepCopy()
-	                latest.LatestPowerStateDisplay = state.LatestPowerStateDisplay.DeepCopy()
-	                latest.LatestTrafficReportDisplay = state.LatestTrafficReportDisplay.DeepCopy()
-	                latest.LatestTrafficTestModeParametersDisplay = state.LatestTrafficTestModeParametersDisplay.DeepCopy()
-	                latest.LatestTrafficTestModeReportDisplay = state.LatestTrafficTestModeReportDisplay.DeepCopy()
-	                latest.LatestActivityReportDisplay = state.LatestActivityReportDisplay.DeepCopy()
-	                latest.LatestDisplayRow = state.LatestDisplayRow.DeepCopy()
-	                *value <- latest
-	                close(*value)
-	                log.Print("%s --> datatable provided latest state and closed channel.\n", logTag)
-	
+            	
+	            // Handle message containers holding somethings of interest
+	            case *MessageContainer:
+	            
+	            	// Make sure there's an entry for this device
+	            	state := deviceLatestStateList[value.DeviceUuid]
+            		if state == nil {
+            			state = &LatestState{};
+            			deviceLatestStateList[value.DeviceUuid] = state;
+                        Dbg.PrintfTrace("%s --> datatable has heard from a new device, UUID %s.\n", logTag, value.DeviceUuid)
+            		}
+                    Dbg.PrintfTrace("%s --> datatable received a message from device with UUID %s.\n", logTag, value.DeviceUuid)
+            		
+	            	switch utmMsg := value.Message.(type) {
+			            case *Connection:
+			            	// TODO sort this
+			                //state.Connection = *value
+			                //Dbg.PrintfTrace("%s --> setting connection state for all devices in datatable: %+v\n", logTag, value)
+			                	
+			            case *InitIndUlMsg:
+			                data := utmMsg.DeepCopy()
+			                if data != nil {
+			                    state.LatestInitIndDisplay = makeInitIndDisplay(data, value.Timestamp)
+			                }
+			
+			            case *IntervalsGetCnfUlMsg:
+			                data := utmMsg.DeepCopy()
+			                if data != nil {
+			                    state.LatestIntervalsDisplay = makeIntervalsDisplay0(data, value.Timestamp)
+			                }
+			
+			            case *ReportingIntervalSetCnfUlMsg:
+			                data := utmMsg.DeepCopy()
+			                if data != nil {
+			                    state.LatestIntervalsDisplay = makeIntervalsDisplay1(data, value.Timestamp)
+			                }
+			
+			            case *HeartbeatSetCnfUlMsg:
+			                data := utmMsg.DeepCopy()
+			                if data != nil {
+			                    state.LatestIntervalsDisplay = makeIntervalsDisplay2(data, value.Timestamp)
+			                }
+			
+			            case *DateTimeIndUlMsg:
+			                data := utmMsg.DeepCopy()
+			                if data != nil {
+			                    state.LatestDateTimeDisplay = makeDateTimeDisplay0(data, value.Timestamp)
+			                }
+			
+			            case *DateTimeSetCnfUlMsg:
+			                data := utmMsg.DeepCopy()
+			                if data != nil {
+			                    state.LatestDateTimeDisplay = makeDateTimeDisplay1(data, value.Timestamp)
+			                }
+			
+			            case *DateTimeGetCnfUlMsg:
+			                data := utmMsg.DeepCopy()
+			                if data != nil {
+			                    state.LatestDateTimeDisplay = makeDateTimeDisplay2(data, value.Timestamp)
+			                }
+			
+			            case *ModeSetCnfUlMsg:
+			                data := utmMsg.DeepCopy()
+			                if data != nil {
+			                    state.LatestModeDisplay = makeModeDisplay0(data, value.Timestamp)
+			                }
+			
+			            case *ModeGetCnfUlMsg:
+			                data := utmMsg.DeepCopy()
+			                if data != nil {
+			                    state.LatestModeDisplay = makeModeDisplay1(data, value.Timestamp)
+			                }
+			                
+			            case *PollIndUlMsg:
+			                data := utmMsg.DeepCopy()
+			                if data != nil {
+			                    state.LatestUtmStatusDisplay = makeUtmStatusDisplay(data, value.Timestamp)
+			                    state.LatestModeDisplay = makeModeDisplay2(data, value.Timestamp)
+			                }
+			
+			            case *MeasurementsIndUlMsg:
+			                data := utmMsg.Measurements.DeepCopy()
+			                if data != nil {
+			                    state.LatestSignalStrengthDisplay = makeSignalStrengthDisplay(data, value.Timestamp)
+			                    if (data.GnssPositionPresent) {
+			                    	state.LatestGnssDisplay = makeGnssDisplay(data, value.Timestamp)
+			                    }
+			                    if (data.CellIdPresent) {
+			                    	state.LatestCellIdDisplay = makeCellIdDisplay(data, value.Timestamp)
+			                    }
+			                    if (data.TemperaturePresent) {
+			                    	state.LatestTemperatureDisplay = makeTemperatureDisplay(data, value.Timestamp)
+			                    }
+			                    if (data.PowerStatePresent) {
+			                    	state.LatestPowerStateDisplay = makePowerStateDisplay(data, value.Timestamp)
+			                    }
+			                }
+			
+			            case *MeasurementsGetCnfUlMsg:
+			                data := utmMsg.Measurements.DeepCopy()
+			                if data != nil {
+			                    state.LatestSignalStrengthDisplay = makeSignalStrengthDisplay(data, value.Timestamp)
+			                    if (data.GnssPositionPresent) {
+			                    	state.LatestGnssDisplay = makeGnssDisplay(data, value.Timestamp)
+			                    }
+			                    if (data.CellIdPresent) {
+			                    	state.LatestCellIdDisplay = makeCellIdDisplay(data, value.Timestamp)
+			                    }
+			                    if (data.TemperaturePresent) {
+			                    	state.LatestTemperatureDisplay = makeTemperatureDisplay(data, value.Timestamp)
+			                    }
+			                    if (data.PowerStatePresent) {
+			                    	state.LatestPowerStateDisplay = makePowerStateDisplay(data, value.Timestamp)
+			                    }
+			                }
+			
+			            case *TrafficReportIndUlMsg:
+			                data := utmMsg.DeepCopy()
+			                if data != nil {
+			                    state.LatestTrafficReportDisplay = makeTrafficReportDisplay0(data, value.Timestamp)
+			                }
+			
+			            case *TrafficReportGetCnfUlMsg:
+			                data := utmMsg.DeepCopy()
+			                if data != nil {
+			                    state.LatestTrafficReportDisplay = makeTrafficReportDisplay1(data, value.Timestamp)
+			                }
+			
+			            case *TrafficTestModeParametersSetCnfUlMsg:
+			                data := utmMsg.DeepCopy()
+			                if data != nil {
+			                    state.LatestTrafficTestModeParametersDisplay = makeTrafficTestModeParametersDisplay0(data, value.Timestamp)
+			                }
+			
+			            case *TrafficTestModeParametersGetCnfUlMsg:
+			                data := utmMsg.DeepCopy()
+			                if data != nil {
+			                    state.LatestTrafficTestModeParametersDisplay = makeTrafficTestModeParametersDisplay1(data, value.Timestamp)
+			                }
+			
+			            case *ActivityReportIndUlMsg:
+			                data := utmMsg.DeepCopy()
+			                if data != nil {
+			                    state.LatestActivityReportDisplay = makeActivityReportDisplay0(data, value.Timestamp)
+			                }
+			
+			            case *ActivityReportGetCnfUlMsg:
+			                data := utmMsg.DeepCopy()
+			                if data != nil {
+			                    state.LatestActivityReportDisplay = makeActivityReportDisplay1(data, value.Timestamp)
+			                }
+	            	}
+	            	
+	            // Return the latest state for a given UUID 
+	            case *DeviceLatestState:
+	            	// Retrieve the device state
+   	            	state := deviceLatestStateList[value.DeviceUuid]
+   	            	
+   	            	if state != nil {
+		                // Duplicate the memory pointed to into a new LatestState struct,
+		                // post it and close the channel
+		                Dbg.PrintfTrace("%s --> fetching latest state for UUID %s.\n", logTag, value.DeviceUuid)
+		                latest := LatestState{}
+		                state.Connection = state.Connection
+		                latest.LatestInitIndDisplay = state.LatestInitIndDisplay.DeepCopy()
+		                latest.LatestIntervalsDisplay = state.LatestIntervalsDisplay.DeepCopy()
+		                latest.LatestModeDisplay = state.LatestModeDisplay.DeepCopy()
+		                latest.LatestDateTimeDisplay = state.LatestDateTimeDisplay.DeepCopy()
+		                latest.LatestUtmStatusDisplay = state.LatestUtmStatusDisplay.DeepCopy()
+		                latest.LatestGnssDisplay = state.LatestGnssDisplay.DeepCopy()
+		                latest.LatestCellIdDisplay = state.LatestCellIdDisplay.DeepCopy()
+		                latest.LatestSignalStrengthDisplay = state.LatestSignalStrengthDisplay.DeepCopy()
+		                latest.LatestTemperatureDisplay = state.LatestTemperatureDisplay.DeepCopy()
+		                latest.LatestPowerStateDisplay = state.LatestPowerStateDisplay.DeepCopy()
+		                latest.LatestTrafficReportDisplay = state.LatestTrafficReportDisplay.DeepCopy()
+		                latest.LatestTrafficTestModeParametersDisplay = state.LatestTrafficTestModeParametersDisplay.DeepCopy()
+		                latest.LatestTrafficTestModeReportDisplay = state.LatestTrafficTestModeReportDisplay.DeepCopy()
+		                latest.LatestActivityReportDisplay = state.LatestActivityReportDisplay.DeepCopy()
+		                latest.LatestDisplayRow = state.LatestDisplayRow.DeepCopy()
+		                value.Latest <- latest
+		                close(value.Latest)
+		                Dbg.PrintfTrace("%s --> datatable provided latest state and closed channel.\n", logTag)
+		            } else {
+		                Dbg.PrintfTrace("%s --> datatable asked for latest state for unknown UUID (%s).\n", logTag, value.DeviceUuid)
+		            }
+		                
 	            default:
-	                log.Printf("%s --> unrecognised datatable message, ignoring:\n\n%s\n", logTag, spew.Sdump(msg))
+	                Dbg.PrintfTrace("%s --> unrecognised datatable message, ignoring:\n\n%s\n", logTag, spew.Sdump(msg))
             }
         }
 
-        log.Printf("%s --> datatable command channel closed, stopping.\n", logTag)
+        Dbg.PrintfTrace("%s --> datatable command channel closed, stopping.\n", logTag)
     }()
 }
 
 func init() {
-    operateStateTable()
+    OperateStateTable()
 }
 
 /* End Of File */

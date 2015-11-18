@@ -16,7 +16,6 @@ import (
     "encoding/json"
     "fmt"
     "github.com/streadway/amqp"
-    "log"
     "time"
 
     //"gopkg.in/mgo.v2"
@@ -27,29 +26,29 @@ var uuidMap = make(map[string]*DisplayRow)
 var uuidSlice = make([]*DisplayRow, len(uuidMap))
 
 type AmqpMessage struct {
-    DeviceUuid   string `bson:"DeviceUuid" json:"DeviceUuid"`
-    EndpointUuid int    `bson:"EndpointUuid" json:"EndpointUuid"`
-    Payload      []int  `bson:"Payload json:"Payload"`
+    DeviceUuid   string `bson:"device_uuid" json:"device_uuid"`
+    EndpointUuid int    `bson:"endpoint_uuid" json:"endpoint_uuid"`
+    Payload      []int  `bson:"payload json:"payload"`
 }
 
 type AmqpReceiveMessage struct {
     AmqpMessage
-    DeviceName string `bson:"DeviceName" json:"DeviceName`
-    Id         string `bson:"Id" json:"Id"`
+    DeviceName string `bson:"device_name" json:"device_name"`
+    Id         string `bson:"id" json:"id"`
 }
 
 type AmqpResponseMessage struct {
     AmqpMessage
-    DeviceName string `bson:"DeviceName" json:"DeviceName`
-    Command    string `bson:"Command" json:"Command"`
-    Data       []byte `bson:"Data" json:"Data"`
+    DeviceName string `bson:"device_name" json:"device_name"`
+    Command    string `bson:"command" json:"command"`
+    Data       []byte `bson:"data" json:"data"`
 }
 
 type AmqpErrorMessage struct {
     AmqpMessage
-    Queue   string `bson:"Queue" json:"Queue"`
-    Message string `bson:"Message" json:"Message"`
-    Reason  string `bson:"Reason" json:"Reason"`
+    Queue   string `bson:"queue" json:"queue"`
+    Message string `bson:"message" json:"message"`
+    Reason  string `bson:"reason" json:"reason"`
 }
 
 type Queue struct {
@@ -136,65 +135,65 @@ func OpenQueue(username, amqpAddress string) (*Queue, error) {
             var msg amqp.Delivery
             receivedMsg := false
             select {
-            case <-q.Quit:
-                return
-            case msg = <-receiveChan:
-                receivedMsg = true
-                m := AmqpReceiveMessage{}
-                err = json.Unmarshal(msg.Body, &m)
-                log.Printf("%s -->maybe there is an error here...\n\n%+v\n\n", logTag, &m)
-                if err == nil {
-                    //rec_Collection.Insert(&m)
-                    log.Printf("%s --> sending the following downlink message:\n\n%+v\n\n", logTag, &m)
-                    q.Msgs <- &m
-                }
-            case msg = <-responseChan:
-                receivedMsg = true
-                m := AmqpResponseMessage{}
-                err = json.Unmarshal(msg.Body, &m)
-                if err == nil {
-                    q.Msgs <- &m
-                    log.Printf("%s --> UTM UUID is %+v.\n", logTag, m.DeviceUuid)
-                    log.Printf("%s --> UTM name is '%+v'.\n", logTag, m.DeviceName)
-                    row.Uuid = m.DeviceUuid
-                    row.UnitName = m.DeviceName
-                    //res_Collection.Insert(&m)
-                }
-            case msg = <-errorChan:
-                receivedMsg = true
-                m := AmqpErrorMessage{}
-                err = json.Unmarshal(msg.Body, &m)
-                if err == nil {
-                    //err_Collection.Insert(&m)
-                    q.Msgs <- &m
-                }
-            case dlMsg := <-q.Downlink:
-                serialisedData, err := json.Marshal(dlMsg)
-                if err != nil {
-                    log.Printf("%s --> attempting to JSONify AMQP message:\n\n%+v\n\n...results in error: %s.\n", logTag, dlMsg, err.Error())
-                } else {
-                    publishedMsg := amqp.Publishing{
-                        DeliveryMode: amqp.Persistent,
-                        Timestamp:    time.Now(),
-                        ContentType:  "application/json",
-                        Body:         serialisedData,
-                    }
-                    err = channel.Publish(username, "send", false, false, publishedMsg)
-                    if err != nil {
-                        log.Printf("%s --> unable to pulbish downlink message %+v due to error: %s.\n", logTag, publishedMsg, err.Error())
-                    } else {
-                        log.Printf("%s --> published downlink message %+v %s.\n", logTag, publishedMsg, string(serialisedData))
-                    }
-                }
+	            case <-q.Quit:
+	                return
+	            case msg = <-receiveChan:
+	                receivedMsg = true
+	                m := AmqpReceiveMessage{}
+	                err = json.Unmarshal(msg.Body, &m)
+	                if err == nil {
+	                    //rec_Collection.Insert(&m)
+	                    Dbg.PrintfTrace("%s --> sending the following downlink message:\n\n%+v\n\n", logTag, &m)
+	                    q.Msgs <- &m
+	                } else {
+		                Dbg.PrintfError("%s -->maybe there is an error here...\n\n%+v\n\n", logTag, &m)	                	
+	                }
+	            case msg = <-responseChan:
+	                receivedMsg = true
+	                m := AmqpResponseMessage{}
+	                err = json.Unmarshal(msg.Body, &m)
+	                if err == nil {
+	                    q.Msgs <- &m
+	                    Dbg.PrintfTrace("%s --> UTM UUID is %+v.\n", logTag, m.DeviceUuid)
+	                    Dbg.PrintfTrace("%s --> UTM name is '%+v'.\n", logTag, m.DeviceName)
+	                    row.Uuid = m.DeviceUuid
+	                    row.UnitName = m.DeviceName
+	                    //res_Collection.Insert(&m)
+	                }
+	            case msg = <-errorChan:
+	                receivedMsg = true
+	                m := AmqpErrorMessage{}
+	                err = json.Unmarshal(msg.Body, &m)
+	                if err == nil {
+	                    //err_Collection.Insert(&m)
+	                    q.Msgs <- &m
+	                }
+	            case dlMsg := <-q.Downlink:
+	                serialisedData, err := json.Marshal(dlMsg)
+	                if err != nil {
+	                    Dbg.PrintfError("%s --> attempting to JSONify AMQP message:\n\n%+v\n\n...results in error: %s.\n", logTag, dlMsg, err.Error())
+	                } else {
+	                    publishedMsg := amqp.Publishing{
+	                        DeliveryMode: amqp.Persistent,
+	                        Timestamp:    time.Now(),
+	                        ContentType:  "application/json",
+	                        Body:         serialisedData,
+	                    }
+	                    err = channel.Publish(username, "send", false, false, publishedMsg)
+	                    if err != nil {
+	                        Dbg.PrintfError("%s --> unable to publish downlink message:\n\n%+v\n\n...due to error: %s.\n", logTag, publishedMsg, err.Error())
+	                    } else {
+	                        Dbg.PrintfTrace("%s --> published downlink message:\n\n%+v\n\n%s\n", logTag, publishedMsg, string(serialisedData))
+	                    }
+	                }
             }
             if receivedMsg {
                 if err == nil {
-                    log.Printf("%s --> received %+v.\n", logTag, string(msg.Body))
+                    Dbg.PrintfTrace("%s --> received:\n\n%+v\n\n", logTag, string(msg.Body))
                 } else {
-                    log.Printf("%s --> received %+v which is undecodable: %s.\n", logTag, string(msg.Body), err.Error())
+                    Dbg.PrintfTrace("%s --> received:\n\n%+v\n\n...which is undecodable: %s.\n", logTag, string(msg.Body), err.Error())
                 }
             }
-
         }
     }()
     return &q, nil

@@ -19,6 +19,32 @@ import (
     "net/http/httputil"
 )
 
+type DebugLevel int
+
+const (
+	DEBUG_OFF   DebugLevel = 0
+    DEBUG_ERROR DebugLevel = 1
+    DEBUG_TRACE DebugLevel = 2
+    DEBUG_INFO  DebugLevel = 3
+)
+
+// General debugging
+func (d DebugLevel) PrintfInfo(s string, a ...interface{}) {
+	if (d > 0) && (d >= DEBUG_INFO) {
+		log.Printf(s, a...)
+	}
+}
+func (d DebugLevel) PrintfTrace(s string, a ...interface{}) {
+	if (d > 0) && (d >= DEBUG_TRACE) {
+		log.Printf(s, a...)
+	}
+}
+func (d DebugLevel) PrintfError(s string, a ...interface{}) {
+	if (d > 0) && (d >= DEBUG_ERROR)  {
+		log.Printf(s, a...)
+	}
+}
+
 // Debugging functions for logging requests and responses
 func DumpRequest(req *http.Request) {
     content, err := httputil.DumpRequest(req, true)

@@ -41,9 +41,9 @@ func (value *InitIndDisplay) DeepCopy() *InitIndDisplay {
     }
     return result
 }
-func makeInitIndDisplay(newData *InitIndUlMsg) *InitIndDisplay {
+func makeInitIndDisplay(newData *InitIndUlMsg, Time time.Time) *InitIndDisplay {
     display := InitIndDisplay {
-        Timestamp:  	   newData.Timestamp,
+        Timestamp:  	   Time,
         WakeUpCode:    	   WakeUpCodeLookUp[newData.WakeUpCode],
 	    RevisionLevel:     newData.RevisionLevel,
 	    SdCardNotRequired: newData.SdCardNotRequired,
@@ -77,9 +77,9 @@ func (value *IntervalsDisplay) DeepCopy() *IntervalsDisplay {
     }
     return result
 }
-func makeIntervalsDisplay0(newData *IntervalsGetCnfUlMsg) *IntervalsDisplay {
+func makeIntervalsDisplay0(newData *IntervalsGetCnfUlMsg, Time time.Time) *IntervalsDisplay {
     display := IntervalsDisplay {
-        Timestamp:                newData.Timestamp,
+        Timestamp:                Time,
         ReportingIntervalPresent: true,
         ReportingInterval:        newData.ReportingInterval,
         HeartbeatPresent:         true,
@@ -88,17 +88,17 @@ func makeIntervalsDisplay0(newData *IntervalsGetCnfUlMsg) *IntervalsDisplay {
     }
     return &display
 }
-func makeIntervalsDisplay1(newData *ReportingIntervalSetCnfUlMsg) *IntervalsDisplay {
+func makeIntervalsDisplay1(newData *ReportingIntervalSetCnfUlMsg, Time time.Time) *IntervalsDisplay {
     display := IntervalsDisplay {
-        Timestamp:                newData.Timestamp,
+        Timestamp:                Time,
         ReportingIntervalPresent: true,
         ReportingInterval:        newData.ReportingInterval,
     }
     return &display
 }
-func makeIntervalsDisplay2(newData *HeartbeatSetCnfUlMsg) *IntervalsDisplay {
+func makeIntervalsDisplay2(newData *HeartbeatSetCnfUlMsg, Time time.Time) *IntervalsDisplay {
     display := IntervalsDisplay {
-        Timestamp:            newData.Timestamp,
+        Timestamp:            Time,
         HeartbeatPresent:     true,
         HeartbeatSeconds:     newData.HeartbeatSeconds,
         HeartbeatSnapToRtc:   newData.HeartbeatSnapToRtc,
@@ -121,23 +121,23 @@ func (value *ModeDisplay) DeepCopy() *ModeDisplay {
     }
     return result
 }
-func makeModeDisplay0(newData *ModeSetCnfUlMsg) *ModeDisplay {
+func makeModeDisplay0(newData *ModeSetCnfUlMsg, Time time.Time) *ModeDisplay {
     display := ModeDisplay {
-        Timestamp:    newData.Timestamp,
+        Timestamp:    Time,
         Mode:         ModeLookUp[newData.Mode],
     }
     return &display
 }
-func makeModeDisplay1(newData *ModeGetCnfUlMsg) *ModeDisplay {
+func makeModeDisplay1(newData *ModeGetCnfUlMsg, Time time.Time) *ModeDisplay {
     display := ModeDisplay {
-        Timestamp:    newData.Timestamp,
+        Timestamp:    Time,
         Mode:         ModeLookUp[newData.Mode],
     }
     return &display
 }
-func makeModeDisplay2(newData *PollIndUlMsg) *ModeDisplay {
+func makeModeDisplay2(newData *PollIndUlMsg, Time time.Time) *ModeDisplay {
     display := ModeDisplay {
-        Timestamp:    newData.Timestamp,
+        Timestamp:    Time,
         Mode:         ModeLookUp[newData.Mode],
     }
     return &display
@@ -160,25 +160,25 @@ func (value *DateTimeDisplay) DeepCopy() *DateTimeDisplay {
     }
     return result
 }
-func makeDateTimeDisplay0(newData *DateTimeIndUlMsg) *DateTimeDisplay {
+func makeDateTimeDisplay0(newData *DateTimeIndUlMsg, Time time.Time) *DateTimeDisplay {
     display := DateTimeDisplay {
-        Timestamp:       newData.Timestamp,
+        Timestamp:       Time,
         UtmTime:         newData.UtmTime,
         TimeSetBy:       TimeSetByLookUp[newData.TimeSetBy],
     }
     return &display
 }
-func makeDateTimeDisplay1(newData *DateTimeSetCnfUlMsg) *DateTimeDisplay {
+func makeDateTimeDisplay1(newData *DateTimeSetCnfUlMsg, Time time.Time) *DateTimeDisplay {
     display := DateTimeDisplay {
-        Timestamp:       newData.Timestamp,
+        Timestamp:       Time,
         UtmTime:         newData.UtmTime,
         TimeSetBy:       TimeSetByLookUp[newData.TimeSetBy],
     }
     return &display
 }
-func makeDateTimeDisplay2(newData *DateTimeGetCnfUlMsg) *DateTimeDisplay {
+func makeDateTimeDisplay2(newData *DateTimeGetCnfUlMsg, Time time.Time) *DateTimeDisplay {
     display := DateTimeDisplay {
-        Timestamp:       newData.Timestamp,
+        Timestamp:       Time,
         UtmTime:         newData.UtmTime,
         TimeSetBy:       TimeSetByLookUp[newData.TimeSetBy],
     }
@@ -202,9 +202,9 @@ func (value *UtmStatusDisplay) DeepCopy() *UtmStatusDisplay {
     }
     return result
 }
-func makeUtmStatusDisplay(newData *PollIndUlMsg) *UtmStatusDisplay {
+func makeUtmStatusDisplay(newData *PollIndUlMsg, Time time.Time) *UtmStatusDisplay {
     display := UtmStatusDisplay {
-        Timestamp:  	   newData.Timestamp,
+        Timestamp:  	   Time,
         EnergyLeft:    	   EnergyLeftLookUp[newData.EnergyLeft],
         DiskSpaceLeft:     DiskSpaceLeftLookUp[newData.DiskSpaceLeft],
     }
@@ -230,9 +230,9 @@ func (value *GnssDisplay) DeepCopy() *GnssDisplay {
     }
     return result
 }
-func makeGnssDisplay(newData *MeasurementData) *GnssDisplay {
+func makeGnssDisplay(newData *MeasurementData, Time time.Time) *GnssDisplay {
     display := GnssDisplay{
-        Timestamp:    newData.Timestamp,
+        Timestamp:    Time,
         Latitude:     float32(newData.GnssPosition.Latitude) / 1000,
         Longitude:    float32(newData.GnssPosition.Longitude) / 1000,
         Elevation:    float32(newData.GnssPosition.Elevation),
@@ -255,9 +255,9 @@ func (value *CellIdDisplay) DeepCopy() *CellIdDisplay {
     }
     return result
 }
-func makeCellIdDisplay(newData *MeasurementData) *CellIdDisplay {
+func makeCellIdDisplay(newData *MeasurementData, Time time.Time) *CellIdDisplay {
     display := CellIdDisplay{
-        Timestamp:    newData.Timestamp,
+        Timestamp:    Time,
         CellId:       uint32(newData.CellId),
     }
     return &display
@@ -278,9 +278,9 @@ func (value *TemperatureDisplay) DeepCopy() *TemperatureDisplay {
     }
     return result
 }
-func makeTemperatureDisplay(newData *MeasurementData) *TemperatureDisplay {
+func makeTemperatureDisplay(newData *MeasurementData, Time time.Time) *TemperatureDisplay {
     display := TemperatureDisplay{
-        Timestamp:    newData.Timestamp,
+        Timestamp:    Time,
         TemperatureC: float32(newData.Temperature),
     }
     return &display
@@ -315,12 +315,12 @@ func (value *SignalStrengthDisplay) DeepCopy() *SignalStrengthDisplay {
     }
     return result
 } 
-func makeSignalStrengthDisplay(newData *MeasurementData) *SignalStrengthDisplay {
+func makeSignalStrengthDisplay(newData *MeasurementData, Time time.Time) *SignalStrengthDisplay {
     display := SignalStrengthDisplay{
-        Timestamp:      newData.Timestamp,
-        RsrpDbm:        float32 (newData.Rsrp.Value.Rssi) / 10,
+        Timestamp:      Time,
+        RsrpDbm:        float32 (newData.Rsrp.Value) / 10,
         RssiDbmPresent: newData.RssiPresent,
-        RssiDbm:        float32 (newData.Rssi.Rssi) / 10,
+        RssiDbm:        float32 (newData.Rssi) / 10,
     }
     
     // TODO: calculate the answer
@@ -348,14 +348,14 @@ func (value *PowerStateDisplay) DeepCopy() *PowerStateDisplay {
     }
     return result
 }
-func makePowerStateDisplay(newData *MeasurementData) *PowerStateDisplay {
+func makePowerStateDisplay(newData *MeasurementData, Time time.Time) *PowerStateDisplay {
     // Change nothing if the new data is nil
     if newData == nil {
         return nil
     }
     // Overwrite if there is no stored data
     display := &PowerStateDisplay{
-        Timestamp:       newData.Timestamp,
+        Timestamp:       Time,
         ChargeState:     ChargerStateEnumLookUp[newData.PowerState.ChargerState],
         BatteryVoltageV: float32(newData.PowerState.BatteryMv) / 1000,
         EnergyLeftWh:    float32(newData.PowerState.EnergyMwh) / 1000,
@@ -386,9 +386,9 @@ func (value *TrafficReportDisplay) DeepCopy() *TrafficReportDisplay {
     }
     return result
 }
-func makeTrafficReportDisplay0(newData *TrafficReportIndUlMsg) *TrafficReportDisplay {
+func makeTrafficReportDisplay0(newData *TrafficReportIndUlMsg, Time time.Time) *TrafficReportDisplay {
     display := TrafficReportDisplay {
-        Timestamp:                  newData.Timestamp,
+        Timestamp:                  Time,
         NumDatagramsUl:             newData.NumDatagramsUl,
         NumBytesUl:                 newData.NumBytesUl,
         NumDatagramsDl:             newData.NumDatagramsDl,
@@ -397,9 +397,9 @@ func makeTrafficReportDisplay0(newData *TrafficReportIndUlMsg) *TrafficReportDis
     }
     return &display
 }
-func makeTrafficReportDisplay1(newData *TrafficReportGetCnfUlMsg) *TrafficReportDisplay {
+func makeTrafficReportDisplay1(newData *TrafficReportGetCnfUlMsg, Time time.Time) *TrafficReportDisplay {
     display := TrafficReportDisplay {
-        Timestamp:                  newData.Timestamp,
+        Timestamp:                  Time,
         NumDatagramsUl:             newData.NumDatagramsUl,
         NumBytesUl:                 newData.NumBytesUl,
         NumDatagramsDl:             newData.NumDatagramsDl,
@@ -434,9 +434,9 @@ func (value *TrafficTestModeParametersDisplay) DeepCopy() *TrafficTestModeParame
     }
     return result
 }
-func makeTrafficTestModeParametersDisplay0(newData *TrafficTestModeParametersSetCnfUlMsg) *TrafficTestModeParametersDisplay {
+func makeTrafficTestModeParametersDisplay0(newData *TrafficTestModeParametersSetCnfUlMsg, Time time.Time) *TrafficTestModeParametersDisplay {
     display := TrafficTestModeParametersDisplay {
-        Timestamp:           newData.Timestamp,
+        Timestamp:           Time,
         NumUlDatagrams:      newData.NumUlDatagrams,
         LenUlDatagram:       newData.LenUlDatagram,
         NumDlDatagrams:      newData.NumDlDatagrams,
@@ -446,9 +446,9 @@ func makeTrafficTestModeParametersDisplay0(newData *TrafficTestModeParametersSet
     }
     return &display
 }
-func makeTrafficTestModeParametersDisplay1(newData *TrafficTestModeParametersGetCnfUlMsg) *TrafficTestModeParametersDisplay {
+func makeTrafficTestModeParametersDisplay1(newData *TrafficTestModeParametersGetCnfUlMsg, Time time.Time) *TrafficTestModeParametersDisplay {
     display := TrafficTestModeParametersDisplay {
-        Timestamp:           newData.Timestamp,
+        Timestamp:           Time,
         NumUlDatagrams:      newData.NumUlDatagrams,
         LenUlDatagram:       newData.LenUlDatagram,
         NumDlDatagrams:      newData.NumDlDatagrams,
@@ -488,9 +488,9 @@ func (value *TrafficTestModeReportDisplay) DeepCopy() *TrafficTestModeReportDisp
     }
     return result
 }
-func makeTrafficTestModeReportDisplay0(newData *TrafficTestModeReportIndUlMsg) *TrafficTestModeReportDisplay {
+func makeTrafficTestModeReportDisplay0(newData *TrafficTestModeReportIndUlMsg, Time time.Time) *TrafficTestModeReportDisplay {
     display := TrafficTestModeReportDisplay {
-        Timestamp:                           newData.Timestamp,
+        Timestamp:                           Time,
         NumTrafficTestDatagramsUl:           newData.NumTrafficTestDatagramsUl,
         NumTrafficTestBytesUl:               newData.NumTrafficTestBytesUl,
         NumTrafficTestDatagramsDl:           newData.NumTrafficTestDatagramsDl,
@@ -502,9 +502,9 @@ func makeTrafficTestModeReportDisplay0(newData *TrafficTestModeReportIndUlMsg) *
     }
     return &display
 }
-func makeTrafficTestModeReportDisplay1(newData *TrafficTestModeReportGetCnfUlMsg) *TrafficTestModeReportDisplay {
+func makeTrafficTestModeReportDisplay1(newData *TrafficTestModeReportGetCnfUlMsg, Time time.Time) *TrafficTestModeReportDisplay {
     display := TrafficTestModeReportDisplay {
-        Timestamp:                           newData.Timestamp,
+        Timestamp:                           Time,
         NumTrafficTestDatagramsUl:           newData.NumTrafficTestDatagramsUl,
         NumTrafficTestBytesUl:               newData.NumTrafficTestBytesUl,
         NumTrafficTestDatagramsDl:           newData.NumTrafficTestDatagramsDl,
@@ -520,8 +520,8 @@ func makeTrafficTestModeReportDisplay1(newData *TrafficTestModeReportGetCnfUlMsg
 // Display activity report information
 type ActivityReportDisplay struct {
     Timestamp                   time.Time
-    TotalTransmitMilliseconds   uint32
-    TotalReceiveMilliseconds    uint32
+    TotalTransmitSeconds        float32
+    TotalReceiveSeconds         float32
     UpTimeSeconds               uint32
     TxPowerDbmPresent           bool
     TxPowerDbm                  int8
@@ -536,8 +536,8 @@ func (value *ActivityReportDisplay) DeepCopy() *ActivityReportDisplay {
     }
     result := &ActivityReportDisplay {
         Timestamp:                  value.Timestamp,
-        TotalTransmitMilliseconds:  value.TotalTransmitMilliseconds,
-        TotalReceiveMilliseconds:   value.TotalReceiveMilliseconds,
+        TotalTransmitSeconds:       value.TotalTransmitSeconds,
+        TotalReceiveSeconds:        value.TotalReceiveSeconds,
         UpTimeSeconds:              value.UpTimeSeconds,
         TxPowerDbmPresent:          value.TxPowerDbmPresent,
         TxPowerDbm:                 value.TxPowerDbm,
@@ -548,11 +548,11 @@ func (value *ActivityReportDisplay) DeepCopy() *ActivityReportDisplay {
     }
     return result
 }
-func makeActivityReportDisplay0(newData *ActivityReportIndUlMsg) *ActivityReportDisplay {
+func makeActivityReportDisplay0(newData *ActivityReportIndUlMsg, Time time.Time) *ActivityReportDisplay {
     display := ActivityReportDisplay {
-        Timestamp:                  newData.Timestamp,
-        TotalTransmitMilliseconds:  newData.TotalTransmitMilliseconds,
-        TotalReceiveMilliseconds:   newData.TotalReceiveMilliseconds,
+        Timestamp:                  Time,
+        TotalTransmitSeconds:       float32(newData.TotalTransmitMilliseconds) / 1000,
+        TotalReceiveSeconds:        float32(newData.TotalReceiveMilliseconds) / 1000,
         UpTimeSeconds:              newData.UpTimeSeconds,
         TxPowerDbmPresent:          newData.TxPowerDbmPresent,
         TxPowerDbm:                 newData.TxPowerDbm,
@@ -563,11 +563,11 @@ func makeActivityReportDisplay0(newData *ActivityReportIndUlMsg) *ActivityReport
     }
     return &display
 }
-func makeActivityReportDisplay1(newData *ActivityReportGetCnfUlMsg) *ActivityReportDisplay {
+func makeActivityReportDisplay1(newData *ActivityReportGetCnfUlMsg, Time time.Time) *ActivityReportDisplay {
     display := ActivityReportDisplay {
-        Timestamp:                  newData.Timestamp,
-        TotalTransmitMilliseconds:  newData.TotalTransmitMilliseconds,
-        TotalReceiveMilliseconds:   newData.TotalReceiveMilliseconds,
+        Timestamp:                  Time,
+        TotalTransmitSeconds:       float32(newData.TotalTransmitMilliseconds) / 1000,
+        TotalReceiveSeconds:        float32(newData.TotalReceiveMilliseconds) / 1000,
         UpTimeSeconds:              newData.UpTimeSeconds,
         TxPowerDbmPresent:          newData.TxPowerDbmPresent,
         TxPowerDbm:                 newData.TxPowerDbm,

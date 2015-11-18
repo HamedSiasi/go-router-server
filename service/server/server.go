@@ -28,7 +28,9 @@ import (
     "github.com/robmeades/utm/service/routes"
 )
 
+const Dbg utilities.DebugLevel = utilities.DEBUG_TRACE
 const configurationFile string = "config.cfg"
+const MaximumNumberOfUtms = 100
 var logTag string = "UTM-API"
 var downlinkMessages chan<- AmqpMessage
 var ueGuid string
@@ -47,7 +49,7 @@ func failOnError (err error, msg string) {
 func getLatestState (response http.ResponseWriter, request *http.Request) *utilities.Error {
 	// Ensure this is a GET request
 	if (request.Method != "GET") || (request.Method == "") {
-        log.Printf("%s --> received unsupported REST request %s %s.\n", logTag, request.Method, request.URL)
+        Dbg.PrintfError("%s --> received unsupported REST request %s %s.\n", logTag, request.Method, request.URL)
         return utilities.ClientError("unsupported method", http.StatusBadRequest)
 	}
 
@@ -70,7 +72,7 @@ func getLatestState (response http.ResponseWriter, request *http.Request) *utili
 	response.WriteHeader(http.StatusOK)
 	err := json.NewEncoder(response).Encode(uuidSlice)
 	if err != nil {
-		log.Printf("%s --> recieved REST request %s but attempting to serialise the result:\n%s\n...yielded error %s.\n", logTag, request.URL, spew.Sdump(state), err.Error())
+		Dbg.PrintfError("%s --> received REST request %s but attempting to serialise the result:\n%s\n...yielded error %s.\n", logTag, request.URL, spew.Sdump(state), err.Error())
 		return utilities.ServerError(err)
 	}
 	//log.Printf("%s Received rest request %s and responding with %s\n", logTag, request.URL, spew.Sdump(state))
@@ -113,7 +115,7 @@ func ConvertMapToSlice(uidMap map[string]*DisplayRow) []*DisplayRow {
 func setReportingInterval(response http.ResponseWriter, request *http.Request) *utilities.Error {
 	// Ensure this is a POST request
 	if request.Method != "POST" {
-		log.Printf("%s --> received unsupported REST request %s %s.\n", logTag, request.Method, request.URL)
+		Dbg.PrintfError("%s --> received unsupported REST request %s %s.\n", logTag, request.Method, request.URL)
 		return utilities.ClientError("unsupported method", http.StatusBadRequest)
 	}
 
@@ -121,14 +123,14 @@ func setReportingInterval(response http.ResponseWriter, request *http.Request) *
 	var mins uint32
 	err := json.NewDecoder(request.Body).Decode(&mins)
 	if err != nil {
-		log.Printf("%s --> unable to extract the reporting interval from request %s: %s.\n", logTag, request.URL, err.Error())
+		Dbg.PrintfError("%s --> unable to extract the reporting interval from request %s: %s.\n", logTag, request.URL, err.Error())
 		return utilities.ClientError("unable to decode reporting interval", http.StatusBadRequest)
 	}
 
 	// Encode and enqueue the requested data
 	err = encodeAndEnqueueReportingInterval(uint32(mins))
 	if err != nil {
-		log.Printf("%s --> unable to encode and enqueue reporting interval for UTM-API %s\n", logTag, request.URL)
+		Dbg.PrintfError("%s --> unable to encode and enqueue reporting interval for UTM-API %s\n", logTag, request.URL)
 		return utilities.ClientError("unable to encode and enqueue reporting interval", http.StatusBadRequest)
 	}
 
@@ -152,6 +154,7 @@ func processAmqp(username, amqpAddress string) {
 	defer q.Close()
 	downlinkMessages = q.Downlink
 
+	// TODO: do this per device
 	stateTableCmds <- &Connection{Status: "Disconnected"}
 
 	connState := "Disconnected"
@@ -159,8 +162,7 @@ func processAmqp(username, amqpAddress string) {
 
 	for {
 		amqpCount = amqpCount + 1
-		log.Println()
-		fmt.Printf("\n=====================> processing datagram no (%v) in AMQP channel =====================================\n", amqpCount)
+		Dbg.PrintfInfo("\n=====================> processing datagram number %v in AMQP channel =====================================\n", amqpCount)
 
 		//time.Sleep(time.Second * 10)
 		select {
@@ -168,18 +170,17 @@ func processAmqp(username, amqpAddress string) {
 				connected = "Disconnected"
 
 			case msg := <-q.Msgs:
-				log.Println(logTag, "--> decoded msg:", msg)
+				Dbg.PrintfTrace("%s --> decoded msg:\n\n%+v\n\n", logTag, msg)
 
 				switch value := msg.(type) {
 					case *AmqpReceiveMessage:
-						log.Println(logTag, "--> is receive")
+						Dbg.PrintfTrace("%s --> is receive.\n", logTag)
 
 					case *AmqpResponseMessage:
-						log.Println(logTag, "--> is response")
-						if value.Command == "UART_data" || value.Command == "LOOPBACK_data" {
+						Dbg.PrintfTrace("%s --> is response.\n", logTag)
+						if value.Command == "UART_data" {
 							// UART data from the UTM-API which needs to be decoded
-							// NOTE: some old data extracted from logs is loopback_data. FIXME: remove this.
-							decode(value.Data)
+							decode(value.Data, value.DeviceUuid)
 							// Get the amount of uplink data and send it on to the data table
 							now := time.Now()
 							stateTableCmds <- &DataVolume{
@@ -195,17 +196,17 @@ func processAmqp(username, amqpAddress string) {
 						}
 
 					case *AmqpErrorMessage:
-						log.Println(logTag, "--> is error")
+						Dbg.PrintfTrace(logTag, "--> is error.\n")
 
 					default:
-						log.Printf("%s --> message type: %+v.\n", logTag, msg)
+						Dbg.PrintfTrace("%s --> message type: %+v.\n", logTag, msg)
 						log.Fatal(logTag, "invalid message type.")
 				}
 		}
 
 		if connState != connected {
 			connState = connected
-			log.Printf("%s --> sending new connection state: %s.\n", logTag, connState)
+			Dbg.PrintfTrace("%s --> sending new connection state: %s.\n", logTag, connState)
 			stateTableCmds <- &Connection{Status: connState}
 		}
 
@@ -231,9 +232,10 @@ func Run() {
 	// Process Amqp messages
 	go processAmqp(username, amqpAddress)
 
-	log.SetFlags(log.LstdFlags | log.Llongfile)
+	log.SetFlags(log.LstdFlags)
 
-	log.Printf("UTM-API service (%s) REST interface listening on %s.\n", logTag, amqpAddress)
+	fmt.Printf("----------------------------------------------------\n")
+	fmt.Printf("UTM-API service (%s) REST interface listening on %s.\n", logTag, amqpAddress)
 
 	store := cookiestore.New([]byte("secretkey789"))
 	router := routes.LoadRoutes()

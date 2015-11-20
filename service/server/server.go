@@ -246,7 +246,7 @@ func processAmqp(username, amqpAddress string) {
 						}
 
 					case *AmqpErrorMessage:
-						Dbg.PrintfTrace(logTag, "--> is error.\n")
+						Dbg.PrintfTrace("%s--> is error.\n", logTag)
 
 					default:
 						Dbg.PrintfTrace("%s --> message type: %+v.\n", logTag, msg)

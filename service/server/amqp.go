@@ -28,7 +28,7 @@ var uuidSlice = make([]*DisplayRow, len(uuidMap))
 type AmqpMessage struct {
     DeviceUuid   string `bson:"device_uuid" json:"device_uuid"`
     EndpointUuid int    `bson:"endpoint_uuid" json:"endpoint_uuid"`
-    Payload      []int  `bson:"payload json:"payload"`
+    Payload      []int  `bson:"payload" json:"payload"`
 }
 
 type AmqpReceiveMessage struct {

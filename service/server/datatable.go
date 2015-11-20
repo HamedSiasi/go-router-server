@@ -127,8 +127,7 @@ func operateDataTable() {
             			deviceLatestStateList[value.DeviceUuid] = state;
                         state.LastHeardFrom = time.Now().Local()
                         Dbg.PrintfTrace("%s --> datatable has heard from a new device, UUID %s.\n", logTag, value.DeviceUuid)
-    					// Get the reporting intervals for this device
-	                    encodeAndEnqueue (&IntervalsGetReqDlMsg{}, value.DeviceUuid)        					
+                        // TODO: find a way to send a get intervals request for a new device, but not from here
             		}
             		
                     Dbg.PrintfTrace("%s --> datatable received a message from UUID %s.\n", logTag, value.DeviceUuid)

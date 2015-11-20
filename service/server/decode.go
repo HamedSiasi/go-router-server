@@ -12,6 +12,10 @@
 
 package server
 
+//--------------------------------------------------------------------
+// CGO stuff
+//--------------------------------------------------------------------
+
 /*
 #cgo CFLAGS: -I .
 #include <stdbool.h>
@@ -157,7 +161,6 @@ DebugIndUlMsg_t getDebugIndUlMsg(UlMsgUnion_t in)
 import "C"  // There must be no line breaks between this and the commented-out section that comes before (bloody whitespace sensitive syntax)
 import (
 	"encoding/hex"
-	"errors"
 	"github.com/davecgh/go-spew/spew"
 	"time"
 	"unsafe"
@@ -257,10 +260,12 @@ type MessageContainer struct {
 }
 
 //--------------------------------------------------------------------
-// Vars
+// Variables
 //--------------------------------------------------------------------
 
 const MaxDatagramSizeRaw uint32 = C.MAX_DATAGRAM_SIZE_RAW
+
+const RevisionLevel uint32 = C.REVISION_LEVEL
 
 var ulDecodeTypeDisplay map[int]string = map[int]string {
 	C.DECODE_RESULT_FAILURE:                                      "DECODE_RESULT_FAILURE",
@@ -303,12 +308,14 @@ var ulDecodeTypeDisplay map[int]string = map[int]string {
 }
 
 //--------------------------------------------------------------------
-// The decode function
+// Functions
 //--------------------------------------------------------------------
 
-func decode(data []byte, uuid string) {
+// The decode function
+func decode(data []byte, uuid string) []interface{} {
 
 	var bytesRemaining C.uint32_t = 1
+	var returnedMsgs []interface{} = nil
 	
 	// Holder for the extracted message
 	var inputBuffer C.union_UlMsgUnionTag_t
@@ -322,7 +329,7 @@ func decode(data []byte, uuid string) {
 	ppNext := (**C.char)(unsafe.Pointer(&pNext))
 
 	hexBuffer := hex.Dump(data)
-	Dbg.PrintfInfo("%s --> the whole input buffer:\n\n(%s)\n\n", logTag, hexBuffer)
+	Dbg.PrintfTrace("%s --> the whole input buffer:\n\n(%s)\n\n", logTag, hexBuffer)
 
 	var decoderCount uint32
 
@@ -335,228 +342,227 @@ func decode(data []byte, uuid string) {
 
 		Dbg.PrintfInfo("%s -----## show buffer data ##-----\n\n%s\n\n", logTag, spew.Sdump(inputBuffer))
 		used := C.pointerSub(pNext, pStart)
-		Dbg.PrintfInfo("%s --> message data used:\n\n%s\n", logTag, spew.Sdump(used))
+		Dbg.PrintfInfo("%s --> message data used: %d.\n", logTag, used)
 		bytesRemaining = C.uint32_t(len(data)) - used
-		Dbg.PrintfInfo("%s --> message data remaining:\n\n%s\n", logTag, spew.Sdump(bytesRemaining))
+		Dbg.PrintfInfo("%s --> %d bytes remaining out of %d.\n", logTag, bytesRemaining, len(data))
 		if bytesRemaining > 0 {
 			result := C.decodeUlMsg(ppNext, bytesRemaining, pBuffer, nil, nil)
 			Dbg.PrintfTrace("%s --> decode received uplink message: %+v.\n\n-----## %s ##----- \n\n", logTag, result, ulDecodeTypeDisplay[int(result)])
 	
-			// Extract any data to be recorded; the C symbols are not available outside
-			// the package so convert into concrete go types
-			var data interface{} = nil
-			var rawData interface{} = nil
-	
 			// Now decode the messages and pass them to the state table
 			switch int(result) {
 				case C.DECODE_RESULT_TRANSPARENT_UL_DATAGRAM:
-				// TODO
+    				// TODO
 				case C.DECODE_RESULT_PING_REQ_UL_MSG:
-				// Empty message
-				// TODO: send a pingReqDlMsg
+	    			// Empty message
+					returnedMsgs = append (returnedMsgs,
+    				    &MessageContainer {
+    						DeviceUuid:        uuid,
+    						Timestamp:         time.Now(),
+    						Message: &PingReqUlMsg {},   
+    					})
 				case C.DECODE_RESULT_PING_CNF_UL_MSG:
-				// Ignored
+	    			// Empty message
+					returnedMsgs = append (returnedMsgs,
+    				    &MessageContainer {
+    						DeviceUuid:        uuid,
+    						Timestamp:         time.Now(),
+    						Message: &PingCnfUlMsg {},   
+    					})
 				case C.DECODE_RESULT_INIT_IND_UL_MSG:
 					value := C.getInitIndUlMsg(inputBuffer)
-					rawData = value
-					data = &MessageContainer {
-						DeviceUuid:        uuid,
-						Timestamp:         time.Now(),
-						Message: &InitIndUlMsg {
-							WakeUpCode:        WakeUpEnum(value.wakeUpCode),
-							RevisionLevel:     uint8(value.revisionLevel),
-							SdCardNotRequired: bool(value.sdCardNotRequired),
-							DisableModemDebug: bool(value.disableModemDebug),
-							DisableButton:     bool(value.disableButton),
-							DisableServerPing: bool(value.disableServerPing),
-						},
-					}
+					returnedMsgs = append (returnedMsgs,
+    				    &MessageContainer {
+    						DeviceUuid:        uuid,
+    						Timestamp:         time.Now(),
+    						Message: &InitIndUlMsg {
+    							WakeUpCode:        WakeUpEnum(value.wakeUpCode),
+    							RevisionLevel:     uint8(value.revisionLevel),
+    							SdCardNotRequired: bool(value.sdCardNotRequired),
+    							DisableModemDebug: bool(value.disableModemDebug),
+    							DisableButton:     bool(value.disableButton),
+    							DisableServerPing: bool(value.disableServerPing),
+    						},
+    					})
 					
 				case C.DECODE_RESULT_DATE_TIME_IND_UL_MSG:
 					value := C.getDateTimeIndUlMsg(inputBuffer)
-					rawData = value
-					data = &MessageContainer {
-						DeviceUuid:        uuid,
-						Timestamp:         time.Now(),
-						Message: &DateTimeIndUlMsg {
-							UtmTime:        time.Unix(int64(value.time), 0).Local(),
-							TimeSetBy:      TimeSetByEnum(value.setBy),
-						},
-					}
+					returnedMsgs = append (returnedMsgs,
+    				    &MessageContainer {
+    						DeviceUuid:        uuid,
+    						Timestamp:         time.Now(),
+    						Message: &DateTimeIndUlMsg {
+    							UtmTime:        time.Unix(int64(value.time), 0).Local(),
+    							TimeSetBy:      TimeSetByEnum(value.setBy),
+    						},
+    					})
 				
 				case C.DECODE_RESULT_DATE_TIME_SET_CNF_UL_MSG:
 					value := C.getDateTimeSetCnfUlMsg(inputBuffer)
-					rawData = value
-					data = &MessageContainer {
-						DeviceUuid:        uuid,
-						Timestamp:         time.Now(),
-						Message: &DateTimeSetCnfUlMsg {
-							UtmTime:        time.Unix(int64(value.time), 0).Local(),
-							TimeSetBy:      TimeSetByEnum(value.setBy),
-						},
-					}
+					returnedMsgs = append (returnedMsgs,
+    				    &MessageContainer {
+    						DeviceUuid:        uuid,
+    						Timestamp:         time.Now(),
+    						Message: &DateTimeSetCnfUlMsg {
+    							UtmTime:        time.Unix(int64(value.time), 0).Local(),
+    							TimeSetBy:      TimeSetByEnum(value.setBy),
+    						},
+    					})
 					
 				case C.DECODE_RESULT_DATE_TIME_GET_CNF_UL_MSG:
 					value := C.getDateTimeGetCnfUlMsg(inputBuffer)
-					rawData = value
-					data = &MessageContainer {
-						DeviceUuid:        uuid,
-						Timestamp:         time.Now(),
-						Message: &DateTimeGetCnfUlMsg {
-							UtmTime:        time.Unix(int64(value.time), 0).Local(),
-							TimeSetBy:      TimeSetByEnum(value.setBy),
-						},
-					}
+					returnedMsgs = append (returnedMsgs,
+    				    &MessageContainer {
+    						DeviceUuid:        uuid,
+    						Timestamp:         time.Now(),
+    						Message: &DateTimeGetCnfUlMsg {
+    							UtmTime:        time.Unix(int64(value.time), 0).Local(),
+    							TimeSetBy:      TimeSetByEnum(value.setBy),
+    						},
+    					})
 					
 				case C.DECODE_RESULT_MODE_SET_CNF_UL_MSG:
 					value := C.getModeSetCnfUlMsg(inputBuffer)
-					rawData = value
-					data = &MessageContainer {
-						DeviceUuid:        uuid,
-						Timestamp:         time.Now(),
-						Message: &ModeSetCnfUlMsg {
-					        Mode:           ModeEnum(value.mode),
-					    },   
-					}
+					returnedMsgs = append (returnedMsgs,
+    				    &MessageContainer {
+    						DeviceUuid:        uuid,
+    						Timestamp:         time.Now(),
+    						Message: &ModeSetCnfUlMsg {
+    					        Mode:           ModeEnum(value.mode),
+    					    },   
+    					})
 					
 				case C.DECODE_RESULT_MODE_GET_CNF_UL_MSG:
 					value := C.getModeGetCnfUlMsg(inputBuffer)
-					rawData = value
-					data = &MessageContainer {
-						DeviceUuid:        uuid,
-						Timestamp:         time.Now(),
-						Message: &ModeGetCnfUlMsg {
-					        Mode:           ModeEnum(value.mode),
-					    },   
-					}
+					returnedMsgs = append (returnedMsgs,
+    				    &MessageContainer {
+    						DeviceUuid:        uuid,
+    						Timestamp:         time.Now(),
+    						Message: &ModeGetCnfUlMsg {
+    					        Mode:           ModeEnum(value.mode),
+    					    },   
+    					})
 					
 				case C.DECODE_RESULT_HEARTBEAT_SET_CNF_UL_MSG:
 					value := C.getHeartbeatSetCnfUlMsg(inputBuffer)
-					rawData = value
-					data = &MessageContainer {
-						DeviceUuid:        uuid,
-						Timestamp:         time.Now(),
-						Message: &HeartbeatSetCnfUlMsg {
-					        HeartbeatSeconds:   uint32(value.heartbeatSeconds),
-					        HeartbeatSnapToRtc: bool(value.heartbeatSnapToRtc),
-					    },   
-					}
+					returnedMsgs = append (returnedMsgs,
+    				    &MessageContainer {
+    						DeviceUuid:        uuid,
+    						Timestamp:         time.Now(),
+    						Message: &HeartbeatSetCnfUlMsg {
+    					        HeartbeatSeconds:   uint32(value.heartbeatSeconds),
+    					        HeartbeatSnapToRtc: bool(value.heartbeatSnapToRtc),
+    					    },   
+    					})
 
 				case C.DECODE_RESULT_REPORTING_INTERVAL_SET_CNF_UL_MSG:
 					value := C.getReportingIntervalSetCnfUlMsg(inputBuffer)
-					rawData = value
-					data = &MessageContainer {
-						DeviceUuid:        uuid,
-						Timestamp:         time.Now(),
-						Message: &ReportingIntervalSetCnfUlMsg {
-					        ReportingInterval:  uint32(value.reportingInterval),
-					    },   
-					}
+					returnedMsgs = append (returnedMsgs,
+    				    &MessageContainer {
+    						DeviceUuid:        uuid,
+    						Timestamp:         time.Now(),
+    						Message: &ReportingIntervalSetCnfUlMsg {
+    					        ReportingInterval:  uint32(value.reportingInterval),
+    					    },   
+    					})
 					
 				case C.DECODE_RESULT_INTERVALS_GET_CNF_UL_MSG:
 					value := C.getIntervalsGetCnfUlMsg(inputBuffer)
-					rawData = value
-					data = &MessageContainer {
-						DeviceUuid:        uuid,
-						Timestamp:         time.Now(),
-						Message: &IntervalsGetCnfUlMsg {
-							ReportingInterval:  uint32(value.reportingInterval),
-							HeartbeatSeconds:   uint32(value.heartbeatSeconds),
-							HeartbeatSnapToRtc: bool(value.heartbeatSnapToRtc),
-					    },   
-					}
-	
-					// TODO
-					row.ReportingInterval = uint32(value.reportingInterval)
-					row.HeartbeatSeconds = uint32(value.heartbeatSeconds)
-					row.HeartbeatSnapToRtc = bool(value.heartbeatSnapToRtc)
-	
-					Dbg.PrintfInfo("%s --> received intervals request confirm: %s.\n", logTag, spew.Sdump(row))
+					returnedMsgs = append (returnedMsgs,
+    				    &MessageContainer {
+    						DeviceUuid:        uuid,
+    						Timestamp:         time.Now(),
+    						Message: &IntervalsGetCnfUlMsg {
+    							ReportingInterval:  uint32(value.reportingInterval),
+    							HeartbeatSeconds:   uint32(value.heartbeatSeconds),
+    							HeartbeatSnapToRtc: bool(value.heartbeatSnapToRtc),
+    					    },   
+    					})
 	
 				case C.DECODE_RESULT_POLL_IND_UL_MSG:
 					value := C.getPollIndUlMsg(inputBuffer)
-					rawData = value
-					data = &MessageContainer {
-						DeviceUuid:        uuid,
-						Timestamp:         time.Now(),
-						Message: &PollIndUlMsg {
-					        Mode:            ModeEnum(value.mode),
-					        EnergyLeft:      EnergyLeftEnum(value.energyLeft),
-					        DiskSpaceLeft:   DiskSpaceLeftEnum(value.diskSpaceLeft),
-					    },   
-					}
+					returnedMsgs = append (returnedMsgs,
+    				    &MessageContainer {
+    						DeviceUuid:        uuid,
+    						Timestamp:         time.Now(),
+    						Message: &PollIndUlMsg {
+    					        Mode:            ModeEnum(value.mode),
+    					        EnergyLeft:      EnergyLeftEnum(value.energyLeft),
+    					        DiskSpaceLeft:   DiskSpaceLeftEnum(value.diskSpaceLeft),
+    					    },   
+    					})
 					
 				case C.DECODE_RESULT_MEASUREMENTS_IND_UL_MSG:
 					value := C.getMeasurementsIndUlMsg(inputBuffer)
-					rawData = value
-					data = &MessageContainer {
-						DeviceUuid:        uuid,
-						Timestamp:         time.Now(),
-						Message: &MeasurementsIndUlMsg {  // Structure initialisation is just horrible in this language
-							Measurements: MeasurementData {
-								TimeMeasured:         time.Unix(int64(value.measurements.time), 0).Local(),
-								GnssPositionPresent:  bool(value.measurements.gnssPositionPresent),
-								GnssPosition: GnssPosition {
-									Latitude:            int32(value.measurements.gnssPosition.latitude),
-									Longitude:           int32(value.measurements.gnssPosition.longitude),
-									Elevation:           int32(value.measurements.gnssPosition.elevation),
-								},
-								CellIdPresent:       bool(value.measurements.cellIdPresent),
-								CellId:              CellId(value.measurements.cellId),
-								RsrpPresent:         bool(value.measurements.rsrpPresent),
-								Rsrp: Rsrp {
-									Value:              Rssi(value.measurements.rsrp.value),
-									IsSyncedWithRssi:   bool(value.measurements.rsrp.isSyncedWithRssi),
-								},
-								RssiPresent:         bool(value.measurements.rssiPresent),
-								Rssi:                Rssi(value.measurements.rsrp.value),
-								TemperaturePresent:  bool(value.measurements.temperaturePresent),
-								Temperature:         Temperature(value.measurements.temperature),
-								PowerStatePresent:   bool(value.measurements.powerStatePresent),
-								PowerState: PowerState {
-									ChargerState:        ChargerStateEnum(value.measurements.powerState.chargerState),
-									BatteryMv:           uint16(value.measurements.powerState.batteryMV),
-									EnergyMwh:           uint32(value.measurements.powerState.energyMWh),
-								},
-							},
-						},	
-					}
+					returnedMsgs = append (returnedMsgs,
+    				    &MessageContainer {
+    						DeviceUuid:        uuid,
+    						Timestamp:         time.Now(),
+    						Message: &MeasurementsIndUlMsg {  // Structure initialisation is just horrible in this language
+    							Measurements: MeasurementData {
+    								TimeMeasured:         time.Unix(int64(value.measurements.time), 0).Local(),
+    								GnssPositionPresent:  bool(value.measurements.gnssPositionPresent),
+    								GnssPosition: GnssPosition {
+    									Latitude:            int32(value.measurements.gnssPosition.latitude),
+    									Longitude:           int32(value.measurements.gnssPosition.longitude),
+    									Elevation:           int32(value.measurements.gnssPosition.elevation),
+    								},
+    								CellIdPresent:       bool(value.measurements.cellIdPresent),
+    								CellId:              CellId(value.measurements.cellId),
+    								RsrpPresent:         bool(value.measurements.rsrpPresent),
+    								Rsrp: Rsrp {
+    									Value:              Rssi(value.measurements.rsrp.value),
+    									IsSyncedWithRssi:   bool(value.measurements.rsrp.isSyncedWithRssi),
+    								},
+    								RssiPresent:         bool(value.measurements.rssiPresent),
+    								Rssi:                Rssi(value.measurements.rsrp.value),
+    								TemperaturePresent:  bool(value.measurements.temperaturePresent),
+    								Temperature:         Temperature(value.measurements.temperature),
+    								PowerStatePresent:   bool(value.measurements.powerStatePresent),
+    								PowerState: PowerState {
+    									ChargerState:        ChargerStateEnum(value.measurements.powerState.chargerState),
+    									BatteryMv:           uint16(value.measurements.powerState.batteryMV),
+    									EnergyMwh:           uint32(value.measurements.powerState.energyMWh),
+    								},
+    							},
+    						},	
+    					})
 					
 				case C.DECODE_RESULT_MEASUREMENTS_GET_CNF_UL_MSG:
 					value := C.getMeasurementsGetCnfUlMsg(inputBuffer)
-					rawData = value
-					data = &MessageContainer {
-						DeviceUuid:        uuid,
-						Timestamp:         time.Now(),
-						Message: &MeasurementsIndUlMsg {  // Still horrible
-							Measurements: MeasurementData {
-								TimeMeasured:         time.Unix(int64(value.measurements.time), 0).Local(),
-								GnssPositionPresent:  bool(value.measurements.gnssPositionPresent),
-								GnssPosition: GnssPosition {
-									Latitude:            int32(value.measurements.gnssPosition.latitude),
-									Longitude:           int32(value.measurements.gnssPosition.longitude),
-									Elevation:           int32(value.measurements.gnssPosition.elevation),
-								},
-								CellIdPresent:       bool(value.measurements.cellIdPresent),
-								CellId:              CellId(value.measurements.cellId),
-								RsrpPresent:         bool(value.measurements.rsrpPresent),
-								Rsrp: Rsrp {
-									Value:              Rssi(value.measurements.rsrp.value),
-									IsSyncedWithRssi:   bool(value.measurements.rsrp.isSyncedWithRssi),
-								},
-								RssiPresent:         bool(value.measurements.rssiPresent),
-								Rssi:                Rssi(value.measurements.rsrp.value),
-								TemperaturePresent:  bool(value.measurements.temperaturePresent),
-								Temperature:         Temperature(value.measurements.temperature),
-								PowerStatePresent:   bool(value.measurements.powerStatePresent),
-								PowerState: PowerState {
-									ChargerState:        ChargerStateEnum(value.measurements.powerState.chargerState),
-									BatteryMv:           uint16(value.measurements.powerState.batteryMV),
-									EnergyMwh:           uint32(value.measurements.powerState.energyMWh),
-								},
-							},
-						},	
-					}
+					returnedMsgs = append (returnedMsgs,
+    				    &MessageContainer {
+    						DeviceUuid:        uuid,
+    						Timestamp:         time.Now(),
+    						Message: &MeasurementsIndUlMsg {  // Still horrible
+    							Measurements: MeasurementData {
+    								TimeMeasured:         time.Unix(int64(value.measurements.time), 0).Local(),
+    								GnssPositionPresent:  bool(value.measurements.gnssPositionPresent),
+    								GnssPosition: GnssPosition {
+    									Latitude:            int32(value.measurements.gnssPosition.latitude),
+    									Longitude:           int32(value.measurements.gnssPosition.longitude),
+    									Elevation:           int32(value.measurements.gnssPosition.elevation),
+    								},
+    								CellIdPresent:       bool(value.measurements.cellIdPresent),
+    								CellId:              CellId(value.measurements.cellId),
+    								RsrpPresent:         bool(value.measurements.rsrpPresent),
+    								Rsrp: Rsrp {
+    									Value:              Rssi(value.measurements.rsrp.value),
+    									IsSyncedWithRssi:   bool(value.measurements.rsrp.isSyncedWithRssi),
+    								},
+    								RssiPresent:         bool(value.measurements.rssiPresent),
+    								Rssi:                Rssi(value.measurements.rsrp.value),
+    								TemperaturePresent:  bool(value.measurements.temperaturePresent),
+    								Temperature:         Temperature(value.measurements.temperature),
+    								PowerStatePresent:   bool(value.measurements.powerStatePresent),
+    								PowerState: PowerState {
+    									ChargerState:        ChargerStateEnum(value.measurements.powerState.chargerState),
+    									BatteryMv:           uint16(value.measurements.powerState.batteryMV),
+    									EnergyMwh:           uint32(value.measurements.powerState.energyMWh),
+    								},
+    							},
+    						},	
+    					})
 					
 				case C.DECODE_RESULT_MEASUREMENTS_CONTROL_IND_UL_MSG:
 				// TODO
@@ -568,137 +574,138 @@ func decode(data []byte, uuid string) {
 				// TODO
 				case C.DECODE_RESULT_TRAFFIC_REPORT_IND_UL_MSG:
 					value := C.getTrafficReportIndUlMsg(inputBuffer)
-					rawData = value
-					data = &MessageContainer {
-						DeviceUuid:        uuid,
-						Timestamp:         time.Now(),
-						Message: &TrafficReportIndUlMsg {
-					        NumDatagramsUl:             uint32(value.numDatagramsUl),
-					        NumBytesUl:                 uint32(value.numBytesUl),
-					        NumDatagramsDl:             uint32(value.numDatagramsDl),
-					        NumBytesDl:                 uint32(value.numBytesDl),
-					        NumDatagramsDlBadChecksum:  uint32(value.numDatagramsDlBadChecksum),
-					    },   
-					}
+					returnedMsgs = append (returnedMsgs,
+    				    &MessageContainer {
+    						DeviceUuid:        uuid,
+    						Timestamp:         time.Now(),
+    						Message: &TrafficReportIndUlMsg {
+    					        NumDatagramsUl:             uint32(value.numDatagramsUl),
+    					        NumBytesUl:                 uint32(value.numBytesUl),
+    					        NumDatagramsDl:             uint32(value.numDatagramsDl),
+    					        NumBytesDl:                 uint32(value.numBytesDl),
+    					        NumDatagramsDlBadChecksum:  uint32(value.numDatagramsDlBadChecksum),
+    					    },   
+    					})
 					
 				case C.DECODE_RESULT_TRAFFIC_REPORT_GET_CNF_UL_MSG:
 					value := C.getTrafficReportGetCnfUlMsg(inputBuffer)
-					rawData = value
-					data = &MessageContainer {
-						DeviceUuid:        uuid,
-						Timestamp:         time.Now(),
-						Message: &TrafficReportGetCnfUlMsg {
-					        NumDatagramsUl:             uint32(value.numDatagramsUl),
-					        NumBytesUl:                 uint32(value.numBytesUl),
-					        NumDatagramsDl:             uint32(value.numDatagramsDl),
-					        NumBytesDl:                 uint32(value.numBytesDl),
-					        NumDatagramsDlBadChecksum:  uint32(value.numDatagramsDlBadChecksum),
-					    },   
-					}
+					returnedMsgs = append (returnedMsgs,
+    				    &MessageContainer {
+    						DeviceUuid:        uuid,
+    						Timestamp:         time.Now(),
+    						Message: &TrafficReportGetCnfUlMsg {
+    					        NumDatagramsUl:             uint32(value.numDatagramsUl),
+    					        NumBytesUl:                 uint32(value.numBytesUl),
+    					        NumDatagramsDl:             uint32(value.numDatagramsDl),
+    					        NumBytesDl:                 uint32(value.numBytesDl),
+    					        NumDatagramsDlBadChecksum:  uint32(value.numDatagramsDlBadChecksum),
+    					    },   
+    					})
 					
 				case C.DECODE_RESULT_TRAFFIC_TEST_MODE_PARAMETERS_SET_CNF_UL_MSG:
 					value := C.getTrafficTestModeParametersSetCnfUlMsg(inputBuffer)
-					rawData = value
-					data = &MessageContainer {
-						DeviceUuid:        uuid,
-						Timestamp:         time.Now(),
-						Message: &TrafficTestModeParametersSetCnfUlMsg {
-					        NumUlDatagrams:      uint32(value.numUlDatagrams),
-					        LenUlDatagram:       uint32(value.lenUlDatagram),
-					        NumDlDatagrams:      uint32(value.numDlDatagrams),
-					        LenDlDatagram:       uint32(value.lenDlDatagram),
-					    },   
-					}
+					returnedMsgs = append (returnedMsgs,
+    				    &MessageContainer {
+    						DeviceUuid:        uuid,
+    						Timestamp:         time.Now(),
+    						Message: &TrafficTestModeParametersSetCnfUlMsg {
+    					        NumUlDatagrams:      uint32(value.numUlDatagrams),
+    					        LenUlDatagram:       uint32(value.lenUlDatagram),
+    					        NumDlDatagrams:      uint32(value.numDlDatagrams),
+    					        LenDlDatagram:       uint32(value.lenDlDatagram),
+    					    },   
+    					})
 					
 				case C.DECODE_RESULT_TRAFFIC_TEST_MODE_PARAMETERS_GET_CNF_UL_MSG:
 					value := C.getTrafficTestModeParametersGetCnfUlMsg(inputBuffer)
-					rawData = value
-					data = &MessageContainer {
-						DeviceUuid:        uuid,
-						Timestamp:         time.Now(),
-						Message: &TrafficTestModeParametersGetCnfUlMsg {
-					        NumUlDatagrams:      uint32(value.numUlDatagrams),
-					        LenUlDatagram:       uint32(value.lenUlDatagram),
-					        NumDlDatagrams:      uint32(value.numDlDatagrams),
-					        LenDlDatagram:       uint32(value.lenDlDatagram),
-					    },   
-					}
+					returnedMsgs = append (returnedMsgs,
+    				    &MessageContainer {
+    						DeviceUuid:        uuid,
+    						Timestamp:         time.Now(),
+    						Message: &TrafficTestModeParametersGetCnfUlMsg {
+    					        NumUlDatagrams:      uint32(value.numUlDatagrams),
+    					        LenUlDatagram:       uint32(value.lenUlDatagram),
+    					        NumDlDatagrams:      uint32(value.numDlDatagrams),
+    					        LenDlDatagram:       uint32(value.lenDlDatagram),
+    					    },   
+    					})
 					
 				case C.DECODE_RESULT_TRAFFIC_TEST_MODE_RULE_BREAKER_UL_DATAGRAM:
 				// TODO
+				
 				case C.DECODE_RESULT_TRAFFIC_TEST_MODE_REPORT_IND_UL_MSG:
 					value := C.getTrafficTestModeReportIndUlMsg(inputBuffer)
-					rawData = value
-					data = &MessageContainer {
-						DeviceUuid:        uuid,
-						Timestamp:         time.Now(),
-						Message: &TrafficTestModeReportIndUlMsg {
-					        NumTrafficTestDatagramsUl:           uint32(value.numTrafficTestDatagramsUl),
-					        NumTrafficTestBytesUl:               uint32(value.numTrafficTestBytesUl),
-					        NumTrafficTestDatagramsDl:           uint32(value.numTrafficTestDatagramsDl),
-					        NumTrafficTestBytesDl:               uint32(value.numTrafficTestBytesDl),
-					        NumTrafficTestDlDatagramsOutOfOrder: uint32(value.numTrafficTestDlDatagramsOutOfOrder),
-					        NumTrafficTestDlDatagramsBad:        uint32(value.numTrafficTestDlDatagramsBad),
-					        NumTrafficTestDlDatagramsMissed:     uint32(value.numTrafficTestDlDatagramsMissed),
-					        TimedOut:                            bool(value.timedOut),
-					    },   
-					}
+					returnedMsgs = append (returnedMsgs,
+    				    &MessageContainer {
+    						DeviceUuid:        uuid,
+    						Timestamp:         time.Now(),
+    						Message: &TrafficTestModeReportIndUlMsg {
+    					        NumTrafficTestDatagramsUl:           uint32(value.numTrafficTestDatagramsUl),
+    					        NumTrafficTestBytesUl:               uint32(value.numTrafficTestBytesUl),
+    					        NumTrafficTestDatagramsDl:           uint32(value.numTrafficTestDatagramsDl),
+    					        NumTrafficTestBytesDl:               uint32(value.numTrafficTestBytesDl),
+    					        NumTrafficTestDlDatagramsOutOfOrder: uint32(value.numTrafficTestDlDatagramsOutOfOrder),
+    					        NumTrafficTestDlDatagramsBad:        uint32(value.numTrafficTestDlDatagramsBad),
+    					        NumTrafficTestDlDatagramsMissed:     uint32(value.numTrafficTestDlDatagramsMissed),
+    					        TimedOut:                            bool(value.timedOut),
+    					    },   
+    					})
 					
 				case C.DECODE_RESULT_TRAFFIC_TEST_MODE_REPORT_GET_CNF_UL_MSG:
 					value := C.getTrafficTestModeReportGetCnfUlMsg(inputBuffer)
-					rawData = value
-					data = &MessageContainer {
-						DeviceUuid:        uuid,
-						Timestamp:         time.Now(),
-						Message: &TrafficTestModeReportGetCnfUlMsg {
-					        NumTrafficTestDatagramsUl:           uint32(value.numTrafficTestDatagramsUl),
-					        NumTrafficTestBytesUl:               uint32(value.numTrafficTestBytesUl),
-					        NumTrafficTestDatagramsDl:           uint32(value.numTrafficTestDatagramsDl),
-					        NumTrafficTestBytesDl:               uint32(value.numTrafficTestBytesDl),
-					        NumTrafficTestDlDatagramsOutOfOrder: uint32(value.numTrafficTestDlDatagramsOutOfOrder),
-					        NumTrafficTestDlDatagramsBad:        uint32(value.numTrafficTestDlDatagramsBad),
-					        NumTrafficTestDlDatagramsMissed:     uint32(value.numTrafficTestDlDatagramsMissed),
-					        TimedOut:                            bool(value.timedOut),
-					    },   
-					}
+					returnedMsgs = append (returnedMsgs,
+    				    &MessageContainer {
+    						DeviceUuid:        uuid,
+    						Timestamp:         time.Now(),
+    						Message: &TrafficTestModeReportGetCnfUlMsg {
+    					        NumTrafficTestDatagramsUl:           uint32(value.numTrafficTestDatagramsUl),
+    					        NumTrafficTestBytesUl:               uint32(value.numTrafficTestBytesUl),
+    					        NumTrafficTestDatagramsDl:           uint32(value.numTrafficTestDatagramsDl),
+    					        NumTrafficTestBytesDl:               uint32(value.numTrafficTestBytesDl),
+    					        NumTrafficTestDlDatagramsOutOfOrder: uint32(value.numTrafficTestDlDatagramsOutOfOrder),
+    					        NumTrafficTestDlDatagramsBad:        uint32(value.numTrafficTestDlDatagramsBad),
+    					        NumTrafficTestDlDatagramsMissed:     uint32(value.numTrafficTestDlDatagramsMissed),
+    					        TimedOut:                            bool(value.timedOut),
+    					    },   
+    					})
 					
 				case C.DECODE_RESULT_ACTIVITY_REPORT_IND_UL_MSG:
 					value := C.getActivityReportIndUlMsg(inputBuffer)
-					rawData = value
-					data = &MessageContainer {
-						DeviceUuid:        uuid,
-						Timestamp:         time.Now(),
-						Message: &ActivityReportIndUlMsg {
-					        TotalTransmitMilliseconds:  uint32(value.totalTransmitMilliseconds),
-					        TotalReceiveMilliseconds:   uint32(value.totalReceiveMilliseconds),
-					        UpTimeSeconds:              uint32(value.upTimeSeconds),
-					        TxPowerDbmPresent:          bool(value.txPowerDbmPresent),
-					        TxPowerDbm:                 int8(value.txPowerDbm),
-					        UlMcsPresent:               bool(value.ulMcsPresent),
-					        UlMcs:                      uint8(value.ulMcs),
-					        DlMcsPresent:               bool(value.dlMcsPresent),
-					        DlMcs:                      uint8(value.dlMcs),
-					    },   
-					}
+					returnedMsgs = append (returnedMsgs,
+    				    &MessageContainer {
+        					DeviceUuid:        uuid,
+        					Timestamp:         time.Now(),
+        					Message: &ActivityReportIndUlMsg {
+        				        TotalTransmitMilliseconds:  uint32(value.totalTransmitMilliseconds),
+        				        TotalReceiveMilliseconds:   uint32(value.totalReceiveMilliseconds),
+        				        UpTimeSeconds:              uint32(value.upTimeSeconds),
+        				        TxPowerDbmPresent:          bool(value.txPowerDbmPresent),
+        				        TxPowerDbm:                 int8(value.txPowerDbm),
+        				        UlMcsPresent:               bool(value.ulMcsPresent),
+        				        UlMcs:                      uint8(value.ulMcs),
+        				        DlMcsPresent:               bool(value.dlMcsPresent),
+        				        DlMcs:                      uint8(value.dlMcs),
+        				    },   
+        				})
 					
 				case C.DECODE_RESULT_ACTIVITY_REPORT_GET_CNF_UL_MSG:
 					value := C.getActivityReportGetCnfUlMsg(inputBuffer)
-					rawData = value
-					data = &MessageContainer {
-						DeviceUuid:        uuid,
-						Timestamp:         time.Now(),
-						Message: &ActivityReportGetCnfUlMsg {
-					        TotalTransmitMilliseconds:  uint32(value.totalTransmitMilliseconds),
-					        TotalReceiveMilliseconds:   uint32(value.totalReceiveMilliseconds),
-					        UpTimeSeconds:              uint32(value.upTimeSeconds),
-					        TxPowerDbmPresent:          bool(value.txPowerDbmPresent),
-					        TxPowerDbm:                 int8(value.txPowerDbm),
-					        UlMcsPresent:               bool(value.ulMcsPresent),
-					        UlMcs:                      uint8(value.ulMcs),
-					        DlMcsPresent:               bool(value.dlMcsPresent),
-					        DlMcs:                      uint8(value.dlMcs),
-					    },   
-					}
+					returnedMsgs = append (returnedMsgs,
+    				    &MessageContainer {
+    						DeviceUuid:        uuid,
+    						Timestamp:         time.Now(),
+    						Message: &ActivityReportGetCnfUlMsg {
+    					        TotalTransmitMilliseconds:  uint32(value.totalTransmitMilliseconds),
+    					        TotalReceiveMilliseconds:   uint32(value.totalReceiveMilliseconds),
+    					        UpTimeSeconds:              uint32(value.upTimeSeconds),
+    					        TxPowerDbmPresent:          bool(value.txPowerDbmPresent),
+    					        TxPowerDbm:                 int8(value.txPowerDbm),
+    					        UlMcsPresent:               bool(value.ulMcsPresent),
+    					        UlMcs:                      uint8(value.ulMcs),
+    					        DlMcsPresent:               bool(value.dlMcsPresent),
+    					        DlMcs:                      uint8(value.dlMcs),
+    					    },   
+    					})
 					
 				case C.DECODE_RESULT_DEBUG_IND_UL_MSG:
 				// TODO
@@ -713,115 +720,12 @@ func decode(data []byte, uuid string) {
 				// TODO
 				case C.DECODE_RESULT_BAD_CHECKSUM:
 				default:
-					// Can't decode the uplink; this case is here to avoid a panic,
-					// the code below will handle this situation fine
-			}
-	
-			// Send any data to be recorded
-			if data != nil {
-				Dbg.PrintfInfo("%s --> decoded data being recorded:\n\n%+v.\n", logTag, data)
-				stateTableCmds <- data
-			} else if rawData != nil {
-				Dbg.PrintfInfo("%s --> data not being recorded:\n\n%+v.\n", logTag, rawData)
-			} else {
-				Dbg.PrintfInfo("%s --> error: undecodable message received.\n", logTag)
-				//log.Printf("%s --> error: undecodable message received:\n\n%s.\n", logTag, spew.Sdump(inputBuffer))
-			}
+				// Can't decode the message, throw it away silently
+			}	
 		}
 	}
 
-	decoderCount = 0
-}
-
-
-// TODO
-func encodeAndEnqueueReportingInterval(mins uint32) error {
-	if downlinkMessages != nil {
-		// Create a buffer that is big enough to store all
-		// the encoded data and take a pointer to it's first element
-		var outputBuffer [C.MAX_DATAGRAM_SIZE_RAW]byte
-		outputPointer := (*C.char)(unsafe.Pointer(&outputBuffer[0]))
-
-		// Populate the data struture to be encoded
-		var data C.ReportingIntervalSetReqDlMsg_t
-
-		//		data.reportingIntervalMinutes = C.uint32_t(mins)
-		var dataPointer = (*C.ReportingIntervalSetReqDlMsg_t)(unsafe.Pointer(&data))
-
-		// Encode the data structure into the output buffer
-		cbytes := C.encodeReportingIntervalSetReqDlMsg(outputPointer, dataPointer, nil, nil)
-
-		// Send the populated output buffer bytes to NeulNet
-		payload := outputBuffer[:cbytes]
-		msg := AmqpMessage{
-			DeviceUuid:   ueGuid,
-			EndpointUuid: 4,
-			//Payload:       payload,
-		}
-		for _, v := range payload {
-			msg.Payload = append(msg.Payload, int(v))
-			row.TotalBytes = row.TotalBytes + uint64(len(payload))
-		}
-
-		Dbg.PrintfInfo("%s --> encoded a ReportingIntervalSetReqDlMsg of %d using AMQP message:\n\n%+v\n", logTag, mins, payload, msg)
-
-		downlinkMessages <- msg
-		now := time.Now()
-
-		// Record the downlink data volume
-		stateTableCmds <- &DataVolume{
-			DownlinkTimestamp: &now,
-			DownlinkBytes:     uint64(len(payload)),
-		}
-
-		return nil
-	}
-
-	return errors.New("No downlink message channel available to enqueue the encoded message.\n")
-}
-
-func encodeAndEnqueueIntervalGetReq(ueGuid string) error {
-	if downlinkMessages != nil {
-
-		// Create a buffer that is big enough to store all
-		// the encoded data and take a pointer to it's first element
-		var outputBuffer [C.MAX_DATAGRAM_SIZE_RAW]byte
-		outputPointer := (*C.char)(unsafe.Pointer(&outputBuffer[0]))
-
-		// Encode the data structure into the output buffer
-		cbytes := C.encodeIntervalsGetReqDlMsg(outputPointer, nil, nil)
-
-		// Send the populated output buffer bytes to NeulNet
-		payload := outputBuffer[:cbytes]
-
-		msg := AmqpMessage{
-			DeviceUuid:   ueGuid,
-			EndpointUuid: 4,
-			//Payload:       payload,
-		}
-		for _, v := range payload {
-			msg.Payload = append(msg.Payload, int(v))
-		}
-		 Dbg.PrintfInfo("%s --> encoded an IntervalsGetReqDlMsg using AMQP message:\n\n%+v\n", logTag, payload, msg)
-
-		downlinkMessages <- msg
-		now := time.Now()
-
-		// Record the downlink data volume
-		stateTableCmds <- &DataVolume{
-			DownlinkTimestamp: &now,
-			DownlinkBytes:     uint64(len(payload)),
-		}
-
-		//Record in the DisplayRow
-		row.DTotalMsgs = row.DTotalMsgs + 1
-		row.DTotalBytes = row.DTotalBytes + uint64(len(payload))
-		row.DlastMsgReceived = &now
-
-		return nil
-	}
-
-	return errors.New("No downlink message channel available to enqueue the encoded message.\n")
+	return returnedMsgs
 }
 
 /* End Of File */

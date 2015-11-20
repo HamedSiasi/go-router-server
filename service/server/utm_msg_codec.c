@@ -3259,6 +3259,7 @@ DecodeResult_t decodeDlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, DlMs
     if (sizeInBuffer < MIN_MESSAGE_SIZE)
     {
         decodeResult = DECODE_RESULT_INPUT_TOO_SHORT;
+        (*ppInBuffer) += sizeInBuffer;
     }
     else
     {
@@ -3785,6 +3786,7 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
     if (sizeInBuffer < MIN_MESSAGE_SIZE)
     {
         decodeResult = DECODE_RESULT_INPUT_TOO_SHORT;
+        (*ppInBuffer) += sizeInBuffer;
     }
     else
     {

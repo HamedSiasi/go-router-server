@@ -74,9 +74,11 @@ func consumeQueue(channel *amqp.Channel, chanName string) (<-chan amqp.Delivery,
         false,    // no-wait
         nil,      // args
     )
+    
     if err != nil {
         return nil, fmt.Errorf("--> consuming '%s' channel: %s", chanName, err.Error())
     }
+    
     return msgChan, nil
 }
 
@@ -130,6 +132,7 @@ func OpenQueue(username, amqpAddress string) (*Queue, error) {
             close(q.Downlink)
             //amqpSession.Close()
         }()
+        
         // Continually process AMQP messages until commanded to Quit
         for {
             var msg amqp.Delivery
@@ -187,6 +190,7 @@ func OpenQueue(username, amqpAddress string) (*Queue, error) {
 	                    }
 	                }
             }
+            
             if receivedMsg {
                 if err == nil {
                     Dbg.PrintfTrace("%s --> received:\n\n%+v\n\n", logTag, string(msg.Body))
@@ -196,6 +200,7 @@ func OpenQueue(username, amqpAddress string) (*Queue, error) {
             }
         }
     }()
+    
     return &q, nil
 }
 

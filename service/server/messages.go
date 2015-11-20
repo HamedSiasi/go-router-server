@@ -38,11 +38,6 @@ type DisplayRow struct {
     HeartbeatSnapToRtc bool       `json:"HeartbeatSnapToRtc, omitempty"`
 }
 
-type Connection struct {
-	DeviceUuid string
-    Status string
-}
-
 //--------------------------------------------------------------------
 // Types used in messages with associated copy functions
 //--------------------------------------------------------------------
@@ -201,6 +196,26 @@ func (value *TransparentDlDatagram) DeepCopy() *TransparentDlDatagram {
     return result
 }
 
+// PingReqUlMsg
+type PingReqUlMsg struct {
+    // Empty
+}
+
+// PingCnfDlMsg
+type PingCnfDlMsg struct {
+    // Empty
+}
+
+// PingReqDlMsg
+type PingReqDlMsg struct {
+    // Empty
+}
+
+// PingCnfUlMsg
+type PingCnfUlMsg struct {
+    // Empty
+}
+
 // InitIndUlMsg
 type InitIndUlMsg struct {
     WakeUpCode        WakeUpEnum
@@ -277,6 +292,11 @@ func (value *DateTimeSetCnfUlMsg) DeepCopy() *DateTimeSetCnfUlMsg {
     return result
 }
 
+// DateTimeGetReqDlMsg
+type DateTimeGetReqDlMsg struct {
+    // Empty    
+}
+
 // DateTimeGetCnfUlMsg
 type DateTimeGetCnfUlMsg struct {
     UtmTime           time.Time
@@ -337,6 +357,11 @@ func (value *ModeSetCnfUlMsg) DeepCopy() *ModeSetCnfUlMsg {
     return result
 }
 
+// ModeGetReqDlMsg
+type ModeGetReqDlMsg struct {
+    // Empty    
+}
+
 // ModeGetCnfUlMsg
 type ModeGetCnfUlMsg struct {
     Mode        ModeEnum
@@ -351,32 +376,23 @@ func (value *ModeGetCnfUlMsg) DeepCopy() *ModeGetCnfUlMsg {
     return result
 }
 
-// HeartbeatSetReqDlMsg
-type HeartbeatSetReqDlMsg struct {
-    HeartbeatSeconds   uint32
-    HeartbeatSnapToRtc bool
-}
-func (value *HeartbeatSetReqDlMsg) DeepCopy() *HeartbeatSetReqDlMsg {
-    if value == nil {
-        return nil
-    }
-    result := &HeartbeatSetReqDlMsg {
-        HeartbeatSeconds:   value.HeartbeatSeconds,
-        HeartbeatSnapToRtc: value.HeartbeatSnapToRtc,
-    }
-    return result
+// IntervalsGetReqDlMsg
+type IntervalsGetReqDlMsg struct {
+    // Empty    
 }
 
-// HeartbeatSetCnfUlMsg
-type HeartbeatSetCnfUlMsg struct {
+// IntervalsGetCnfUlMsg
+type IntervalsGetCnfUlMsg struct {
+    ReportingInterval  uint32
     HeartbeatSeconds   uint32
     HeartbeatSnapToRtc bool
 }
-func (value *HeartbeatSetCnfUlMsg) DeepCopy() *HeartbeatSetCnfUlMsg {
+func (value *IntervalsGetCnfUlMsg) DeepCopy() *IntervalsGetCnfUlMsg {
     if value == nil {
         return nil
     }
-    result := &HeartbeatSetCnfUlMsg {
+    result := &IntervalsGetCnfUlMsg {
+        ReportingInterval:  value.ReportingInterval,
         HeartbeatSeconds:   value.HeartbeatSeconds,
         HeartbeatSnapToRtc: value.HeartbeatSnapToRtc,
     }
@@ -411,18 +427,32 @@ func (value *ReportingIntervalSetCnfUlMsg) DeepCopy() *ReportingIntervalSetCnfUl
     return result
 }
 
-// IntervalsGetCnfUlMsg
-type IntervalsGetCnfUlMsg struct {
-    ReportingInterval  uint32
+// HeartbeatSetReqDlMsg
+type HeartbeatSetReqDlMsg struct {
     HeartbeatSeconds   uint32
     HeartbeatSnapToRtc bool
 }
-func (value *IntervalsGetCnfUlMsg) DeepCopy() *IntervalsGetCnfUlMsg {
+func (value *HeartbeatSetReqDlMsg) DeepCopy() *HeartbeatSetReqDlMsg {
     if value == nil {
         return nil
     }
-    result := &IntervalsGetCnfUlMsg {
-        ReportingInterval:  value.ReportingInterval,
+    result := &HeartbeatSetReqDlMsg {
+        HeartbeatSeconds:   value.HeartbeatSeconds,
+        HeartbeatSnapToRtc: value.HeartbeatSnapToRtc,
+    }
+    return result
+}
+
+// HeartbeatSetCnfUlMsg
+type HeartbeatSetCnfUlMsg struct {
+    HeartbeatSeconds   uint32
+    HeartbeatSnapToRtc bool
+}
+func (value *HeartbeatSetCnfUlMsg) DeepCopy() *HeartbeatSetCnfUlMsg {
+    if value == nil {
+        return nil
+    }
+    result := &HeartbeatSetCnfUlMsg {
         HeartbeatSeconds:   value.HeartbeatSeconds,
         HeartbeatSnapToRtc: value.HeartbeatSnapToRtc,
     }
@@ -461,6 +491,11 @@ func (value *MeasurementsIndUlMsg) DeepCopy() *MeasurementsIndUlMsg {
     return result
 }
 
+// MeasurementsGetReqDlMsg
+type MeasurementsGetReqDlMsg struct {
+    // Empty
+}
+
 // MeasurementsGetCnfUlMsg
 type MeasurementsGetCnfUlMsg struct {
     Measurements  MeasurementData
@@ -480,6 +515,8 @@ func (value *MeasurementsGetCnfUlMsg) DeepCopy() *MeasurementsGetCnfUlMsg {
 // type MeasurementControlSetCnfUlMsg struct
 // type MeasurementControlGetCnfUlMsg struct
 // type MeasurementControlIndUlMsg struct
+// type MeasurementsControlDefaultsSetReqDlMsg struct
+// type MeasurementsControlDefaultsSetCnfUlMsg struct
 
 // TrafficReportIndUlMsg
 type TrafficReportIndUlMsg struct {
@@ -501,6 +538,11 @@ func (value *TrafficReportIndUlMsg) DeepCopy() *TrafficReportIndUlMsg {
         NumDatagramsDlBadChecksum:  value.NumDatagramsDlBadChecksum,
     }
     return result
+}
+
+// TrafficReportGetReqDlMsg
+type TrafficReportGetReqDlMsg struct {
+    // Empty
 }
 
 // TrafficReportGetCnfUlMsg
@@ -589,6 +631,11 @@ func (value *TrafficTestModeParametersSetCnfUlMsg) DeepCopy() *TrafficTestModePa
     return result
 }
 
+// TrafficTestModeParametersGetReqDlMsg
+type TrafficTestModeParametersGetReqDlMsg struct {
+    // Empty
+}
+
 // TrafficTestModeParametersGetCnfUlMsg
 type TrafficTestModeParametersGetCnfUlMsg struct {
     NumUlDatagrams      uint32
@@ -673,6 +720,11 @@ func (value *TrafficTestModeReportIndUlMsg) DeepCopy() *TrafficTestModeReportInd
     return result
 }
 
+// TrafficTestModeReportGetReqDlMsg
+type TrafficTestModeReportGetReqDlMsg struct {
+    // Empty
+}
+
 // TrafficTestModeReportGetCnfUlMsg
 type TrafficTestModeReportGetCnfUlMsg struct {
     NumTrafficTestDatagramsUl            uint32
@@ -729,6 +781,11 @@ func (value *ActivityReportIndUlMsg) DeepCopy() *ActivityReportIndUlMsg {
         DlMcs:                      value.DlMcs,
     }
     return result
+}
+
+// ActivityReportGetReqDlMsg
+type ActivityReportGetReqDlMsg struct {
+    // Empty
 }
 
 // ActivityReportGetCnfUlMsg

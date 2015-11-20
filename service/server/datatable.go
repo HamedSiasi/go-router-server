@@ -1,4 +1,4 @@
-/* Datatable definitions for the UTM server.
+/* Datatable storage for the UTM server.
  *
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -13,11 +13,20 @@
 package server
 
 import (
+    "time"
     "github.com/davecgh/go-spew/spew"
 )
 
+//--------------------------------------------------------------------
+// Types 
+//--------------------------------------------------------------------
+
+// NOTE: if you ever add anything here, don't forget to add it to the InitIndUlMsg handling
+// and to the copying under DeviceLatestState
 type LatestState struct {
-    Connection                              Connection
+    Connected                               bool                              `json:"Connected,omitempty"`
+    DeviceName                              string                            `json:"DeviceName,omitempty"`
+    LastHeardFrom                           time.Time                         `json:"LastHeardFrom,omitempty"`
     LatestInitIndDisplay                    *InitIndDisplay                   `json:"LatestInitIndDisplay,omitempty"`
     LatestIntervalsDisplay                  *IntervalsDisplay                 `json:"LatestIntervalsDisplay,omitempty"`
     LatestModeDisplay                       *ModeDisplay                      `json:"LatestModeDisplay,omitempty"`
@@ -40,6 +49,10 @@ type DeviceLatestState struct {
 	Latest       chan LatestState
 }
 
+//--------------------------------------------------------------------
+// Variables
+//--------------------------------------------------------------------
+
 // To update the latest values send a MessageContainer into this channel
 // containing the received message; a copy their contents will be stored
 // in a displayable form
@@ -51,21 +64,59 @@ type DeviceLatestState struct {
 
 // To terminate execution simply close the channel
 
-var stateTableCmds chan<- interface{}
+var dataTableCmds chan<- interface{}
 
-func OperateStateTable() {
+//--------------------------------------------------------------------
+// Functions
+//--------------------------------------------------------------------
+
+func operateDataTable() {
     cmds := make(chan interface{})
-    stateTableCmds = cmds
+    dataTableCmds = cmds
+	deviceLatestStateList := make(map[string]*LatestState)    	
+    checkConnections := time.NewTicker (time.Second * 10)
+    
     Dbg.PrintfTrace("%s --> datatable command channel created and now being serviced.\n", logTag)
     
+    // Deal with the check connections timer
+    // If we know the reporting interval we can say a device
+    // is not connected if we've heard nothing for more than the
+    // reporting interval
     go func() {
-    	deviceLatestStateList := make(map[string]*LatestState)
-    	
-        for msg := range cmds {
-            Dbg.PrintfTrace("%s --> datatable command:\n\n%+v\n\n", logTag, msg)
-
-            switch value := msg.(type) {
+        for _ = range checkConnections.C {
+            for uuid, state := range deviceLatestStateList {
+                if state.LatestIntervalsDisplay != nil &&
+                   state.LatestIntervalsDisplay.ReportingInterval > 0 {
+                    if state.LatestIntervalsDisplay.HeartbeatSnapToRtc {
+                        if time.Now().After (state.LastHeardFrom.Add(time.Hour + time.Minute * 10)) {
+                            state.Connected = false;
+                            Dbg.PrintfTrace("%s --> device %s no longer connected (last heard from @ %s).\n", logTag, uuid, state.LastHeardFrom.String())
+                        }
+                    } else {
+                        if time.Now().After (state.LastHeardFrom.Add(time.Duration(state.LatestIntervalsDisplay.HeartbeatSeconds * (state.LatestIntervalsDisplay.ReportingInterval + 2)) * time.Second)) {                   
+                            state.Connected = false;
+                            Dbg.PrintfTrace("%s --> device %s no longer connected  (last heard from @ %s).\n", logTag, uuid, state.LastHeardFrom.String())
+                        }   
+                    }                
+                }    
+            }     
+        }
+    }()
+    
+    // Deal with messages on the cmds channel
+    go func() {
+        for cmd := range cmds {
+            switch value := cmd.(type) {
             	
+	            // Handle connection indications
+	            case *Connection:
+	            	state := deviceLatestStateList[value.DeviceUuid]
+            		if state != nil {
+    	                state.LastHeardFrom = value.LastHeardFrom;
+    	                state.DeviceName = value.DeviceName;
+    	                state.Connected = true;
+    	            }    
+			                	
 	            // Handle message containers holding somethings of interest
 	            case *MessageContainer:
 	            
@@ -74,20 +125,38 @@ func OperateStateTable() {
             		if state == nil {
             			state = &LatestState{};
             			deviceLatestStateList[value.DeviceUuid] = state;
+                        state.LastHeardFrom = time.Now().Local()
                         Dbg.PrintfTrace("%s --> datatable has heard from a new device, UUID %s.\n", logTag, value.DeviceUuid)
+    					// Get the reporting intervals for this device
+	                    encodeAndEnqueue (&IntervalsGetReqDlMsg{}, value.DeviceUuid)        					
             		}
-                    Dbg.PrintfTrace("%s --> datatable received a message from device with UUID %s.\n", logTag, value.DeviceUuid)
+            		
+                    Dbg.PrintfTrace("%s --> datatable received a message from UUID %s.\n", logTag, value.DeviceUuid)
             		
 	            	switch utmMsg := value.Message.(type) {
-			            case *Connection:
-			            	// TODO sort this
-			                //state.Connection = *value
-			                //Dbg.PrintfTrace("%s --> setting connection state for all devices in datatable: %+v\n", logTag, value)
-			                	
 			            case *InitIndUlMsg:
 			                data := utmMsg.DeepCopy()
 			                if data != nil {
 			                    state.LatestInitIndDisplay = makeInitIndDisplay(data, value.Timestamp)
+			                    // Device must have (re)booted so clear what we know
+			                    // TODO: I _think_ the values that were here all get garbage collected
+			                    // as there seems to be no way to do an explicit free.  But I'd really
+			                    // like to check.
+                                state.LastHeardFrom = time.Now().Local()
+                                state.LatestIntervalsDisplay = nil
+                                state.LatestModeDisplay = nil
+                                state.LatestDateTimeDisplay = nil
+                                state.LatestUtmStatusDisplay = nil
+                                state.LatestGnssDisplay = nil
+                                state.LatestCellIdDisplay = nil
+                                state.LatestSignalStrengthDisplay = nil
+                                state.LatestTemperatureDisplay = nil
+                                state.LatestPowerStateDisplay = nil
+                                state.LatestTrafficReportDisplay = nil
+                                state.LatestTrafficTestModeParametersDisplay = nil
+                                state.LatestTrafficTestModeReportDisplay = nil
+                                state.LatestActivityReportDisplay = nil
+                                state.LatestDisplayRow = nil
 			                }
 			
 			            case *IntervalsGetCnfUlMsg:
@@ -205,6 +274,19 @@ func OperateStateTable() {
 			                    state.LatestTrafficTestModeParametersDisplay = makeTrafficTestModeParametersDisplay1(data, value.Timestamp)
 			                }
 			
+			            case *TrafficTestModeReportIndUlMsg:
+			                data := utmMsg.DeepCopy()
+			                if data != nil {
+        			            // TODO check for a pass/fail result 
+			                    state.LatestTrafficTestModeReportDisplay = makeTrafficTestModeReportDisplay0(data, value.Timestamp)
+			                }
+			
+			            case *TrafficTestModeReportGetCnfUlMsg:
+			                data := utmMsg.DeepCopy()
+			                if data != nil {
+			                    state.LatestTrafficTestModeReportDisplay = makeTrafficTestModeReportDisplay1(data, value.Timestamp)
+			                }
+			
 			            case *ActivityReportIndUlMsg:
 			                data := utmMsg.DeepCopy()
 			                if data != nil {
@@ -228,7 +310,8 @@ func OperateStateTable() {
 		                // post it and close the channel
 		                Dbg.PrintfTrace("%s --> fetching latest state for UUID %s.\n", logTag, value.DeviceUuid)
 		                latest := LatestState{}
-		                state.Connection = state.Connection
+		                latest.Connected = state.Connected
+		                latest.LastHeardFrom = state.LastHeardFrom
 		                latest.LatestInitIndDisplay = state.LatestInitIndDisplay.DeepCopy()
 		                latest.LatestIntervalsDisplay = state.LatestIntervalsDisplay.DeepCopy()
 		                latest.LatestModeDisplay = state.LatestModeDisplay.DeepCopy()
@@ -252,16 +335,17 @@ func OperateStateTable() {
 		            }
 		                
 	            default:
-	                Dbg.PrintfTrace("%s --> unrecognised datatable message, ignoring:\n\n%s\n", logTag, spew.Sdump(msg))
+	                Dbg.PrintfTrace("%s --> unrecognised datatable message, ignoring:\n\n%s\n", logTag, spew.Sdump(cmd))
             }
         }
 
         Dbg.PrintfTrace("%s --> datatable command channel closed, stopping.\n", logTag)
+        checkConnections.Stop();
     }()
 }
 
 func init() {
-    OperateStateTable()
+    operateDataTable()
 }
 
 /* End Of File */

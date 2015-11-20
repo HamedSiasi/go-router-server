@@ -28,17 +28,56 @@ import (
     "github.com/robmeades/utm/service/routes"
 )
 
+//--------------------------------------------------------------------
+// Types 
+//--------------------------------------------------------------------
+
+// A message expected back from a device
+type ExpectedMsg struct {
+    TimeStarted  time.Time
+    ResponseId   ResponseTypeEnum
+}
+
+// The list of messages expected back from a device
+type ExpectedMsgList []ExpectedMsg
+
+// Conection details for a device
+type Connection struct {
+	DeviceUuid    string
+	DeviceName    string
+    LastHeardFrom time.Time
+}
+
+//--------------------------------------------------------------------
+// Variables
+//--------------------------------------------------------------------
+
+// Level of debug required
 const Dbg utilities.DebugLevel = utilities.DEBUG_TRACE
+
+// Server details
 const configurationFile string = "config.cfg"
-const MaximumNumberOfUtms = 100
+
+// Log  prefix so that we can tell who we are
 var logTag string = "UTM-API"
-var downlinkMessages chan<- AmqpMessage
-var ueGuid string
-var amqpCount int
+
+// TODO
 var displayRow = &DisplayRow{}
 
-//var UuidsMap = map[string]*DisplayRow{}
+// A list of expected response messages against each device
+var deviceExpectedMsgList map[string]ExpectedMsgList
 
+// Downlink channel to device
+var downlinkMessages chan<- AmqpMessage
+
+// Count of AMQP messages received
+var amqpCount int = 0
+
+//--------------------------------------------------------------------
+// Functions
+//--------------------------------------------------------------------
+
+// Fail func
 func failOnError (err error, msg string) {
     if err != nil {
         log.Fatalf("%s: %s", msg, err)
@@ -46,6 +85,7 @@ func failOnError (err error, msg string) {
     }
 }
 
+// TODO
 func getLatestState (response http.ResponseWriter, request *http.Request) *utilities.Error {
 	// Ensure this is a GET request
 	if (request.Method != "GET") || (request.Method == "") {
@@ -55,10 +95,10 @@ func getLatestState (response http.ResponseWriter, request *http.Request) *utili
 
 	// Get the latest state; only one response will come back before the requesting channel is closed
 	get := make(chan LatestState)
-	stateTableCmds <- &get
+	dataTableCmds <- &get
 	state := <-get
 
-	//Graddually group our units
+	//Gradually group our units
 	AddUuidToMap(state.LatestDisplayRow)
 
 	//Recyle map with new state
@@ -79,7 +119,7 @@ func getLatestState (response http.ResponseWriter, request *http.Request) *utili
 
 	return nil
 }
-
+// TODO
 func AddUuidToMap(row *DisplayRow) *utilities.Error {
 	if row != nil {
 		_, ok := uuidMap[row.Uuid]
@@ -89,6 +129,7 @@ func AddUuidToMap(row *DisplayRow) *utilities.Error {
 	}
 	return nil
 }
+// TODO
 func RecycleMap(oldMap map[string]*DisplayRow, newState LatestState) map[string]*DisplayRow {
 	if len(oldMap) > 3 {
 		_, ok := oldMap[newState.LatestDisplayRow.Uuid]
@@ -102,6 +143,7 @@ func RecycleMap(oldMap map[string]*DisplayRow, newState LatestState) map[string]
 
 	return oldMap
 }
+// TODO
 func ConvertMapToSlice(uidMap map[string]*DisplayRow) []*DisplayRow {
 	var sdisplay []*DisplayRow
 	for _, v := range uidMap {
@@ -111,7 +153,7 @@ func ConvertMapToSlice(uidMap map[string]*DisplayRow) []*DisplayRow {
 	return sdisplay
 }
 
-//DownLink (DL) messages
+// TODO
 func setReportingInterval(response http.ResponseWriter, request *http.Request) *utilities.Error {
 	// Ensure this is a POST request
 	if request.Method != "POST" {
@@ -128,7 +170,7 @@ func setReportingInterval(response http.ResponseWriter, request *http.Request) *
 	}
 
 	// Encode and enqueue the requested data
-	err = encodeAndEnqueueReportingInterval(uint32(mins))
+	// TODO err = encodeAndEnqueueReportingInterval(uint32(mins))
 	if err != nil {
 		Dbg.PrintfError("%s --> unable to encode and enqueue reporting interval for UTM-API %s\n", logTag, request.URL)
 		return utilities.ClientError("unable to encode and enqueue reporting interval", http.StatusBadRequest)
@@ -139,9 +181,8 @@ func setReportingInterval(response http.ResponseWriter, request *http.Request) *
 	return nil
 }
 
+// Process messages from the AMQP queues
 func processAmqp(username, amqpAddress string) {
-
-	//ueGuid, err := amqp.GetString("ueguid")
 
 	// create a queue and bind it with relevant routing keys
 	// amqpAddress := utilities.EnvStr("AMQP_ADDRESS")
@@ -154,21 +195,11 @@ func processAmqp(username, amqpAddress string) {
 	defer q.Close()
 	downlinkMessages = q.Downlink
 
-	// TODO: do this per device
-	stateTableCmds <- &Connection{Status: "Disconnected"}
-
-	connState := "Disconnected"
-	connected := connState
-
 	for {
 		amqpCount = amqpCount + 1
 		Dbg.PrintfInfo("\n=====================> processing datagram number %v in AMQP channel =====================================\n", amqpCount)
 
-		//time.Sleep(time.Second * 10)
 		select {
-			case <-time.After(30 * time.Minute):
-				connected = "Disconnected"
-
 			case msg := <-q.Msgs:
 				Dbg.PrintfTrace("%s --> decoded msg:\n\n%+v\n\n", logTag, msg)
 
@@ -180,10 +211,30 @@ func processAmqp(username, amqpAddress string) {
 						Dbg.PrintfTrace("%s --> is response.\n", logTag)
 						if value.Command == "UART_data" {
 							// UART data from the UTM-API which needs to be decoded
-							decode(value.Data, value.DeviceUuid)
+                			// Decode the messages
+							msgs := decode(value.Data, value.DeviceUuid)
+
+							// Pass the messages to the state table for recording
+							// and pass them to processing to see if any responses
+							// are required
+							if msgs != nil {
+    							for _, msg := range msgs {
+                            		dataTableCmds <- msg							    
+        							processMsgs <- msg
+    							}
+    						}							
+
+							// Send the datatable a message indicating that this device
+							// has been heard from							
+                			dataTableCmds <- &Connection {
+                			    DeviceUuid:    value.DeviceUuid,
+                			    DeviceName:    value.DeviceName,
+                			    LastHeardFrom: time.Now(),
+              			    }
+                			
 							// Get the amount of uplink data and send it on to the data table
 							now := time.Now()
-							stateTableCmds <- &DataVolume{
+							dataTableCmds <- &DataVolume{
 								UplinkTimestamp: &now,
 								UplinkBytes:     uint64(len(value.Data)),
 							}
@@ -192,7 +243,6 @@ func processAmqp(username, amqpAddress string) {
 							row.TotalMsgs = row.TotalMsgs + uint64(len(value.Data))
 							row.TotalBytes = row.UTotalBytes + row.DTotalBytes
 							row.TotalMsgs = row.UTotalMsgs + row.DTotalMsgs + row.TotalMsgs
-							connected = "CONNECTED"
 						}
 
 					case *AmqpErrorMessage:
@@ -203,38 +253,51 @@ func processAmqp(username, amqpAddress string) {
 						log.Fatal(logTag, "invalid message type.")
 				}
 		}
-
-		if connState != connected {
-			connState = connected
-			Dbg.PrintfTrace("%s --> sending new connection state: %s.\n", logTag, connState)
-			stateTableCmds <- &Connection{Status: connState}
-		}
-
 	}
-	amqpCount = 0
 }
 
+// Entry point
 func Run() {
+
     // First, parse the configuration file
     settings, err := forge.ParseFile(configurationFile)
     if err != nil {
         panic(err)
 	}
-
 	amqp, err := settings.GetSection("amqp")
 	username, err := amqp.GetString("uname")
 	amqpAddress, err := amqp.GetString("amqp_address")
-	//ueGuid, err := amqp.GetString("ueguid")
-
 	host, err := settings.GetSection("host")
 	port, err := host.GetString("port")
 
+	// Set up the device expected message list map
+	deviceExpectedMsgList = make(map[string]ExpectedMsgList)
+	// And a timer to remove crud from it
+    removeOldExpectedMsgs := time.NewTicker (time.Minute * 10)
+    
+    // Remove old stuff from the expected message list on a tick
+    go func() {
+        for _ = range removeOldExpectedMsgs.C {
+            for uuid, expectedMsgList := range deviceExpectedMsgList {
+                var x = 0                
+                for x < len(expectedMsgList) {
+                    if time.Now().After (expectedMsgList[x].TimeStarted.Add(time.Hour)) {
+    		            expectedMsgList = append(expectedMsgList[:x], expectedMsgList[x + 1:] ...)
+                        Dbg.PrintfTrace("%s --> giving up after waiting > 1 hour for %d from device %s.\n", logTag, expectedMsgList[x].ResponseId, uuid)
+                    }
+                    x++
+                }
+            }
+        }
+    }()
+    
 	// Process Amqp messages
 	go processAmqp(username, amqpAddress)
 
+	// Set up logging
 	log.SetFlags(log.LstdFlags)
 
-	fmt.Printf("----------------------------------------------------\n")
+	fmt.Printf("######################################################################################################\n")
 	fmt.Printf("UTM-API service (%s) REST interface listening on %s.\n", logTag, amqpAddress)
 
 	store := cookiestore.New([]byte("secretkey789"))

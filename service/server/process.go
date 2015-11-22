@@ -48,7 +48,7 @@ func operateProcess() {
 	            
     		        responseId := RESPONSE_NONE
 
-					Dbg.PrintfInfo("%s --> processing message from UUID %s:\n\n%s\n\n", logTag, value.DeviceUuid, spew.Sdump(msg))
+					Dbg.PrintfTrace("%s --> processing message from UUID %s:\n\n%s\n\n", logTag, value.DeviceUuid, spew.Sdump(msg))
             		
 	            	switch utmMsg := value.Message.(type) {
         				
@@ -176,7 +176,6 @@ func operateProcess() {
 	            	}
 	            	
                 	// If this was a response message, take it out of the expected list for this UUID
-                	
                 	if responseId != RESPONSE_NONE {
                     	list := deviceExpectedMsgList[value.DeviceUuid]
                 		if list != nil {
@@ -190,7 +189,8 @@ func operateProcess() {
                 	}
 	            	
 	            default:
-	                Dbg.PrintfTrace("%s --> unrecognised message, ignoring:\n\n%s\n", logTag, spew.Sdump(msg))
+	                Dbg.PrintfTrace("%s --> unrecognised message, ignoring.\n", logTag)
+	                //Dbg.PrintfTrace("%s --> unrecognised message, ignoring:\n\n%s\n", logTag, spew.Sdump(msg))
             }
         }
 

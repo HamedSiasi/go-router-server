@@ -267,6 +267,9 @@ const MaxDatagramSizeRaw uint32 = C.MAX_DATAGRAM_SIZE_RAW
 
 const RevisionLevel uint32 = C.REVISION_LEVEL
 
+var inputBuffer C.union_UlMsgUnionTag_t
+var xmlDecodeBuffer [8192]C.char
+
 var ulDecodeTypeDisplay map[int]string = map[int]string {
 	C.DECODE_RESULT_FAILURE:                                      "DECODE_RESULT_FAILURE",
 	C.DECODE_RESULT_INPUT_TOO_SHORT:                              "DECODE_RESULT_INPUT_TOO_SHORT",
@@ -318,9 +321,9 @@ func decode(data []byte, uuid string) []interface{} {
 	var returnedMsgs []interface{} = nil
 	
 	// Holder for the extracted message
-	var inputBuffer C.union_UlMsgUnionTag_t
 	pBuffer := (*C.UlMsgUnion_t)(unsafe.Pointer(&inputBuffer))
 	
+	// TODO
 	row.UTotalMsgs = row.UTotalMsgs + uint64(len(data))
 
 	// Loop over the messages in the datagram
@@ -329,7 +332,7 @@ func decode(data []byte, uuid string) []interface{} {
 	ppNext := (**C.char)(unsafe.Pointer(&pNext))
 
 	hexBuffer := hex.Dump(data)
-	Dbg.PrintfTrace("%s --> the whole input buffer:\n\n(%s)\n\n", logTag, hexBuffer)
+	Dbg.PrintfInfo("%s --> the whole input buffer:\n\n%s\n\n", logTag, hexBuffer)
 
 	var decoderCount uint32
 
@@ -346,8 +349,15 @@ func decode(data []byte, uuid string) []interface{} {
 		bytesRemaining = C.uint32_t(len(data)) - used
 		Dbg.PrintfInfo("%s --> %d bytes remaining out of %d.\n", logTag, bytesRemaining, len(data))
 		if bytesRemaining > 0 {
-			result := C.decodeUlMsg(ppNext, bytesRemaining, pBuffer, nil, nil)
+        	// A place to put the XML output from the decoder
+        	pXmlBuffer := (*C.char) (unsafe.Pointer(&(xmlDecodeBuffer[0])))
+        	ppXmlBuffer := (**C.char) (unsafe.Pointer(&pXmlBuffer))
+            xmlBufferLen := (C.uint32_t) (len(xmlDecodeBuffer))
+            pXmlBufferLen := (*C.uint32_t) (unsafe.Pointer(&xmlBufferLen))
+	
+			result := C.decodeUlMsg(ppNext, bytesRemaining, pBuffer, ppXmlBuffer, pXmlBufferLen)
 			Dbg.PrintfTrace("%s --> decode received uplink message: %+v.\n\n-----## %s ##----- \n\n", logTag, result, ulDecodeTypeDisplay[int(result)])
+			Dbg.PrintfInfo("%s --> XML buffer pointer 0x%08x, used %d, left %d:.\n", logTag, *ppXmlBuffer, C.uint32_t(len(xmlDecodeBuffer)) - xmlBufferLen, xmlBufferLen)
 	
 			// Now decode the messages and pass them to the state table
 			switch int(result) {

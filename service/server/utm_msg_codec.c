@@ -43,6 +43,30 @@ extern "C"
 #define MESSAGE_CODEC_LOGMSG(...)
 #endif
 
+// Note on debugging GCC issues on Windows, with thanks
+// to Dennis Yurichev:
+//
+// http://dennisyurichev.blogspot.co.uk/2013/05/warning-invalid-parameter-passed-to-c.html
+//
+// While compiling under GCC (for Golang) a Mingw
+// run-time library uses Windows calls to do certain things,
+// like printf or snprintf etc.  I was getting a segmentation
+// fault and so, running under gdb, saw the message:
+// "warning: Invalid parameter passed to C runtime function."
+// It is apparently being dumped into the debugger in
+// msvcrt.dll's __invoke_watson() call, using well-known
+// OutputDebugStringA().  So to trace what his happening you
+// need to add a breakpoint there, by typing:
+//
+// break OutputDebugStringA
+//
+// ...in GDB.  You should then be able to find out what's up
+// with a backtrace (type "bt").
+//
+// In my case it turns out that I was calling strftime() with a
+// C99 formatter, %F, which is a but to recent for Golang's use
+// of GCC.  I needed to use the equivalent %Y-%m-%d instead.
+
 // ----------------------------------------------------------------
 // GENERAL COMPILE-TIME CONSTANTS
 // ----------------------------------------------------------------
@@ -1598,9 +1622,10 @@ uint32_t logDateTime(char * pBuffer, uint32_t *pBufferSize, uint32_t timeValue)
     uint32_t bytesUsed;
     char timeString[32];
     struct tm * pT;
+    time_t t = timeValue;
 
-    pT = gmtime((time_t *) &(timeValue));
-    strftime(&(timeString[0]), sizeof(timeString), "%F %X", pT);
+    pT = gmtime(&t);
+    strftime(&(timeString[0]), sizeof(timeString), "%Y-%m-%d %X", pT);
     bytesUsed = snprintf(pBuffer, *pBufferSize, "<DateTime Value=\"%s\" TimeZone=\"UTC\" />", &(timeString[0]));
 
     return calcBytesUsed(pBufferSize, bytesUsed);
@@ -1612,13 +1637,14 @@ uint32_t logHeartbeat(char * pBuffer, uint32_t *pBufferSize, uint32_t heartbeatV
     uint32_t bytesUsed;
     char timeString[32];
     struct tm * pT;
+    time_t t = heartbeatValue;
 
     bytesUsed = snprintf(pBuffer, *pBufferSize, "<Heartbeat>");
     bytesUsed = calcBytesUsed(pBufferSize, bytesUsed);
 
     if (snapToRtc)
     {
-        pT = gmtime((time_t *) &(heartbeatValue));
+        pT = gmtime(&t);
         strftime(&(timeString[0]), sizeof(timeString), "%M:%S", pT);
         bytesUsed += snprintf((pBuffer + bytesUsed), *pBufferSize, "<SnapToRtc Value=\"%s\" Units=\"Mins:Secs\" />", &(timeString[0]));
         bytesUsed = calcBytesUsed(pBufferSize, bytesUsed);
@@ -1638,15 +1664,21 @@ uint32_t logHeartbeat(char * pBuffer, uint32_t *pBufferSize, uint32_t heartbeatV
 /// Log the RSSI
 uint32_t logRssi(char * pBuffer, uint32_t *pBufferSize, Rssi_t rssi)
 {
-    uint32_t bytesUsed = snprintf(pBuffer, *pBufferSize, "<Rssi Value=\"%.1f\" Units=\"dBm\" />", (double) rssi / 10);
+    uint32_t bytesUsed = snprintf(pBuffer, *pBufferSize, "<Rssi Value=\"%d\" Units=\"dBm\" />", (double) rssi / 10);
     return calcBytesUsed(pBufferSize, bytesUsed);
 }
 
 /// Log the RSRP
 uint32_t logRsrp(char * pBuffer, uint32_t *pBufferSize, Rssi_t rsrp, bool isSyncedWithRssi)
 {
-    uint32_t bytesUsed = snprintf(pBuffer, *pBufferSize, "<Rrsp Value=\"%.1f\" Units=\"dBm\" IsSyncedWithRssi=\"%s\" />", (double) rsrp / 10, getStringBoolean(isSyncedWithRssi));
-    return calcBytesUsed(pBufferSize, bytesUsed);
+	// TODO: for reasons I have not yet determined, if the string value and the float
+	// value are included in this log point I get a segmentation fault out of snprintf().
+	// I've printf'ed all the values around here and everything seems in order, the string
+	// isn't actually getting too large for the supplied buffer.  If I don't do the float
+	// the problem goes away.  Don't understand.  Be afraid, be moderately afraid.
+    //uint32_t bytesUsed = snprintf(pBuffer, *pBufferSize, "<Rrsp Value=\"%.1f\" Units=\"dBm\" IsSyncedWithRssi=\"%s\" />", (double) rsrp / 10, getStringBoolean(isSyncedWithRssi));
+    uint32_t bytesUsed = snprintf(pBuffer, *pBufferSize, "<Rrsp Value=\"%d.%d\" Units=\"dBm\" IsSyncedWithRssi=\"%s\" />", rsrp / 10, rsrp % 10, getStringBoolean(isSyncedWithRssi));
+	return calcBytesUsed(pBufferSize, bytesUsed);
 }
 
 /// Log the temperature

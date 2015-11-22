@@ -90,7 +90,7 @@ func OpenQueue(username, amqpAddress string) (*Queue, error) {
 
     Conn, err := amqp.Dial(amqpAddress)
     if err != nil {
-        return nil, fmt.Errorf("--> connecting to RabbitMQ: %s", err.Error)
+        return nil, fmt.Errorf("--> connecting to RabbitMQ: %s", err.Error())
     }
     q.Conn = Conn
 

@@ -99,13 +99,13 @@ func getLatestState (response http.ResponseWriter, request *http.Request) *utili
 	state := <-get
 
 	//Gradually group our units
-	AddUuidToMap(state.LatestDisplayRow)
+	//AddUuidToMap(state.LatestDisplayRow)
 
 	//Recyle map with new state
-	uuidMap = RecycleMap(uuidMap, state)
+	//uuidMap = RecycleMap(uuidMap, state)
 
 	//Copy unit into slice, for encoding
-	uuidSlice = ConvertMapToSlice(uuidMap)
+	//uuidSlice = ConvertMapToSlice(uuidMap)
 
 	// Send the requested data
 	response.Header().Set("Content-Type", "application/json")
@@ -118,39 +118,6 @@ func getLatestState (response http.ResponseWriter, request *http.Request) *utili
 	//log.Printf("%s Received rest request %s and responding with %s\n", logTag, request.URL, spew.Sdump(state))
 
 	return nil
-}
-// TODO
-func AddUuidToMap(row *DisplayRow) *utilities.Error {
-	if row != nil {
-		_, ok := uuidMap[row.Uuid]
-		if !ok {
-			uuidMap[row.Uuid] = row
-		}
-	}
-	return nil
-}
-// TODO
-func RecycleMap(oldMap map[string]*DisplayRow, newState LatestState) map[string]*DisplayRow {
-	if len(oldMap) > 3 {
-		_, ok := oldMap[newState.LatestDisplayRow.Uuid]
-		if ok {
-			//Delete old state
-			delete(oldMap, newState.LatestDisplayRow.Uuid)
-			//Add new state
-			oldMap[newState.LatestDisplayRow.Uuid] = newState.LatestDisplayRow
-		}
-	}
-
-	return oldMap
-}
-// TODO
-func ConvertMapToSlice(uidMap map[string]*DisplayRow) []*DisplayRow {
-	var sdisplay []*DisplayRow
-	for _, v := range uidMap {
-		sdisplay = append(sdisplay, v)
-	}
-
-	return sdisplay
 }
 
 // TODO

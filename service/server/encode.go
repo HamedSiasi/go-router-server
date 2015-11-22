@@ -59,6 +59,8 @@ const (
 // Variables
 //--------------------------------------------------------------------
 
+var xmlEncodeBuffer [8192]C.char
+
 //--------------------------------------------------------------------
 // Functions
 //--------------------------------------------------------------------
@@ -74,17 +76,23 @@ func encodeAndEnqueue(msg interface{}, uuid string) error {
 		var byteCount C.uint32_t = 0     
         responseId := RESPONSE_NONE
 		
+    	// A place to put the XML output from the decoder
+    	pXmlBuffer := (*C.char) (unsafe.Pointer(&(xmlEncodeBuffer[0])))
+    	ppXmlBuffer := (**C.char) (unsafe.Pointer(&pXmlBuffer))
+        xmlBufferLen := (C.uint32_t) (len(xmlEncodeBuffer))
+        pXmlBufferLen := (*C.uint32_t) (unsafe.Pointer(&xmlBufferLen))
+        
 		// Encode each message type
 		switch value := msg.(type) {
 		    case *TransparentDlDatagram:
 		        // TODO
             case *PingReqDlMsg:
-        		byteCount = C.encodePingReqMsg(outputPointer, nil, nil)
+        		byteCount = C.encodePingReqMsg(outputPointer, ppXmlBuffer, pXmlBufferLen)
                 Dbg.PrintfTrace("%s --> encoded PingReqDlMsg.\n", logTag)
                 responseId = RESPONSE_PING_CNF
                 
             case *PingCnfDlMsg:
-        		byteCount = C.encodePingCnfMsg(outputPointer, nil, nil)
+        		byteCount = C.encodePingCnfMsg(outputPointer, ppXmlBuffer, pXmlBufferLen)
                 Dbg.PrintfTrace("%s --> encoded PingCnfDlMsg.\n", logTag)
                 
             case *RebootReqDlMsg:
@@ -95,7 +103,7 @@ func encodeAndEnqueue(msg interface{}, uuid string) error {
                     disableServerPing: (C.bool) (value.DisableServerPing),                    
                 }
         		dataPointer := (*C.RebootReqDlMsg_t)(unsafe.Pointer(&data))
-        		byteCount = C.encodeRebootReqDlMsg(outputPointer, dataPointer, nil, nil)
+        		byteCount = C.encodeRebootReqDlMsg(outputPointer, dataPointer, ppXmlBuffer, pXmlBufferLen)
                 Dbg.PrintfTrace("%s --> encoded RebootReqDlMsg.\n", logTag)
                 
             case *DateTimeSetReqDlMsg:
@@ -104,11 +112,11 @@ func encodeAndEnqueue(msg interface{}, uuid string) error {
                     setDateOnly: (C.bool) (value.SetDateOnly),
                 }
         		dataPointer := (*C.DateTimeSetReqDlMsg_t)(unsafe.Pointer(&data))
-        		byteCount = C.encodeDateTimeSetReqDlMsg(outputPointer, dataPointer, nil, nil)
+        		byteCount = C.encodeDateTimeSetReqDlMsg(outputPointer, dataPointer, ppXmlBuffer, pXmlBufferLen)
                 Dbg.PrintfTrace("%s --> encoded DateTimeSetReqDlMsg.\n", logTag)
                 responseId = RESPONSE_DATE_TIME_SET_CNF
             case *DateTimeGetReqDlMsg:
-        		byteCount = C.encodeDateTimeGetReqDlMsg(outputPointer, nil, nil)
+        		byteCount = C.encodeDateTimeGetReqDlMsg(outputPointer, ppXmlBuffer, pXmlBufferLen)
                 Dbg.PrintfTrace("%s --> encoded DateTimeGetReqDlMsg.\n", logTag)
                 responseId = RESPONSE_DATE_TIME_GET_CNF
                 
@@ -117,17 +125,17 @@ func encodeAndEnqueue(msg interface{}, uuid string) error {
                     mode:  (C.Mode_t) (value.Mode),
                 }
         		dataPointer := (*C.ModeSetReqDlMsg_t)(unsafe.Pointer(&data))
-        		byteCount = C.encodeModeSetReqDlMsg(outputPointer, dataPointer, nil, nil)
+        		byteCount = C.encodeModeSetReqDlMsg(outputPointer, dataPointer, ppXmlBuffer, pXmlBufferLen)
                 Dbg.PrintfTrace("%s --> encoded ModeSetReqDlMsg.\n", logTag)
                 responseId = RESPONSE_MODE_SET_CNF
                 
             case *ModeGetReqDlMsg:
-        		byteCount = C.encodeModeGetReqDlMsg(outputPointer, nil, nil)
+        		byteCount = C.encodeModeGetReqDlMsg(outputPointer, ppXmlBuffer, pXmlBufferLen)
                 Dbg.PrintfTrace("%s --> encoded ModeGetReqDlMsg.\n", logTag)
                 responseId = RESPONSE_MODE_GET_CNF
             
             case *IntervalsGetReqDlMsg:
-        		byteCount = C.encodeIntervalsGetReqDlMsg(outputPointer, nil, nil)
+        		byteCount = C.encodeIntervalsGetReqDlMsg(outputPointer, ppXmlBuffer, pXmlBufferLen)
                 Dbg.PrintfTrace("%s --> encoded IntervalsGetReqDlMsg.\n", logTag)
                 responseId = RESPONSE_INTERVALS_GET_CNF
                 
@@ -136,7 +144,7 @@ func encodeAndEnqueue(msg interface{}, uuid string) error {
                     reportingInterval:  (C.uint32_t) (value.ReportingInterval),
                 }
         		dataPointer := (*C.ReportingIntervalSetReqDlMsg_t)(unsafe.Pointer(&data))
-        		byteCount = C.encodeReportingIntervalSetReqDlMsg(outputPointer, dataPointer, nil, nil)
+        		byteCount = C.encodeReportingIntervalSetReqDlMsg(outputPointer, dataPointer, ppXmlBuffer, pXmlBufferLen)
                 Dbg.PrintfTrace("%s --> encoded ReportingIntervalSetReqDlMsg.\n", logTag)
                 responseId = RESPONSE_REPORTING_INTERVAL_SET_CNF
                 
@@ -146,12 +154,12 @@ func encodeAndEnqueue(msg interface{}, uuid string) error {
                     heartbeatSnapToRtc:  (C.bool) (value.HeartbeatSnapToRtc),
                 }
         		dataPointer := (*C.HeartbeatSetReqDlMsg_t)(unsafe.Pointer(&data))
-        		byteCount = C.encodeHeartbeatSetReqDlMsg(outputPointer, dataPointer, nil, nil)
+        		byteCount = C.encodeHeartbeatSetReqDlMsg(outputPointer, dataPointer, ppXmlBuffer, pXmlBufferLen)
                 Dbg.PrintfTrace("%s --> encoded HeartbeatSetReqDlMsg.\n", logTag)
                 responseId = RESPONSE_HEARTBEAT_SET_CNF
                 
             case *MeasurementsGetReqDlMsg:
-        		byteCount = C.encodeMeasurementsGetReqDlMsg(outputPointer, nil, nil)
+        		byteCount = C.encodeMeasurementsGetReqDlMsg(outputPointer, ppXmlBuffer, pXmlBufferLen)
                 Dbg.PrintfTrace("%s --> encoded MeasurementsReportReqDlMsg.\n", logTag)        
                 responseId = RESPONSE_MEASUREMENTS_GET_CNF
                         
@@ -160,7 +168,7 @@ func encodeAndEnqueue(msg interface{}, uuid string) error {
             // case *MeasurementsControlDefaultsSetReqDlMsg
             
             case *TrafficReportGetReqDlMsg:
-        		byteCount = C.encodeTrafficReportGetReqDlMsg(outputPointer, nil, nil)
+        		byteCount = C.encodeTrafficReportGetReqDlMsg(outputPointer, ppXmlBuffer, pXmlBufferLen)
                 Dbg.PrintfTrace("%s --> encoded TrafficReportGetReqDlMsg.\n", logTag)
                 responseId = RESPONSE_TRAFFIC_REPORT_GET_CNF
                                 
@@ -174,22 +182,22 @@ func encodeAndEnqueue(msg interface{}, uuid string) error {
                     noReportsDuringTest: (C.bool) (value.NoReportsDuringTest),
                 }
         		dataPointer := (*C.TrafficTestModeParametersSetReqDlMsg_t)(unsafe.Pointer(&data))
-        		byteCount = C.encodeTrafficTestModeParametersSetReqDlMsg(outputPointer, dataPointer, nil, nil)
+        		byteCount = C.encodeTrafficTestModeParametersSetReqDlMsg(outputPointer, dataPointer, ppXmlBuffer, pXmlBufferLen)
                 Dbg.PrintfTrace("%s --> encoded TrafficTestModeParametersSetReqDlMsg.\n", logTag)
                 responseId = RESPONSE_TRAFFIC_TEST_MODE_PARAMETERS_SET_CNF
                 
             case *TrafficTestModeParametersGetReqDlMsg:
-        		byteCount = C.encodeTrafficTestModeParametersGetReqDlMsg(outputPointer, nil, nil)
+        		byteCount = C.encodeTrafficTestModeParametersGetReqDlMsg(outputPointer, ppXmlBuffer, pXmlBufferLen)
                 Dbg.PrintfTrace("%s --> encoded TrafficTestModeParametersGetReqDlMsg.\n", logTag)
                 responseId = RESPONSE_TRAFFIC_TEST_MODE_PARAMETERS_GET_CNF
                                 
             case *TrafficTestModeReportGetReqDlMsg:
-        		byteCount = C.encodeTrafficTestModeReportGetReqDlMsg(outputPointer, nil, nil)
+        		byteCount = C.encodeTrafficTestModeReportGetReqDlMsg(outputPointer, ppXmlBuffer, pXmlBufferLen)
                 Dbg.PrintfTrace("%s --> encoded TrafficTestModeReportGetReqDlMsg.\n", logTag)
                 responseId = RESPONSE_TRAFFIC_TEST_MODE_REPORT_GET_CNF
                                 
             case *ActivityReportGetReqDlMsg:
-        		byteCount = C.encodeActivityReportGetReqDlMsg(outputPointer, nil, nil)
+        		byteCount = C.encodeActivityReportGetReqDlMsg(outputPointer, ppXmlBuffer, pXmlBufferLen)
                 Dbg.PrintfTrace("%s --> encoded ActivityReportGetReqDlMsg.\n", logTag)                
                 responseId = RESPONSE_ACTIVITY_REPORT_GET_CNF
 
@@ -197,7 +205,7 @@ func encodeAndEnqueue(msg interface{}, uuid string) error {
                 Dbg.PrintfTrace("%s --> asked to send unknown message:\n\n%s\n", logTag, spew.Sdump(msg))
 		}
 		
-	    if byteCount > 0 {    		
+	    if byteCount > 0 {
     		// Send the output buffer to the TSW server
     		payload := outputBuffer[:byteCount]
     		msg := AmqpMessage {
@@ -214,6 +222,7 @@ func encodeAndEnqueue(msg interface{}, uuid string) error {
     		downlinkMessages <- msg
     		
     		Dbg.PrintfTrace("%s --> encoded %d bytes into AMQP message:\n\n%+v\n", logTag, byteCount, msg)
+			Dbg.PrintfInfo("%s --> XML buffer pointer 0x%08x, used %d, left %d:.\n", logTag, *ppXmlBuffer, C.uint32_t(len(xmlEncodeBuffer)) - xmlBufferLen, xmlBufferLen)
     		
         	// If a response is expected, add it to the list for this device
         	if (responseId != RESPONSE_NONE) {

@@ -41,7 +41,6 @@ type LatestState struct {
     LatestTrafficTestModeParametersDisplay  *TrafficTestModeParametersDisplay `json:"LatestTrafficTestModeParametersDisplay,omitempty"`
     LatestTrafficTestModeReportDisplay      *TrafficTestModeReportDisplay     `json:"LatestTrafficTestModeReportDisplay,omitempty"`
     LatestActivityReportDisplay             *ActivityReportDisplay            `json:"LatestActivityReportDisplay,omitempty"`
-    LatestDisplayRow                        *DisplayRow                       `json:"LatestDisplayRow,omitempty"`
 }
 
 type DeviceLatestState struct {
@@ -155,7 +154,6 @@ func operateDataTable() {
                                 state.LatestTrafficTestModeParametersDisplay = nil
                                 state.LatestTrafficTestModeReportDisplay = nil
                                 state.LatestActivityReportDisplay = nil
-                                state.LatestDisplayRow = nil
 			                }
 			
 			            case *IntervalsGetCnfUlMsg:
@@ -325,7 +323,6 @@ func operateDataTable() {
 		                latest.LatestTrafficTestModeParametersDisplay = state.LatestTrafficTestModeParametersDisplay.DeepCopy()
 		                latest.LatestTrafficTestModeReportDisplay = state.LatestTrafficTestModeReportDisplay.DeepCopy()
 		                latest.LatestActivityReportDisplay = state.LatestActivityReportDisplay.DeepCopy()
-		                latest.LatestDisplayRow = state.LatestDisplayRow.DeepCopy()
 		                value.Latest <- latest
 		                close(value.Latest)
 		                Dbg.PrintfTrace("%s --> datatable provided latest state and closed channel.\n", logTag)

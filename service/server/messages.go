@@ -121,7 +121,6 @@ func (value *PowerState) DeepCopy() *PowerState {
 
 // Measurements data
 type MeasurementData struct {
-    Timestamp           time.Time
     TimeMeasured        time.Time
     GnssPositionPresent bool
     GnssPosition        GnssPosition
@@ -141,7 +140,6 @@ func (value *MeasurementData) DeepCopy() *MeasurementData {
         return nil
     }
     result := &MeasurementData{
-        Timestamp:           value.Timestamp,
         TimeMeasured:        value.TimeMeasured,
         GnssPositionPresent: value.GnssPositionPresent,
         GnssPosition:        value.GnssPosition,

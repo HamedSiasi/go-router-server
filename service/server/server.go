@@ -45,7 +45,11 @@ type ExpectedMsgList []ExpectedMsg
 type Connection struct {
 	DeviceUuid    string
 	DeviceName    string
-    LastHeardFrom time.Time
+	Timestamp     time.Time
+    UlMsgs        int
+    UlBytes       int
+    DlMsgs        int
+    DlBytes       int
 }
 
 //--------------------------------------------------------------------
@@ -61,9 +65,6 @@ const configurationFile string = "config.cfg"
 // Log  prefix so that we can tell who we are
 var logTag string = "UTM-API"
 
-// TODO
-var displayRow = &DisplayRow{}
-
 // A list of expected response messages against each device
 var deviceExpectedMsgList map[string]ExpectedMsgList
 
@@ -71,13 +72,13 @@ var deviceExpectedMsgList map[string]ExpectedMsgList
 var downlinkMessages chan<- AmqpMessage
 
 // Count of AMQP messages received
-var amqpCount int = 0
+var amqpCount int
 
 //--------------------------------------------------------------------
 // Functions
 //--------------------------------------------------------------------
 
-// Fail func
+/// Fail func
 func failOnError (err error, msg string) {
     if err != nil {
         log.Fatalf("%s: %s", msg, err)
@@ -85,76 +86,29 @@ func failOnError (err error, msg string) {
     }
 }
 
-// TODO
-func getLatestState (response http.ResponseWriter, request *http.Request) *utilities.Error {
+/// Get the summary data for the front page
+func getFrontPageData (response http.ResponseWriter, request *http.Request) *utilities.Error {
 	// Ensure this is a GET request
 	if (request.Method != "GET") || (request.Method == "") {
         Dbg.PrintfError("%s --> received unsupported REST request %s %s.\n", logTag, request.Method, request.URL)
         return utilities.ClientError("unsupported method", http.StatusBadRequest)
 	}
 
-	// Get the latest state; only one response will come back before the requesting channel is closed
-	get := make(chan LatestState)
-	dataTableCmds <- &get
-	state := <-get
-
-	//Gradually group our units
-	//AddUuidToMap(state.LatestDisplayRow)
-
-	//Recyle map with new state
-	//uuidMap = RecycleMap(uuidMap, state)
-
-	//Copy unit into slice, for encoding
-	//uuidSlice = ConvertMapToSlice(uuidMap)
-
+    displayData := displayFrontPageData()
 	// Send the requested data
 	response.Header().Set("Content-Type", "application/json")
 	response.WriteHeader(http.StatusOK)
-	err := json.NewEncoder(response).Encode(uuidSlice)
+	err := json.NewEncoder(response).Encode(displayData)
 	if err != nil {
-		Dbg.PrintfError("%s --> received REST request %s but attempting to serialise the result:\n%s\n...yielded error %s.\n", logTag, request.URL, spew.Sdump(state), err.Error())
+		Dbg.PrintfError("%s --> received REST request %s but attempting to serialise the result:\n%s\n...yielded error %s.\n", logTag, request.URL, spew.Sdump(displayData), err.Error())
 		return utilities.ServerError(err)
 	}
-	//log.Printf("%s Received rest request %s and responding with %s\n", logTag, request.URL, spew.Sdump(state))
 
-	return nil
-}
-
-// TODO
-func setReportingInterval(response http.ResponseWriter, request *http.Request) *utilities.Error {
-	// Ensure this is a POST request
-	if request.Method != "POST" {
-		Dbg.PrintfError("%s --> received unsupported REST request %s %s.\n", logTag, request.Method, request.URL)
-		return utilities.ClientError("unsupported method", http.StatusBadRequest)
-	}
-
-	// Get the minutes interval
-	var mins uint32
-	err := json.NewDecoder(request.Body).Decode(&mins)
-	if err != nil {
-		Dbg.PrintfError("%s --> unable to extract the reporting interval from request %s: %s.\n", logTag, request.URL, err.Error())
-		return utilities.ClientError("unable to decode reporting interval", http.StatusBadRequest)
-	}
-
-	// Encode and enqueue the requested data
-	// TODO err = encodeAndEnqueueReportingInterval(uint32(mins))
-	if err != nil {
-		Dbg.PrintfError("%s --> unable to encode and enqueue reporting interval for UTM-API %s\n", logTag, request.URL)
-		return utilities.ClientError("unable to encode and enqueue reporting interval", http.StatusBadRequest)
-	}
-
-	// Success
-	response.WriteHeader(http.StatusOK)
 	return nil
 }
 
 // Process messages from the AMQP queues
 func processAmqp(username, amqpAddress string) {
-
-	// create a queue and bind it with relevant routing keys
-	// amqpAddress := utilities.EnvStr("AMQP_ADDRESS")
-	// username := utilities.EnvStr("UNAME")
-	// ueGuid = utilities.EnvStr("UEGUID")
 
 	q, err := OpenQueue(username, amqpAddress)
 
@@ -177,39 +131,35 @@ func processAmqp(username, amqpAddress string) {
 					case *AmqpResponseMessage:
 						Dbg.PrintfTrace("%s --> is response.\n", logTag)
 						if value.Command == "UART_data" {
+						    savedUlMsgs := totalUlMsgs
+						    savedUlBytes := totalUlBytes
+						    savedDlMsgs := totalDlMsgs
+						    savedDlBytes := totalDlBytes
 							// UART data from the UTM-API which needs to be decoded
                 			// Decode the messages
 							msgs := decode(value.Data, value.DeviceUuid)
 
-							// Pass the messages to the state table for recording
+							// Pass the messages to the data table for recording
 							// and pass them to processing to see if any responses
 							// are required
 							if msgs != nil {
     							for _, msg := range msgs {
-                            		dataTableCmds <- msg							    
+                            		dataTableChannel <- msg							    
         							processMsgs <- msg
     							}
     						}							
 
 							// Send the datatable a message indicating that this device
 							// has been heard from							
-                			dataTableCmds <- &Connection {
-                			    DeviceUuid:    value.DeviceUuid,
-                			    DeviceName:    value.DeviceName,
-                			    LastHeardFrom: time.Now(),
+                			dataTableChannel <- &Connection {
+                			    DeviceUuid: value.DeviceUuid,
+                			    DeviceName: value.DeviceName,
+                			    Timestamp:  time.Now(),
+                                UlMsgs:     totalUlMsgs - savedUlMsgs,
+                                UlBytes:    totalUlBytes - savedUlBytes,
+                                DlMsgs:     totalDlMsgs - savedDlMsgs,
+                                DlBytes:    totalDlBytes - savedDlBytes,
               			    }
-                			
-							// Get the amount of uplink data and send it on to the data table
-							now := time.Now()
-							dataTableCmds <- &DataVolume{
-								UplinkTimestamp: &now,
-								UplinkBytes:     uint64(len(value.Data)),
-							}
-							row.UlastMsgReceived = &now
-							row.UTotalBytes = uint64(len(value.Data))
-							row.TotalMsgs = row.TotalMsgs + uint64(len(value.Data))
-							row.TotalBytes = row.UTotalBytes + row.DTotalBytes
-							row.TotalMsgs = row.UTotalMsgs + row.DTotalMsgs + row.TotalMsgs
 						}
 
 					case *AmqpErrorMessage:
@@ -270,8 +220,7 @@ func Run() {
 	store := cookiestore.New([]byte("secretkey789"))
 	router := routes.LoadRoutes()
 
-	router.Handle("/latestState", utilities.Handler(getLatestState))
-	router.Handle("/reportingInterval", utilities.Handler(setReportingInterval))
+	router.Handle("/frontPageData", utilities.Handler(getFrontPageData))
 
 	n := negroni.Classic()
 	static := negroni.NewStatic(http.Dir("static"))

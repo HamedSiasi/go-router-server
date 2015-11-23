@@ -61,6 +61,10 @@ const (
 
 var xmlEncodeBuffer [8192]C.char
 
+var totalDlMsgs int
+var totalDlBytes int
+var lastDlMsgTime time.Time
+
 //--------------------------------------------------------------------
 // Functions
 //--------------------------------------------------------------------
@@ -206,6 +210,10 @@ func encodeAndEnqueue(msg interface{}, uuid string) error {
 		}
 		
 	    if byteCount > 0 {
+	        totalDlMsgs++
+	        totalDlBytes += int (byteCount)
+	        lastDlMsgTime = time.Now()
+	        
     		// Send the output buffer to the TSW server
     		payload := outputBuffer[:byteCount]
     		msg := AmqpMessage {
@@ -215,8 +223,6 @@ func encodeAndEnqueue(msg interface{}, uuid string) error {
     		
     		for _, v := range payload {
     			msg.Payload = append(msg.Payload, int(v))
-    			// TODO
-    			row.TotalBytes = row.TotalBytes + uint64(len(payload))
     		}
     
     		downlinkMessages <- msg
@@ -240,14 +246,6 @@ func encodeAndEnqueue(msg interface{}, uuid string) error {
     			list = append(list, expectedMsg)
             }    
             		
-    		// TODO
-    		now := time.Now()    
-    		// Record the downlink data volume
-    		dataTableCmds <- &DataVolume {
-    			DownlinkTimestamp: &now,
-    			DownlinkBytes:     uint64(len(payload)),
-    		}
-    		
     	    return nil
         }    				   
 	    

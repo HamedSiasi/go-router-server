@@ -270,6 +270,10 @@ const RevisionLevel uint32 = C.REVISION_LEVEL
 var inputBuffer C.union_UlMsgUnionTag_t
 var xmlDecodeBuffer [8192]C.char
 
+var totalUlMsgs int
+var totalUlBytes int
+var lastUlMsgTime time.Time
+
 var ulDecodeTypeDisplay map[int]string = map[int]string {
 	C.DECODE_RESULT_FAILURE:                                      "DECODE_RESULT_FAILURE",
 	C.DECODE_RESULT_INPUT_TOO_SHORT:                              "DECODE_RESULT_INPUT_TOO_SHORT",
@@ -319,13 +323,11 @@ func decode(data []byte, uuid string) []interface{} {
 
 	var bytesRemaining C.uint32_t = 1
 	var returnedMsgs []interface{} = nil
+	var used C.uint32_t
 	
 	// Holder for the extracted message
 	pBuffer := (*C.UlMsgUnion_t)(unsafe.Pointer(&inputBuffer))
 	
-	// TODO
-	row.UTotalMsgs = row.UTotalMsgs + uint64(len(data))
-
 	// Loop over the messages in the datagram
 	pStart := (*C.char)(unsafe.Pointer(&data[0]))
 	pNext := pStart
@@ -338,8 +340,6 @@ func decode(data []byte, uuid string) []interface{} {
 
 	for bytesRemaining > 0 {
 		decoderCount = decoderCount + 1
-		now := time.Now()
-		row.LastMsgReceived = &now
 
 		Dbg.PrintfTrace("%s --> decoding message number (%v) of AMQP datagram number (%v).\n", logTag, decoderCount, amqpCount)
 
@@ -735,6 +735,10 @@ func decode(data []byte, uuid string) []interface{} {
 		}
 	}
 
+    totalUlMsgs += len (returnedMsgs)
+    totalUlBytes += int(used)
+    lastUlMsgTime = time.Now()
+    
 	return returnedMsgs
 }
 

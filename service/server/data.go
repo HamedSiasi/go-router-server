@@ -1,4 +1,4 @@
-/* Functions that populate displayable values for the UTM server.
+/* Functions that populate data items values for the UTM server.
  *
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -16,8 +16,46 @@ import (
     "time"
 )
 
-// Display InitInd
-type InitIndDisplay struct {
+// Storage for traffic volume data
+type TrafficVolumeData struct {
+    TotalUlMsgs       int
+    TotalUlBytes      int
+    LastUlMsgTime     time.Time
+    TotalDlMsgs       int
+    TotalDlBytes      int
+    LastDlMsgTime     time.Time
+}
+func (value *TrafficVolumeData) DeepCopy() *TrafficVolumeData {
+    if value == nil {
+        return nil
+    }
+    result := &TrafficVolumeData {
+        TotalUlMsgs:     value.TotalUlMsgs,
+        TotalUlBytes:    value.TotalUlBytes,
+        LastUlMsgTime:   value.LastUlMsgTime,
+        TotalDlMsgs:     value.TotalDlMsgs,
+        TotalDlBytes:    value.TotalDlBytes,
+        LastDlMsgTime:   value.LastDlMsgTime,
+    }
+    return result
+}
+func updateTrafficVolumeData(trafficData *TrafficVolumeData, connection *Connection) *TrafficVolumeData {
+    trafficData.TotalUlMsgs   += connection.UlMsgs
+    trafficData.TotalUlBytes  += connection.UlBytes
+    trafficData.TotalDlMsgs   += connection.DlMsgs
+    trafficData.TotalDlBytes  += connection.DlBytes
+    if connection.UlMsgs > 0 {
+        trafficData.LastUlMsgTime = connection.Timestamp
+    }
+    if connection.DlMsgs > 0 {
+        trafficData.LastDlMsgTime = connection.Timestamp
+    }
+    
+    return trafficData
+}
+
+// Storage for InitInd data
+type InitIndData struct {
     Timestamp         time.Time
     WakeUpCode        string
     RevisionLevel     uint8
@@ -26,11 +64,11 @@ type InitIndDisplay struct {
     DisableButton     bool
     DisableServerPing bool
 }
-func (value *InitIndDisplay) DeepCopy() *InitIndDisplay {
+func (value *InitIndData) DeepCopy() *InitIndData {
     if value == nil {
         return nil
     }
-    result := &InitIndDisplay {
+    result := &InitIndData {
         Timestamp:         value.Timestamp,
         WakeUpCode:        value.WakeUpCode,
         RevisionLevel:     value.RevisionLevel,
@@ -41,8 +79,8 @@ func (value *InitIndDisplay) DeepCopy() *InitIndDisplay {
     }
     return result
 }
-func makeInitIndDisplay(newData *InitIndUlMsg, Time time.Time) *InitIndDisplay {
-    display := InitIndDisplay {
+func makeInitIndData(newData *InitIndUlMsg, Time time.Time) *InitIndData {
+    data := InitIndData {
         Timestamp:  	   Time,
         WakeUpCode:    	   WakeUpCodeLookUp[newData.WakeUpCode],
 	    RevisionLevel:     newData.RevisionLevel,
@@ -51,11 +89,11 @@ func makeInitIndDisplay(newData *InitIndUlMsg, Time time.Time) *InitIndDisplay {
 	    DisableButton:     newData.DisableButton,
 	    DisableServerPing: newData.DisableServerPing,
     }
-    return &display
+    return &data
 }
 
-// Display intervals
-type IntervalsDisplay struct {
+//  Storage for intervals data
+type IntervalsData struct {
     Timestamp                time.Time
     ReportingIntervalPresent bool
     ReportingInterval        uint32
@@ -63,11 +101,11 @@ type IntervalsDisplay struct {
     HeartbeatSeconds         uint32
     HeartbeatSnapToRtc       bool
 }
-func (value *IntervalsDisplay) DeepCopy() *IntervalsDisplay {
+func (value *IntervalsData) DeepCopy() *IntervalsData {
     if value == nil {
         return nil
     }
-    result := &IntervalsDisplay {
+    result := &IntervalsData {
         Timestamp:                value.Timestamp,
         ReportingIntervalPresent: value.ReportingIntervalPresent,
         ReportingInterval:        value.ReportingInterval,
@@ -77,8 +115,8 @@ func (value *IntervalsDisplay) DeepCopy() *IntervalsDisplay {
     }
     return result
 }
-func makeIntervalsDisplay0(newData *IntervalsGetCnfUlMsg, Time time.Time) *IntervalsDisplay {
-    display := IntervalsDisplay {
+func makeIntervalsData0(newData *IntervalsGetCnfUlMsg, Time time.Time) *IntervalsData {
+    data := IntervalsData {
         Timestamp:                Time,
         ReportingIntervalPresent: true,
         ReportingInterval:        newData.ReportingInterval,
@@ -86,143 +124,143 @@ func makeIntervalsDisplay0(newData *IntervalsGetCnfUlMsg, Time time.Time) *Inter
         HeartbeatSeconds:         newData.HeartbeatSeconds,
         HeartbeatSnapToRtc:       newData.HeartbeatSnapToRtc,
     }
-    return &display
+    return &data
 }
-func makeIntervalsDisplay1(newData *ReportingIntervalSetCnfUlMsg, Time time.Time) *IntervalsDisplay {
-    display := IntervalsDisplay {
+func makeIntervalsData1(newData *ReportingIntervalSetCnfUlMsg, Time time.Time) *IntervalsData {
+    data := IntervalsData {
         Timestamp:                Time,
         ReportingIntervalPresent: true,
         ReportingInterval:        newData.ReportingInterval,
     }
-    return &display
+    return &data
 }
-func makeIntervalsDisplay2(newData *HeartbeatSetCnfUlMsg, Time time.Time) *IntervalsDisplay {
-    display := IntervalsDisplay {
+func makeIntervalsData2(newData *HeartbeatSetCnfUlMsg, Time time.Time) *IntervalsData {
+    data := IntervalsData {
         Timestamp:            Time,
         HeartbeatPresent:     true,
         HeartbeatSeconds:     newData.HeartbeatSeconds,
         HeartbeatSnapToRtc:   newData.HeartbeatSnapToRtc,
     }
-    return &display
+    return &data
 }
 
-// Display mode
-type ModeDisplay struct {
+//  Storage for mode data
+type ModeData struct {
     Timestamp    time.Time
     Mode         string
 }
-func (value *ModeDisplay) DeepCopy() *ModeDisplay {
+func (value *ModeData) DeepCopy() *ModeData {
     if value == nil {
         return nil
     }
-    result := &ModeDisplay {
+    result := &ModeData {
         Timestamp:    value.Timestamp,
         Mode:         value.Mode,
     }
     return result
 }
-func makeModeDisplay0(newData *ModeSetCnfUlMsg, Time time.Time) *ModeDisplay {
-    display := ModeDisplay {
+func makeModeData0(newData *ModeSetCnfUlMsg, Time time.Time) *ModeData {
+    data := ModeData {
         Timestamp:    Time,
         Mode:         ModeLookUp[newData.Mode],
     }
-    return &display
+    return &data
 }
-func makeModeDisplay1(newData *ModeGetCnfUlMsg, Time time.Time) *ModeDisplay {
-    display := ModeDisplay {
+func makeModeData1(newData *ModeGetCnfUlMsg, Time time.Time) *ModeData {
+    data := ModeData {
         Timestamp:    Time,
         Mode:         ModeLookUp[newData.Mode],
     }
-    return &display
+    return &data
 }
-func makeModeDisplay2(newData *PollIndUlMsg, Time time.Time) *ModeDisplay {
-    display := ModeDisplay {
+func makeModeData2(newData *PollIndUlMsg, Time time.Time) *ModeData {
+    data := ModeData {
         Timestamp:    Time,
         Mode:         ModeLookUp[newData.Mode],
     }
-    return &display
+    return &data
 }
 
-// Display date/time
-type DateTimeDisplay struct {
+//  Storage for date/time data
+type DateTimeData struct {
     Timestamp       time.Time
     UtmTime         time.Time
     TimeSetBy       string
 }
-func (value *DateTimeDisplay) DeepCopy() *DateTimeDisplay {
+func (value *DateTimeData) DeepCopy() *DateTimeData {
     if value == nil {
         return nil
     }
-    result := &DateTimeDisplay {
+    result := &DateTimeData {
         Timestamp:       value.Timestamp,
         UtmTime:         value.UtmTime,
         TimeSetBy:       value.TimeSetBy,
     }
     return result
 }
-func makeDateTimeDisplay0(newData *DateTimeIndUlMsg, Time time.Time) *DateTimeDisplay {
-    display := DateTimeDisplay {
+func makeDateTimeData0(newData *DateTimeIndUlMsg, Time time.Time) *DateTimeData {
+    data := DateTimeData {
         Timestamp:       Time,
         UtmTime:         newData.UtmTime,
         TimeSetBy:       TimeSetByLookUp[newData.TimeSetBy],
     }
-    return &display
+    return &data
 }
-func makeDateTimeDisplay1(newData *DateTimeSetCnfUlMsg, Time time.Time) *DateTimeDisplay {
-    display := DateTimeDisplay {
+func makeDateTimeData1(newData *DateTimeSetCnfUlMsg, Time time.Time) *DateTimeData {
+    data := DateTimeData {
         Timestamp:       Time,
         UtmTime:         newData.UtmTime,
         TimeSetBy:       TimeSetByLookUp[newData.TimeSetBy],
     }
-    return &display
+    return &data
 }
-func makeDateTimeDisplay2(newData *DateTimeGetCnfUlMsg, Time time.Time) *DateTimeDisplay {
-    display := DateTimeDisplay {
+func makeDateTimeData2(newData *DateTimeGetCnfUlMsg, Time time.Time) *DateTimeData {
+    data := DateTimeData {
         Timestamp:       Time,
         UtmTime:         newData.UtmTime,
         TimeSetBy:       TimeSetByLookUp[newData.TimeSetBy],
     }
-    return &display
+    return &data
 }
 
-// Display UtmStatus
-type UtmStatusDisplay struct {
+//  Storage for UtmStatus data
+type UtmStatusData struct {
     Timestamp     time.Time
     EnergyLeft    string
     DiskSpaceLeft string
 }
-func (value *UtmStatusDisplay) DeepCopy() *UtmStatusDisplay {
+func (value *UtmStatusData) DeepCopy() *UtmStatusData {
     if value == nil {
         return nil
     }
-    result := &UtmStatusDisplay {
+    result := &UtmStatusData {
         Timestamp:         value.Timestamp,
         EnergyLeft:        value.EnergyLeft,
         DiskSpaceLeft:     value.DiskSpaceLeft,
     }
     return result
 }
-func makeUtmStatusDisplay(newData *PollIndUlMsg, Time time.Time) *UtmStatusDisplay {
-    display := UtmStatusDisplay {
+func makeUtmStatusData(newData *PollIndUlMsg, Time time.Time) *UtmStatusData {
+    data := UtmStatusData {
         Timestamp:  	   Time,
         EnergyLeft:    	   EnergyLeftLookUp[newData.EnergyLeft],
         DiskSpaceLeft:     DiskSpaceLeftLookUp[newData.DiskSpaceLeft],
     }
-    return &display
+    return &data
 }
 
-// Display GNSS
-type GnssDisplay struct {
+//  Storage for GNSS data
+type GnssData struct {
     Timestamp    time.Time
     Latitude     float32
     Longitude    float32
     Elevation    float32
 }
-func (value *GnssDisplay) DeepCopy() *GnssDisplay {
+func (value *GnssData) DeepCopy() *GnssData {
     if value == nil {
         return nil
     }
-    result := &GnssDisplay {
+    result := &GnssData {
         Timestamp:     value.Timestamp,
         Latitude:      value.Latitude,
         Longitude:     value.Longitude,
@@ -230,64 +268,64 @@ func (value *GnssDisplay) DeepCopy() *GnssDisplay {
     }
     return result
 }
-func makeGnssDisplay(newData *MeasurementData, Time time.Time) *GnssDisplay {
-    display := GnssDisplay{
+func makeGnssData(newData *MeasurementData, Time time.Time) *GnssData {
+    data := GnssData{
         Timestamp:    Time,
         Latitude:     float32(newData.GnssPosition.Latitude) / 1000,
         Longitude:    float32(newData.GnssPosition.Longitude) / 1000,
         Elevation:    float32(newData.GnssPosition.Elevation),
     }
-    return &display
+    return &data
 }
 
-// Display cell ID
-type CellIdDisplay struct {
+//  Storage for cell ID data
+type CellIdData struct {
     Timestamp    time.Time
     CellId       uint32
 }
-func (value *CellIdDisplay) DeepCopy() *CellIdDisplay {
+func (value *CellIdData) DeepCopy() *CellIdData {
     if value == nil {
         return nil
     }
-    result := &CellIdDisplay {
+    result := &CellIdData {
         Timestamp:  value.Timestamp,
         CellId:     value.CellId,
     }
     return result
 }
-func makeCellIdDisplay(newData *MeasurementData, Time time.Time) *CellIdDisplay {
-    display := CellIdDisplay{
+func makeCellIdData(newData *MeasurementData, Time time.Time) *CellIdData {
+    data := CellIdData{
         Timestamp:    Time,
         CellId:       uint32(newData.CellId),
     }
-    return &display
+    return &data
 }
 
-// Display temperature
-type TemperatureDisplay struct {
+//  Storage for temperature data
+type TemperatureData struct {
     Timestamp    time.Time
     TemperatureC float32
 }
-func (value *TemperatureDisplay) DeepCopy() *TemperatureDisplay {
+func (value *TemperatureData) DeepCopy() *TemperatureData {
     if value == nil {
         return nil
     }
-    result := &TemperatureDisplay {
+    result := &TemperatureData {
         Timestamp:     value.Timestamp,
         TemperatureC:  value.TemperatureC,
     }
     return result
 }
-func makeTemperatureDisplay(newData *MeasurementData, Time time.Time) *TemperatureDisplay {
-    display := TemperatureDisplay{
+func makeTemperatureData(newData *MeasurementData, Time time.Time) *TemperatureData {
+    data := TemperatureData{
         Timestamp:    Time,
         TemperatureC: float32(newData.Temperature),
     }
-    return &display
+    return &data
 }
 
-// Display signal strength items
-type SignalStrengthDisplay struct {
+//  Storage for signal strength data
+type SignalStrengthData struct {
     Timestamp         time.Time
     RsrpDbm           float32
     Mcl               float32
@@ -298,11 +336,11 @@ type SignalStrengthDisplay struct {
     SnrPresent        bool
     Snr               float32
 }
-func (value *SignalStrengthDisplay) DeepCopy() *SignalStrengthDisplay {
+func (value *SignalStrengthData) DeepCopy() *SignalStrengthData {
     if value == nil {
         return nil
     }
-    result := &SignalStrengthDisplay{
+    result := &SignalStrengthData{
         Timestamp:         value.Timestamp,
         RsrpDbm:           value.RsrpDbm,
         Mcl:               value.Mcl,
@@ -315,8 +353,8 @@ func (value *SignalStrengthDisplay) DeepCopy() *SignalStrengthDisplay {
     }
     return result
 } 
-func makeSignalStrengthDisplay(newData *MeasurementData, Time time.Time) *SignalStrengthDisplay {
-    display := SignalStrengthDisplay{
+func makeSignalStrengthData(newData *MeasurementData, Time time.Time) *SignalStrengthData {
+    data := SignalStrengthData{
         Timestamp:      Time,
         RsrpDbm:        float32 (newData.Rsrp.Value) / 10,
         RssiDbmPresent: newData.RssiPresent,
@@ -325,22 +363,22 @@ func makeSignalStrengthDisplay(newData *MeasurementData, Time time.Time) *Signal
     
     // TODO: calculate the answer
 
-    return &display
+    return &data
 }
 
-// Display power/state items
-type PowerStateDisplay struct {
+//  Storage for power/state data
+type PowerStateData struct {
     Timestamp       time.Time
     ChargeState     string
     BatteryVoltageV float32
     EnergyLeftWh    float32
 }
 
-func (value *PowerStateDisplay) DeepCopy() *PowerStateDisplay {
+func (value *PowerStateData) DeepCopy() *PowerStateData {
     if value == nil {
         return nil
     }
-    result := &PowerStateDisplay{
+    result := &PowerStateData{
         Timestamp:       value.Timestamp,
         ChargeState:     value.ChargeState,
         BatteryVoltageV: value.BatteryVoltageV,
@@ -348,23 +386,23 @@ func (value *PowerStateDisplay) DeepCopy() *PowerStateDisplay {
     }
     return result
 }
-func makePowerStateDisplay(newData *MeasurementData, Time time.Time) *PowerStateDisplay {
+func makePowerStateData(newData *MeasurementData, Time time.Time) *PowerStateData {
     // Change nothing if the new data is nil
     if newData == nil {
         return nil
     }
     // Overwrite if there is no stored data
-    display := &PowerStateDisplay{
+    data := &PowerStateData{
         Timestamp:       Time,
         ChargeState:     ChargerStateEnumLookUp[newData.PowerState.ChargerState],
         BatteryVoltageV: float32(newData.PowerState.BatteryMv) / 1000,
         EnergyLeftWh:    float32(newData.PowerState.EnergyMwh) / 1000,
     }
-    return display
+    return data
 }
 
-// Display traffic information
-type TrafficReportDisplay struct {
+//  Storage for traffic data
+type TrafficReportData struct {
     Timestamp                 time.Time
     NumDatagramsUl            uint32
     NumBytesUl                uint32
@@ -372,11 +410,11 @@ type TrafficReportDisplay struct {
     NumBytesDl                uint32
     NumDatagramsDlBadChecksum uint32
 }
-func (value *TrafficReportDisplay) DeepCopy() *TrafficReportDisplay {
+func (value *TrafficReportData) DeepCopy() *TrafficReportData {
     if value == nil {
         return nil
     }
-    result := &TrafficReportDisplay {
+    result := &TrafficReportData {
         Timestamp:                  value.Timestamp,
         NumDatagramsUl:             value.NumDatagramsUl,
         NumBytesUl:                 value.NumBytesUl,
@@ -386,8 +424,8 @@ func (value *TrafficReportDisplay) DeepCopy() *TrafficReportDisplay {
     }
     return result
 }
-func makeTrafficReportDisplay0(newData *TrafficReportIndUlMsg, Time time.Time) *TrafficReportDisplay {
-    display := TrafficReportDisplay {
+func makeTrafficReportData0(newData *TrafficReportIndUlMsg, Time time.Time) *TrafficReportData {
+    data := TrafficReportData {
         Timestamp:                  Time,
         NumDatagramsUl:             newData.NumDatagramsUl,
         NumBytesUl:                 newData.NumBytesUl,
@@ -395,10 +433,10 @@ func makeTrafficReportDisplay0(newData *TrafficReportIndUlMsg, Time time.Time) *
         NumBytesDl:                 newData.NumBytesDl,
         NumDatagramsDlBadChecksum:  newData.NumDatagramsDlBadChecksum,
     }
-    return &display
+    return &data
 }
-func makeTrafficReportDisplay1(newData *TrafficReportGetCnfUlMsg, Time time.Time) *TrafficReportDisplay {
-    display := TrafficReportDisplay {
+func makeTrafficReportData1(newData *TrafficReportGetCnfUlMsg, Time time.Time) *TrafficReportData {
+    data := TrafficReportData {
         Timestamp:                  Time,
         NumDatagramsUl:             newData.NumDatagramsUl,
         NumBytesUl:                 newData.NumBytesUl,
@@ -406,11 +444,11 @@ func makeTrafficReportDisplay1(newData *TrafficReportGetCnfUlMsg, Time time.Time
         NumBytesDl:                 newData.NumBytesDl,
         NumDatagramsDlBadChecksum:  newData.NumDatagramsDlBadChecksum,
     }
-    return &display
+    return &data
 }
 
-// Display traffic test mode parameter information
-type TrafficTestModeParametersDisplay struct {
+//  Storage for traffic test mode parameter data
+type TrafficTestModeParametersData struct {
     Timestamp           time.Time
     NumUlDatagrams      uint32
     LenUlDatagram       uint32
@@ -419,11 +457,11 @@ type TrafficTestModeParametersDisplay struct {
     TimeoutSeconds      uint32
     NoReportsDuringTest bool
 }
-func (value *TrafficTestModeParametersDisplay) DeepCopy() *TrafficTestModeParametersDisplay {
+func (value *TrafficTestModeParametersData) DeepCopy() *TrafficTestModeParametersData {
     if value == nil {
         return nil
     }
-    result := &TrafficTestModeParametersDisplay {
+    result := &TrafficTestModeParametersData {
         Timestamp:           value.Timestamp,
         NumUlDatagrams:      value.NumUlDatagrams,
         LenUlDatagram:       value.LenUlDatagram,
@@ -434,8 +472,8 @@ func (value *TrafficTestModeParametersDisplay) DeepCopy() *TrafficTestModeParame
     }
     return result
 }
-func makeTrafficTestModeParametersDisplay0(newData *TrafficTestModeParametersSetCnfUlMsg, Time time.Time) *TrafficTestModeParametersDisplay {
-    display := TrafficTestModeParametersDisplay {
+func makeTrafficTestModeParametersData0(newData *TrafficTestModeParametersSetCnfUlMsg, Time time.Time) *TrafficTestModeParametersData {
+    data := TrafficTestModeParametersData {
         Timestamp:           Time,
         NumUlDatagrams:      newData.NumUlDatagrams,
         LenUlDatagram:       newData.LenUlDatagram,
@@ -444,10 +482,10 @@ func makeTrafficTestModeParametersDisplay0(newData *TrafficTestModeParametersSet
         TimeoutSeconds:      newData.TimeoutSeconds,
         NoReportsDuringTest: newData.NoReportsDuringTest,
     }
-    return &display
+    return &data
 }
-func makeTrafficTestModeParametersDisplay1(newData *TrafficTestModeParametersGetCnfUlMsg, Time time.Time) *TrafficTestModeParametersDisplay {
-    display := TrafficTestModeParametersDisplay {
+func makeTrafficTestModeParametersData1(newData *TrafficTestModeParametersGetCnfUlMsg, Time time.Time) *TrafficTestModeParametersData {
+    data := TrafficTestModeParametersData {
         Timestamp:           Time,
         NumUlDatagrams:      newData.NumUlDatagrams,
         LenUlDatagram:       newData.LenUlDatagram,
@@ -456,11 +494,11 @@ func makeTrafficTestModeParametersDisplay1(newData *TrafficTestModeParametersGet
         TimeoutSeconds:      newData.TimeoutSeconds,
         NoReportsDuringTest: newData.NoReportsDuringTest,
     }
-    return &display
+    return &data
 }
 
-// Display traffic test mode information
-type TrafficTestModeReportDisplay struct {
+//  Storage for traffic test mode data
+type TrafficTestModeReportData struct {
     Timestamp                            time.Time
     NumTrafficTestDatagramsUl            uint32
     NumTrafficTestBytesUl                uint32
@@ -471,11 +509,11 @@ type TrafficTestModeReportDisplay struct {
     NumTrafficTestDlDatagramsMissed      uint32
     TimedOut bool
 }
-func (value *TrafficTestModeReportDisplay) DeepCopy() *TrafficTestModeReportDisplay {
+func (value *TrafficTestModeReportData) DeepCopy() *TrafficTestModeReportData {
     if value == nil {
         return nil
     }
-    result := &TrafficTestModeReportDisplay {
+    result := &TrafficTestModeReportData {
         Timestamp:                           value.Timestamp,
         NumTrafficTestDatagramsUl:           value.NumTrafficTestDatagramsUl,
         NumTrafficTestBytesUl:               value.NumTrafficTestBytesUl,
@@ -488,8 +526,8 @@ func (value *TrafficTestModeReportDisplay) DeepCopy() *TrafficTestModeReportDisp
     }
     return result
 }
-func makeTrafficTestModeReportDisplay0(newData *TrafficTestModeReportIndUlMsg, Time time.Time) *TrafficTestModeReportDisplay {
-    display := TrafficTestModeReportDisplay {
+func makeTrafficTestModeReportData0(newData *TrafficTestModeReportIndUlMsg, Time time.Time) *TrafficTestModeReportData {
+    data := TrafficTestModeReportData {
         Timestamp:                           Time,
         NumTrafficTestDatagramsUl:           newData.NumTrafficTestDatagramsUl,
         NumTrafficTestBytesUl:               newData.NumTrafficTestBytesUl,
@@ -500,10 +538,10 @@ func makeTrafficTestModeReportDisplay0(newData *TrafficTestModeReportIndUlMsg, T
         NumTrafficTestDlDatagramsMissed:     newData.NumTrafficTestDlDatagramsMissed,
         TimedOut:                            newData.TimedOut,
     }
-    return &display
+    return &data
 }
-func makeTrafficTestModeReportDisplay1(newData *TrafficTestModeReportGetCnfUlMsg, Time time.Time) *TrafficTestModeReportDisplay {
-    display := TrafficTestModeReportDisplay {
+func makeTrafficTestModeReportData1(newData *TrafficTestModeReportGetCnfUlMsg, Time time.Time) *TrafficTestModeReportData {
+    data := TrafficTestModeReportData {
         Timestamp:                           Time,
         NumTrafficTestDatagramsUl:           newData.NumTrafficTestDatagramsUl,
         NumTrafficTestBytesUl:               newData.NumTrafficTestBytesUl,
@@ -514,11 +552,11 @@ func makeTrafficTestModeReportDisplay1(newData *TrafficTestModeReportGetCnfUlMsg
         NumTrafficTestDlDatagramsMissed:     newData.NumTrafficTestDlDatagramsMissed,
         TimedOut:                            newData.TimedOut,
     }
-    return &display
+    return &data
 }
 
-// Display activity report information
-type ActivityReportDisplay struct {
+//  Storage for activity report data
+type ActivityReportData struct {
     Timestamp                   time.Time
     TotalTransmitSeconds        float32
     TotalReceiveSeconds         float32
@@ -530,11 +568,11 @@ type ActivityReportDisplay struct {
     DlMcsPresent                bool
     DlMcs                       uint8
 }
-func (value *ActivityReportDisplay) DeepCopy() *ActivityReportDisplay {
+func (value *ActivityReportData) DeepCopy() *ActivityReportData {
     if value == nil {
         return nil
     }
-    result := &ActivityReportDisplay {
+    result := &ActivityReportData {
         Timestamp:                  value.Timestamp,
         TotalTransmitSeconds:       value.TotalTransmitSeconds,
         TotalReceiveSeconds:        value.TotalReceiveSeconds,
@@ -548,8 +586,8 @@ func (value *ActivityReportDisplay) DeepCopy() *ActivityReportDisplay {
     }
     return result
 }
-func makeActivityReportDisplay0(newData *ActivityReportIndUlMsg, Time time.Time) *ActivityReportDisplay {
-    display := ActivityReportDisplay {
+func makeActivityReportData0(newData *ActivityReportIndUlMsg, Time time.Time) *ActivityReportData {
+    data := ActivityReportData {
         Timestamp:                  Time,
         TotalTransmitSeconds:       float32(newData.TotalTransmitMilliseconds) / 1000,
         TotalReceiveSeconds:        float32(newData.TotalReceiveMilliseconds) / 1000,
@@ -561,10 +599,10 @@ func makeActivityReportDisplay0(newData *ActivityReportIndUlMsg, Time time.Time)
         DlMcsPresent:               newData.DlMcsPresent,
         DlMcs:                      newData.DlMcs,
     }
-    return &display
+    return &data
 }
-func makeActivityReportDisplay1(newData *ActivityReportGetCnfUlMsg, Time time.Time) *ActivityReportDisplay {
-    display := ActivityReportDisplay {
+func makeActivityReportData1(newData *ActivityReportGetCnfUlMsg, Time time.Time) *ActivityReportData {
+    data := ActivityReportData {
         Timestamp:                  Time,
         TotalTransmitSeconds:       float32(newData.TotalTransmitMilliseconds) / 1000,
         TotalReceiveSeconds:        float32(newData.TotalReceiveMilliseconds) / 1000,
@@ -576,7 +614,7 @@ func makeActivityReportDisplay1(newData *ActivityReportGetCnfUlMsg, Time time.Ti
         DlMcsPresent:               newData.DlMcsPresent,
         DlMcs:                      newData.DlMcs,
     }
-    return &display
+    return &data
 }
 
 /* End Of File */

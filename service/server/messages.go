@@ -16,28 +16,6 @@ import (
     "time"
 )
 
-// TODO
-type DisplayRow struct {
-    TotalMsgs          uint64     `json:"TotalMsgs,omitempty"`
-    TotalBytes         uint64     `json:"TotalBytes,omitempty"`
-    LastMsgReceived    *time.Time `json:"LastMsgReceived,omitempty"`
-    Uuid               string     `json:"Uuid,omitempty"`
-    UnitName           string     `json:"UnitName, omitempty"`
-    Mode               string     `json:"Mode, omitempty"`
-    UTotalMsgs         uint64     `json:"UTotalMsgs, omitempty"`
-    UTotalBytes        uint64     `json:"UTotalBytes, omitempty"`
-    UlastMsgReceived   *time.Time `json:"UlastMsgReceived, omitempty"`
-    DTotalMsgs         uint64     `json:"DTotalMsgs, omitempty"`
-    DTotalBytes        uint64     `json:"DTotalBytes, omitempty"`
-    DlastMsgReceived   *time.Time `json:"DlastMsgReceived, omitempty"`
-    RSRP               int32      `json:"RSRP, omitempty"`
-    BatteryLevel       string     `json:"BatteryLevel, omitempty"`
-    DiskSpaceLeft      string     `json:"DiskSpaceLeft, omitempty"`
-    ReportingInterval  uint32     `json:"ReportingInterval, omitempty"`
-    HeartbeatSeconds   uint32     `json:"HeartbeatSeconds, omitempty"`
-    HeartbeatSnapToRtc bool       `json:"HeartbeatSnapToRtc, omitempty"`
-}
-
 //--------------------------------------------------------------------
 // Types used in messages with associated copy functions
 //--------------------------------------------------------------------
@@ -812,69 +790,6 @@ func (value *ActivityReportGetCnfUlMsg) DeepCopy() *ActivityReportGetCnfUlMsg {
         UlMcs:                      value.UlMcs,
         DlMcsPresent:               value.DlMcsPresent,
         DlMcs:                      value.DlMcs,
-    }
-    return result
-}
-
-
-// TODO
-func (value *DisplayRow) DeepCopy() *DisplayRow {
-    if value == nil {
-        return nil
-    }
-    result := &DisplayRow{
-        TotalMsgs:          value.TotalMsgs,
-        TotalBytes:         value.TotalBytes,
-        LastMsgReceived:    value.LastMsgReceived,
-        Uuid:               value.Uuid,
-        UnitName:           value.UnitName,
-        Mode:               value.Mode,
-        UTotalMsgs:         value.UTotalMsgs,
-        UTotalBytes:        value.UTotalBytes,
-        UlastMsgReceived:   value.UlastMsgReceived,
-        DTotalMsgs:         value.DTotalMsgs,
-        DTotalBytes:        value.DTotalBytes,
-        DlastMsgReceived:   value.DlastMsgReceived,
-        RSRP:               value.RSRP,
-        BatteryLevel:       value.BatteryLevel,
-        DiskSpaceLeft:      value.DiskSpaceLeft,
-        ReportingInterval:  value.ReportingInterval,
-        HeartbeatSeconds:   value.HeartbeatSeconds,
-        HeartbeatSnapToRtc: value.HeartbeatSnapToRtc,
-    }
-    return result
-}
-
-/* // TODO
-func (value *MeasurementsIndUlMsg) DeepCopy() *MeasurementsIndUlMsg {
-    if value == nil {
-        return nil
-    }
-    result := &MeasurementsIndUlMsg{
-    // rsrp: value.Timestamp,
-    // rssi: value.ReportingIntervalMinutes,
-    }
-    return result
-}
-*/
-
-type DataVolume struct {
-    UplinkTimestamp   *time.Time
-    DownlinkTimestamp *time.Time
-    UplinkBytes       uint64
-    DownlinkBytes     uint64
-}
-
-
-func (value *DataVolume) DeepCopy() *DataVolume {
-    if value == nil {
-        return nil
-    }
-    result := &DataVolume{
-        UplinkTimestamp:   value.UplinkTimestamp,
-        DownlinkTimestamp: value.DownlinkTimestamp,
-        UplinkBytes:       value.UplinkBytes,
-        DownlinkBytes:     value.DownlinkBytes,
     }
     return result
 }

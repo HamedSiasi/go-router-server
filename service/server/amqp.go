@@ -22,9 +22,6 @@ import (
     //"gopkg.in/mgo.v2/bson"
 )
 
-var uuidMap = make(map[string]*DisplayRow)
-var uuidSlice = make([]*DisplayRow, len(uuidMap))
-
 type AmqpMessage struct {
     DeviceUuid   string `bson:"device_uuid" json:"device_uuid"`
     EndpointUuid int    `bson:"endpoint_uuid" json:"endpoint_uuid"`
@@ -57,12 +54,6 @@ type Queue struct {
     Msgs     chan interface{}
     Downlink chan AmqpMessage
 }
-
-var totalMsgs uint64
-var totalBytes uint64
-
-var row = &DisplayRow{}
-var rowsList = make([]*DisplayRow, 1)
 
 func consumeQueue(channel *amqp.Channel, chanName string) (<-chan amqp.Delivery, error) {
     msgChan, err := channel.Consume(
@@ -145,7 +136,6 @@ func OpenQueue(username, amqpAddress string) (*Queue, error) {
 	                m := AmqpReceiveMessage{}
 	                err = json.Unmarshal(msg.Body, &m)
 	                if err == nil {
-	                    //rec_Collection.Insert(&m)
 	                    Dbg.PrintfTrace("%s --> sending the following downlink message:\n\n%+v\n\n", logTag, &m)
 	                    q.Msgs <- &m
 	                } else {
@@ -159,16 +149,12 @@ func OpenQueue(username, amqpAddress string) (*Queue, error) {
 	                    q.Msgs <- &m
 	                    Dbg.PrintfTrace("%s --> UTM UUID is %+v.\n", logTag, m.DeviceUuid)
 	                    Dbg.PrintfTrace("%s --> UTM name is '%+v'.\n", logTag, m.DeviceName)
-	                    row.Uuid = m.DeviceUuid
-	                    row.UnitName = m.DeviceName
-	                    //res_Collection.Insert(&m)
 	                }
 	            case msg = <-errorChan:
 	                receivedMsg = true
 	                m := AmqpErrorMessage{}
 	                err = json.Unmarshal(msg.Body, &m)
 	                if err == nil {
-	                    //err_Collection.Insert(&m)
 	                    q.Msgs <- &m
 	                }
 	            case dlMsg := <-q.Downlink:

@@ -60,7 +60,8 @@ func ClientError(message string, status int) *Error {
     return apperr
 }
 
-/// TODO
+/// A handler which takes rest request handler function as an argument
+// and returns an error
 type Handler func(w http.ResponseWriter, req *http.Request) *Error
 
 /// TODO

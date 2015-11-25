@@ -17,6 +17,8 @@ import (
     "fmt"
     "github.com/streadway/amqp"
     "time"
+	"github.com/robmeades/utm/service/globals"
+    
 
     //"gopkg.in/mgo.v2"
     //"gopkg.in/mgo.v2/bson"
@@ -127,10 +129,10 @@ func OpenQueue(username, amqpAddress string) (*Queue, error) {
             var msg amqp.Delivery
             var ok bool
             receivedMsg := false
-	        Dbg.PrintfTrace("%s --> AMQP waiting for UL stimulus.\n", logTag)
+	        globals.Dbg.PrintfTrace("%s [amqp] --> AMQP waiting for UL stimulus.\n", globals.LogTag)
             select {
 	            case <-q.Quit:
-        	        Dbg.PrintfTrace("%s --> AMQP UL quitting.\n", logTag)
+        	        globals.Dbg.PrintfTrace("%s [amqp] --> AMQP UL quitting.\n", globals.LogTag)
 	                return
 	            case msg, ok = <-responseChan:
 	                if (!ok) {
@@ -141,28 +143,28 @@ func OpenQueue(username, amqpAddress string) (*Queue, error) {
 	                err = json.Unmarshal(msg.Body, &m)
 	                if err == nil {
 	                    q.Msgs <- &m
-	                    Dbg.PrintfTrace("%s --> UTM UUID is %+v.\n", logTag, m.DeviceUuid)
-	                    Dbg.PrintfTrace("%s --> UTM name is \"%+v\".\n", logTag, m.DeviceName)
+	                    globals.Dbg.PrintfTrace("%s [amqp] --> UTM UUID is %+v.\n", globals.LogTag, m.DeviceUuid)
+	                    globals.Dbg.PrintfTrace("%s [amqp] --> UTM name is \"%+v\".\n", globals.LogTag, m.DeviceName)
 	                }
 	            case msg, ok = <-errorChan:
 	                if (!ok) {
 	                    return
 	                }
 	                receivedMsg = true
-        	        Dbg.PrintfTrace("%s --> AMQP error channel says %v.\n", logTag, msg)
+        	        globals.Dbg.PrintfTrace("%s [amqp] --> AMQP error channel says %v.\n", globals.LogTag, msg)
 	                m := AmqpErrorMessage{}
 	                err = json.Unmarshal(msg.Body, &m)
 	                if err == nil {
-    					Dbg.PrintfTrace("%s--> error is %v.\n", logTag, m)
+    					globals.Dbg.PrintfTrace("%s--> error is %v.\n", globals.LogTag, m)
 	                }
     					
             }
             
             if receivedMsg {
                 if err == nil {
-                    Dbg.PrintfTrace("%s --> received UL:\n\n%+v\n\n", logTag, string(msg.Body))
+                    globals.Dbg.PrintfTrace("%s [amqp] --> received UL:\n\n%+v\n\n", globals.LogTag, string(msg.Body))
                 } else {
-                    Dbg.PrintfTrace("%s --> received UL:\n\n%+v\n\n...which is undecodable: \"%s\".\n", logTag, string(msg.Body), err.Error())
+                    globals.Dbg.PrintfTrace("%s [amqp] --> received UL:\n\n%+v\n\n...which is not JSON decodable: \"%s\".\n", globals.LogTag, string(msg.Body), err.Error())
                 }
             }
         }
@@ -172,10 +174,10 @@ func OpenQueue(username, amqpAddress string) (*Queue, error) {
     go func() {        
         // Continually process DL AMQP Uplink messages until commanded to Quit
         for {
-	        Dbg.PrintfTrace("%s --> AMQP waiting for DL stimulus.\n", logTag)
+	        globals.Dbg.PrintfTrace("%s [amqp] --> AMQP waiting for DL stimulus.\n", globals.LogTag)
             select {
 	            case <-q.Quit:
-        	        Dbg.PrintfTrace("%s --> AMQP DL loop quitting.\n", logTag)
+        	        globals.Dbg.PrintfTrace("%s [amqp] --> AMQP DL loop quitting.\n", globals.LogTag)
 	                return
 	            case dlMsg, ok := <-q.Downlink:
 	                if (!ok) {
@@ -183,7 +185,7 @@ func OpenQueue(username, amqpAddress string) (*Queue, error) {
 	                }
 	                serialisedData, err := json.Marshal(dlMsg)
 	                if err != nil {
-	                    Dbg.PrintfError("%s --> attempting to JSONify DL AMQP message:\n\n%+v\n\n...results in error: \"%s\".\n", logTag, dlMsg, err.Error())
+	                    globals.Dbg.PrintfError("%s [amqp] --> attempting to JSONify DL AMQP message:\n\n%+v\n\n...results in error: \"%s\".\n", globals.LogTag, dlMsg, err.Error())
 	                } else {
 	                    publishedMsg := amqp.Publishing{
 	                        DeliveryMode: amqp.Persistent,
@@ -193,9 +195,9 @@ func OpenQueue(username, amqpAddress string) (*Queue, error) {
 	                    }
 	                    err = channel.Publish(username, "send", false, false, publishedMsg)
 	                    if err != nil {
-	                        Dbg.PrintfError("%s --> unable to publish DL message:\n\n%+v\n\n...due to error: \"%s\".\n", logTag, publishedMsg, err.Error())
+	                        globals.Dbg.PrintfError("%s [amqp] --> unable to publish DL message:\n\n%+v\n\n...due to error: \"%s\".\n", globals.LogTag, publishedMsg, err.Error())
 	                    } else {
-	                        Dbg.PrintfTrace("%s --> published DL message:\n\n%+v\n\n%s\n", logTag, publishedMsg, string(serialisedData))
+	                        globals.Dbg.PrintfTrace("%s [amqp] --> published DL message:\n\n%+v\n\n%s\n", globals.LogTag, publishedMsg, string(serialisedData))
 	                    }
 	                }
             }            

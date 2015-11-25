@@ -21,12 +21,12 @@ import (
 //--------------------------------------------------------------------
 
 type FrontPageSummaryData struct {
-    TotalUlMsgs        int        `json:"TotalUlMsgs,omitempty"`
-    TotalUlBytes       int        `json:"TotalUlBytes,omitempty"`
-    LastUlMsgTime      *time.Time `json:"LastUlMsgTime,omitempty"`    
-    TotalDlMsgs        int        `json:"TotalDlMsgs,omitempty"`
-    TotalDlBytes       int        `json:"TotalDlBytes,omitempty"`
-    LastDlMsgTime      *time.Time `json:"LastDlMsgTime,omitempty"`    
+    TotalUlMsgs        int        `json:"TotalUlMsgs, omitempty"`
+    TotalUlBytes       int        `json:"TotalUlBytes, omitempty"`
+    LastUlMsgTime      *time.Time `json:"LastUlMsgTime, omitempty"`    
+    TotalDlMsgs        int        `json:"TotalDlMsgs, omitempty"`
+    TotalDlBytes       int        `json:"TotalDlBytes, omitempty"`
+    LastDlMsgTime      *time.Time `json:"LastDlMsgTime, omitempty"`    
 }
 
 type FrontPageDeviceData struct {

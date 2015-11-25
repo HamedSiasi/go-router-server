@@ -29,6 +29,7 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"time"
 	"unsafe"
+	"github.com/robmeades/utm/service/globals"
 )
 
 //--------------------------------------------------------------------
@@ -92,12 +93,12 @@ func encodeAndEnqueue(msg interface{}, uuid string) error {
 		        // TODO
             case *PingReqDlMsg:
         		byteCount = C.encodePingReqMsg(outputPointer, ppXmlBuffer, pXmlBufferLen)
-                Dbg.PrintfTrace("%s --> encoded PingReqDlMsg.\n", logTag)
+                globals.Dbg.PrintfTrace("%s [encode] --> encoded PingReqDlMsg.\n", globals.LogTag)
                 responseId = RESPONSE_PING_CNF
                 
             case *PingCnfDlMsg:
         		byteCount = C.encodePingCnfMsg(outputPointer, ppXmlBuffer, pXmlBufferLen)
-                Dbg.PrintfTrace("%s --> encoded PingCnfDlMsg.\n", logTag)
+                globals.Dbg.PrintfTrace("%s [encode] --> encoded PingCnfDlMsg.\n", globals.LogTag)
                 
             case *RebootReqDlMsg:
                 data := C.RebootReqDlMsg_t {
@@ -108,7 +109,7 @@ func encodeAndEnqueue(msg interface{}, uuid string) error {
                 }
         		dataPointer := (*C.RebootReqDlMsg_t)(unsafe.Pointer(&data))
         		byteCount = C.encodeRebootReqDlMsg(outputPointer, dataPointer, ppXmlBuffer, pXmlBufferLen)
-                Dbg.PrintfTrace("%s --> encoded RebootReqDlMsg.\n", logTag)
+                globals.Dbg.PrintfTrace("%s [encode] --> encoded RebootReqDlMsg.\n", globals.LogTag)
                 
             case *DateTimeSetReqDlMsg:
                 data := C.DateTimeSetReqDlMsg_t {
@@ -117,11 +118,11 @@ func encodeAndEnqueue(msg interface{}, uuid string) error {
                 }
         		dataPointer := (*C.DateTimeSetReqDlMsg_t)(unsafe.Pointer(&data))
         		byteCount = C.encodeDateTimeSetReqDlMsg(outputPointer, dataPointer, ppXmlBuffer, pXmlBufferLen)
-                Dbg.PrintfTrace("%s --> encoded DateTimeSetReqDlMsg.\n", logTag)
+                globals.Dbg.PrintfTrace("%s [encode] --> encoded DateTimeSetReqDlMsg.\n", globals.LogTag)
                 responseId = RESPONSE_DATE_TIME_SET_CNF
             case *DateTimeGetReqDlMsg:
         		byteCount = C.encodeDateTimeGetReqDlMsg(outputPointer, ppXmlBuffer, pXmlBufferLen)
-                Dbg.PrintfTrace("%s --> encoded DateTimeGetReqDlMsg.\n", logTag)
+                globals.Dbg.PrintfTrace("%s [encode] --> encoded DateTimeGetReqDlMsg.\n", globals.LogTag)
                 responseId = RESPONSE_DATE_TIME_GET_CNF
                 
             case *ModeSetReqDlMsg:
@@ -130,17 +131,17 @@ func encodeAndEnqueue(msg interface{}, uuid string) error {
                 }
         		dataPointer := (*C.ModeSetReqDlMsg_t)(unsafe.Pointer(&data))
         		byteCount = C.encodeModeSetReqDlMsg(outputPointer, dataPointer, ppXmlBuffer, pXmlBufferLen)
-                Dbg.PrintfTrace("%s --> encoded ModeSetReqDlMsg.\n", logTag)
+                globals.Dbg.PrintfTrace("%s [encode] --> encoded ModeSetReqDlMsg.\n", globals.LogTag)
                 responseId = RESPONSE_MODE_SET_CNF
                 
             case *ModeGetReqDlMsg:
         		byteCount = C.encodeModeGetReqDlMsg(outputPointer, ppXmlBuffer, pXmlBufferLen)
-                Dbg.PrintfTrace("%s --> encoded ModeGetReqDlMsg.\n", logTag)
+                globals.Dbg.PrintfTrace("%s [encode] --> encoded ModeGetReqDlMsg.\n", globals.LogTag)
                 responseId = RESPONSE_MODE_GET_CNF
             
             case *IntervalsGetReqDlMsg:
         		byteCount = C.encodeIntervalsGetReqDlMsg(outputPointer, ppXmlBuffer, pXmlBufferLen)
-                Dbg.PrintfTrace("%s --> encoded IntervalsGetReqDlMsg.\n", logTag)
+                globals.Dbg.PrintfTrace("%s [encode] --> encoded IntervalsGetReqDlMsg.\n", globals.LogTag)
                 responseId = RESPONSE_INTERVALS_GET_CNF
                 
             case *ReportingIntervalSetReqDlMsg:
@@ -149,7 +150,7 @@ func encodeAndEnqueue(msg interface{}, uuid string) error {
                 }
         		dataPointer := (*C.ReportingIntervalSetReqDlMsg_t)(unsafe.Pointer(&data))
         		byteCount = C.encodeReportingIntervalSetReqDlMsg(outputPointer, dataPointer, ppXmlBuffer, pXmlBufferLen)
-                Dbg.PrintfTrace("%s --> encoded ReportingIntervalSetReqDlMsg.\n", logTag)
+                globals.Dbg.PrintfTrace("%s [encode] --> encoded ReportingIntervalSetReqDlMsg.\n", globals.LogTag)
                 responseId = RESPONSE_REPORTING_INTERVAL_SET_CNF
                 
             case *HeartbeatSetReqDlMsg:
@@ -159,12 +160,12 @@ func encodeAndEnqueue(msg interface{}, uuid string) error {
                 }
         		dataPointer := (*C.HeartbeatSetReqDlMsg_t)(unsafe.Pointer(&data))
         		byteCount = C.encodeHeartbeatSetReqDlMsg(outputPointer, dataPointer, ppXmlBuffer, pXmlBufferLen)
-                Dbg.PrintfTrace("%s --> encoded HeartbeatSetReqDlMsg.\n", logTag)
+                globals.Dbg.PrintfTrace("%s [encode] --> encoded HeartbeatSetReqDlMsg.\n", globals.LogTag)
                 responseId = RESPONSE_HEARTBEAT_SET_CNF
                 
             case *MeasurementsGetReqDlMsg:
         		byteCount = C.encodeMeasurementsGetReqDlMsg(outputPointer, ppXmlBuffer, pXmlBufferLen)
-                Dbg.PrintfTrace("%s --> encoded MeasurementsReportReqDlMsg.\n", logTag)        
+                globals.Dbg.PrintfTrace("%s [encode] --> encoded MeasurementsReportReqDlMsg.\n", globals.LogTag)        
                 responseId = RESPONSE_MEASUREMENTS_GET_CNF
                         
             // TODO
@@ -173,7 +174,7 @@ func encodeAndEnqueue(msg interface{}, uuid string) error {
             
             case *TrafficReportGetReqDlMsg:
         		byteCount = C.encodeTrafficReportGetReqDlMsg(outputPointer, ppXmlBuffer, pXmlBufferLen)
-                Dbg.PrintfTrace("%s --> encoded TrafficReportGetReqDlMsg.\n", logTag)
+                globals.Dbg.PrintfTrace("%s [encode] --> encoded TrafficReportGetReqDlMsg.\n", globals.LogTag)
                 responseId = RESPONSE_TRAFFIC_REPORT_GET_CNF
                                 
             case *TrafficTestModeParametersSetReqDlMsg:
@@ -187,26 +188,26 @@ func encodeAndEnqueue(msg interface{}, uuid string) error {
                 }
         		dataPointer := (*C.TrafficTestModeParametersSetReqDlMsg_t)(unsafe.Pointer(&data))
         		byteCount = C.encodeTrafficTestModeParametersSetReqDlMsg(outputPointer, dataPointer, ppXmlBuffer, pXmlBufferLen)
-                Dbg.PrintfTrace("%s --> encoded TrafficTestModeParametersSetReqDlMsg.\n", logTag)
+                globals.Dbg.PrintfTrace("%s [encode] --> encoded TrafficTestModeParametersSetReqDlMsg.\n", globals.LogTag)
                 responseId = RESPONSE_TRAFFIC_TEST_MODE_PARAMETERS_SET_CNF
                 
             case *TrafficTestModeParametersGetReqDlMsg:
         		byteCount = C.encodeTrafficTestModeParametersGetReqDlMsg(outputPointer, ppXmlBuffer, pXmlBufferLen)
-                Dbg.PrintfTrace("%s --> encoded TrafficTestModeParametersGetReqDlMsg.\n", logTag)
+                globals.Dbg.PrintfTrace("%s [encode] --> encoded TrafficTestModeParametersGetReqDlMsg.\n", globals.LogTag)
                 responseId = RESPONSE_TRAFFIC_TEST_MODE_PARAMETERS_GET_CNF
                                 
             case *TrafficTestModeReportGetReqDlMsg:
         		byteCount = C.encodeTrafficTestModeReportGetReqDlMsg(outputPointer, ppXmlBuffer, pXmlBufferLen)
-                Dbg.PrintfTrace("%s --> encoded TrafficTestModeReportGetReqDlMsg.\n", logTag)
+                globals.Dbg.PrintfTrace("%s [encode] --> encoded TrafficTestModeReportGetReqDlMsg.\n", globals.LogTag)
                 responseId = RESPONSE_TRAFFIC_TEST_MODE_REPORT_GET_CNF
                                 
             case *ActivityReportGetReqDlMsg:
         		byteCount = C.encodeActivityReportGetReqDlMsg(outputPointer, ppXmlBuffer, pXmlBufferLen)
-                Dbg.PrintfTrace("%s --> encoded ActivityReportGetReqDlMsg.\n", logTag)                
+                globals.Dbg.PrintfTrace("%s [encode] --> encoded ActivityReportGetReqDlMsg.\n", globals.LogTag)                
                 responseId = RESPONSE_ACTIVITY_REPORT_GET_CNF
 
 		    default:
-                Dbg.PrintfTrace("%s --> asked to send unknown message:\n\n%s\n", logTag, spew.Sdump(msg))
+                globals.Dbg.PrintfTrace("%s [encode] --> asked to send unknown message:\n\n%s\n", globals.LogTag, spew.Sdump(msg))
 		}
 		
 	    if byteCount > 0 {
@@ -225,17 +226,20 @@ func encodeAndEnqueue(msg interface{}, uuid string) error {
     			msg.Payload = append(msg.Payload, int(v))
     		}
     
-    		Dbg.PrintfTrace("%s --> %d byte message for AMQP downlink:\n\n%+v\n", logTag, byteCount, msg)
+    		globals.Dbg.PrintfTrace("%s [encode] --> %d byte message for AMQP downlink:\n\n%+v\n", globals.LogTag, byteCount, msg)
     		downlinkMessages <- msg    		
-    		Dbg.PrintfTrace("%s --> encoded %d bytes into AMQP message:\n\n%+v\n", logTag, byteCount, msg)
-			Dbg.PrintfInfo("%s --> XML buffer pointer 0x%08x, used %d, left %d:.\n", logTag, *ppXmlBuffer, C.uint32_t(len(xmlEncodeBuffer)) - xmlBufferLen, xmlBufferLen)
+    		globals.Dbg.PrintfTrace("%s [encode] --> encoded %d bytes into AMQP message:\n\n%+v\n", globals.LogTag, byteCount, msg)
+			globals.Dbg.PrintfInfo("%s [encode] --> XML buffer pointer 0x%08x, used %d, left %d:.\n", globals.LogTag, *ppXmlBuffer, C.uint32_t(len(xmlEncodeBuffer)) - xmlBufferLen, xmlBufferLen)
     		
         	// If a response is expected, add it to the list for this device
         	if (responseId != RESPONSE_NONE) {
+				globals.Dbg.PrintfTrace("%s [encode] --> now expecting response ID %d from UUID %s.\n", globals.LogTag, responseId, uuid)
             	list := deviceExpectedMsgList[uuid]
         		if list == nil {
-        		    list = make (ExpectedMsgList, 0)
+        		    var expectedMsgList []ExpectedMsg 
+        		    list = &expectedMsgList
         			deviceExpectedMsgList[uuid] = list
+    				globals.Dbg.PrintfTrace("%s [encode] --> making a new list for UUID %s, number of lists is now %d.\n", globals.LogTag, uuid, len(deviceExpectedMsgList))
         		}
         		
         		expectedMsg := ExpectedMsg {
@@ -243,7 +247,8 @@ func encodeAndEnqueue(msg interface{}, uuid string) error {
                     ResponseId:  responseId,		    
         		}
         		
-    			list = append(list, expectedMsg)
+    			*list = append(*list, expectedMsg)
+				globals.Dbg.PrintfTrace("%s [encode] --> expected list for UUID %s is now size %d.\n", globals.LogTag, uuid, len(*list))
             }    
             		
     	    return nil

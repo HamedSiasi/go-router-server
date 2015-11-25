@@ -13,20 +13,18 @@
 package server
 
 import (
-    "encoding/json"
     "fmt"
     "github.com/brettlangdon/forge"
 	//"github.com/gorilla/mux"
+    "github.com/robmeades/utm/service/globals"
 	"github.com/robmeades/utm/service/utilities"
     "log"
 	"net/http"
     //"os"
     "time"
     "github.com/codegangsta/negroni"
-    "github.com/davecgh/go-spew/spew"
     "github.com/goincremental/negroni-sessions"
     "github.com/goincremental/negroni-sessions/cookiestore"
-    "github.com/robmeades/utm/service/models"
     "github.com/robmeades/utm/service/routes"
 )
 
@@ -39,9 +37,6 @@ type ExpectedMsg struct {
     TimeStarted  time.Time
     ResponseId   ResponseTypeEnum
 }
-
-// The list of messages expected back from a device
-type ExpectedMsgList []ExpectedMsg
 
 // Conection details for a device
 type Connection struct {
@@ -58,17 +53,11 @@ type Connection struct {
 // Variables
 //--------------------------------------------------------------------
 
-// Level of debug required
-const Dbg utilities.DebugLevel = utilities.DEBUG_TRACE
-
 // Server details
 const configurationFile string = "config.cfg"
 
-// Log  prefix so that we can tell who we are
-var logTag string = "UTM-API"
-
 // A list of expected response messages against each device
-var deviceExpectedMsgList map[string]ExpectedMsgList
+var deviceExpectedMsgList map[string]*[]ExpectedMsg
 
 // Downlink channel to device
 var downlinkMessages chan<- AmqpMessage
@@ -83,69 +72,6 @@ var amqpRetryCount int
 // Functions
 //--------------------------------------------------------------------
 
-/// Fail func
-func failOnError (err error, msg string) {
-    if err != nil {
-        log.Fatalf("%s: %s", msg, err)
-	    panic(fmt.Sprintf("%s: %s", msg, err))
-    }
-}
-
-func loginHandler(response http.ResponseWriter, request *http.Request) {
-
-	email := request.FormValue("email")
-	password := request.FormValue("password")
-	session := sessions.GetSession(request)
-
-	db := utilities.GetDB(request)
-	user := new(models.User)
-	err := user.Authenticate(db, email, password)
-	if err == nil {
-		session.Set("user_id", user.ID.Hex())
-		session.Set("user_company", user.Company)
-		session.Set("user_email", user.Email)
-		//Fmt.Fprintf(response, "User %s success!\n", session.Get("user_email"))
-		http.Redirect(response, request, "/", 302)
-	}
-}
-
-func registerHandler(response http.ResponseWriter, request *http.Request) {
-
-	company := request.FormValue("company_name")
-	firstName := request.FormValue("user_firstName")
-	lastName := request.FormValue("user_lastName")
-	email := request.FormValue("email")
-	password := request.FormValue("password")
-
-	db := utilities.GetDB(request)
-	user := new(models.User)
-
-	user.NewUser(db, company, firstName, lastName, email, password)
-	//Fmt.Fprintf(response, "User %s created successfully!\n", firstName)
-	http.Redirect(response, request, "/login", 302)
-}
-
-/// Get the summary data for the front page
-func getFrontPageData (response http.ResponseWriter, request *http.Request) *utilities.Error {
-	// Ensure this is a GET request
-	if (request.Method != "GET") || (request.Method == "") {
-        Dbg.PrintfError("%s --> received unsupported REST request %s %s.\n", logTag, request.Method, request.URL)
-        return utilities.ClientError("unsupported method", http.StatusBadRequest)
-	}
-
-    displayData := displayFrontPageData()
-	// Send the requested data
-	response.Header().Set("Content-Type", "application/json")
-	response.WriteHeader(http.StatusOK)
-	err := json.NewEncoder(response).Encode(displayData)
-	if err != nil {
-		Dbg.PrintfError("%s --> received REST request %s but attempting to serialise the result:\n%s\n...yielded error %s.\n", logTag, request.URL, spew.Sdump(displayData), err.Error())
-		return utilities.ServerError(err)
-	}
-
-	return nil
-}
-
 // Process datagrams from the AMQP queue
 func processDatagrams(q *Queue) {
     
@@ -156,11 +82,11 @@ func processDatagrams(q *Queue) {
                 if (!ok) {
                     return
                 }
-    			Dbg.PrintfTrace("%s --> decoded msg:\n\n%+v\n\n", logTag, msg)
+    			globals.Dbg.PrintfTrace("%s [server] --> decoded msg:\n\n%+v\n\n", globals.LogTag, msg)
     
     			switch value := msg.(type) {
     				case *AmqpResponseMessage:
-    					Dbg.PrintfTrace("%s --> is response.\n", logTag)
+    					globals.Dbg.PrintfTrace("%s [server] --> is response.\n", globals.LogTag)
     					if value.Command == "UART_data" {
     					    savedUlMsgs := totalUlMsgs
     					    savedUlBytes := totalUlBytes
@@ -195,12 +121,12 @@ func processDatagrams(q *Queue) {
     
     				case *error:
     					// If an error has occurred, drop out of the loop
-    					Dbg.PrintfTrace("%s --> AMQP error received (%s), dropping out...\n", logTag, (*value).Error())
+    					globals.Dbg.PrintfTrace("%s [server] --> AMQP error received (%s), dropping out...\n", globals.LogTag, (*value).Error())
     					return
     
     				default:
-    					Dbg.PrintfTrace("%s --> message type: %+v.\n", logTag, msg)
-    					log.Fatal(logTag, "invalid message type.")
+    					globals.Dbg.PrintfTrace("%s [server] --> message type: %+v.\n", globals.LogTag, msg)
+    					log.Fatal(globals.LogTag, "invalid message type.")
     			}
     	}
     }	
@@ -214,24 +140,26 @@ func processAmqp(username, amqpAddress string) {
     // a little while and try again
 	for {
     	fmt.Printf("######################################################################################################\n")
-    	fmt.Printf("UTM-API service (%s) REST interface opening %s...\n", logTag, amqpAddress)
+    	fmt.Printf("UTM-API service (%s) REST interface opening %s...\n", globals.LogTag, amqpAddress)
 
     	q, err := OpenQueue(username, amqpAddress)
 
     	if err == nil {
         	defer q.Close()
     
-        	fmt.Printf("%s --> connection opened.\n", logTag)
+        	fmt.Printf("%s [server] --> connection opened.\n", globals.LogTag)
     	
         	downlinkMessages = q.Downlink
     
-            processDatagrams (q)    
+            // The meat is in here
+            processDatagrams (q)
+            
     	} else {
-    		Dbg.PrintfTrace("%s --> error opening AMQP queue (%s).\n", logTag, err.Error())    	    
+    		globals.Dbg.PrintfTrace("%s [server] --> error opening AMQP queue (%s).\n", globals.LogTag, err.Error())    	    
     	}
     	
 		amqpRetryCount++;
-		Dbg.PrintfTrace("%s --> waiting before trying again...\n", logTag)    	        	
+		globals.Dbg.PrintfTrace("%s [server] --> waiting before trying again...\n", globals.LogTag)    	        	
     	time.Sleep (time.Second * 10)	
 	}
 }
@@ -251,7 +179,7 @@ func Run() {
 	port, err := host.GetString("port")
 
 	// Set up the device expected message list map
-	deviceExpectedMsgList = make(map[string]ExpectedMsgList)
+	deviceExpectedMsgList = make(map[string]*[]ExpectedMsg)
 	// And a timer to remove crud from it
     removeOldExpectedMsgs := time.NewTicker (time.Minute * 10)
     
@@ -260,10 +188,10 @@ func Run() {
         for _ = range removeOldExpectedMsgs.C {
             for uuid, expectedMsgList := range deviceExpectedMsgList {
                 var x = 0                
-                for x < len(expectedMsgList) {
-                    if time.Now().After (expectedMsgList[x].TimeStarted.Add(time.Hour)) {
-    		            expectedMsgList = append(expectedMsgList[:x], expectedMsgList[x + 1:] ...)
-                        Dbg.PrintfTrace("%s --> giving up after waiting > 1 hour for %d from device %s.\n", logTag, expectedMsgList[x].ResponseId, uuid)
+                for x < len(*expectedMsgList) {
+                    if time.Now().After ((*expectedMsgList)[x].TimeStarted.Add(time.Hour)) {
+    		            *expectedMsgList = append((*expectedMsgList)[:x], (*expectedMsgList)[x + 1:] ...)
+                        globals.Dbg.PrintfTrace("%s [server] --> giving up after waiting > 1 hour for %d from device %s.\n", globals.LogTag, (*expectedMsgList)[x].ResponseId, uuid)
                     }
                     x++
                 }
@@ -281,6 +209,8 @@ func Run() {
 	router := routes.LoadRoutes()
 
 	router.Handle("/frontPageData", utilities.Handler(getFrontPageData))
+	//router.Handle("/sendPingReqDlMsg", utilities.Handler (sendPingReq))
+    //router.HandleFunc("/sendHeartbeatSetReqDlMsg", hb.Set).Methods("POST")
 	router.HandleFunc("/register", registerHandler)
 	router.HandleFunc("/login", loginHandler)
 	

@@ -163,6 +163,7 @@ import (
 	"encoding/hex"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/robmeades/utm/service/utilities"
+	"github.com/robmeades/utm/service/globals"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"time"
@@ -337,20 +338,20 @@ func decode(data []byte, uuid string) []interface{} {
 	ppNext := (**C.char)(unsafe.Pointer(&pNext))
 
 	hexBuffer := hex.Dump(data)
-	Dbg.PrintfInfo("%s --> the whole input buffer:\n\n%s\n\n", logTag, hexBuffer)
+	globals.Dbg.PrintfInfo("%s [decode] --> the whole input buffer:\n\n%s\n\n", globals.LogTag, hexBuffer)
 
 	var decoderCount uint32
 
 	for bytesRemaining > 0 {
 		decoderCount = decoderCount + 1
 
-		Dbg.PrintfTrace("%s --> decoding message number %d of AMQP message number %d.\n", logTag, decoderCount, amqpMessageCount)
+		globals.Dbg.PrintfTrace("%s [decode] --> decoding message number %d of AMQP message number %d.\n", globals.LogTag, decoderCount, amqpMessageCount)
 
-		Dbg.PrintfInfo("%s -----## show buffer data ##-----\n\n%s\n\n", logTag, spew.Sdump(inputBuffer))
-		used := C.pointerSub(pNext, pStart)
-		Dbg.PrintfInfo("%s --> message data used: %d.\n", logTag, used)
+		globals.Dbg.PrintfInfo("%s -----## show buffer data ##-----\n\n%s\n\n", globals.LogTag, spew.Sdump(inputBuffer))
+		used = C.pointerSub(pNext, pStart)
+		globals.Dbg.PrintfInfo("%s [decode] --> message data used: %d.\n", globals.LogTag, used)
 		bytesRemaining = C.uint32_t(len(data)) - used
-		Dbg.PrintfInfo("%s --> %d bytes remaining out of %d.\n", logTag, bytesRemaining, len(data))
+		globals.Dbg.PrintfInfo("%s [decode] --> %d bytes remaining out of %d.\n", globals.LogTag, bytesRemaining, len(data))
 		if bytesRemaining > 0 {
         	// A place to put the XML output from the decoder
         	pXmlBuffer := (*C.char) (unsafe.Pointer(&(xmlDecodeBuffer[0])))
@@ -359,12 +360,12 @@ func decode(data []byte, uuid string) []interface{} {
             pXmlBufferLen := (*C.uint32_t) (unsafe.Pointer(&xmlBufferLen))
 	
 			result := C.decodeUlMsg(ppNext, bytesRemaining, pBuffer, ppXmlBuffer, pXmlBufferLen)
-			Dbg.PrintfTrace("%s --> decode received uplink message: %+v.\n\n-----## %s ##----- \n\n", logTag, result, ulDecodeTypeDisplay[int(result)])
-			Dbg.PrintfInfo("%s --> XML buffer pointer 0x%08x, used %d, left %d:.\n", logTag, *ppXmlBuffer, C.uint32_t(len(xmlDecodeBuffer)) - xmlBufferLen, xmlBufferLen)
+			globals.Dbg.PrintfTrace("%s [decode] --> decode received uplink message: %+v.\n\n-----## %s ##----- \n\n", globals.LogTag, result, ulDecodeTypeDisplay[int(result)])
+			globals.Dbg.PrintfInfo("%s [decode] --> XML buffer pointer 0x%08x, used %d, left %d:.\n", globals.LogTag, *ppXmlBuffer, C.uint32_t(len(xmlDecodeBuffer)) - xmlBufferLen, xmlBufferLen)
 	
     		//Store XmlData in MongoDB
     		//XmlDataStore(xmlDecodeBuffer, uuid)
-    		//Dbg.PrintfInfo("%s -->  the XML data is:\n\n%s\n\n", logTag, spew.Sdump(xmlDecodeBuffer))
+    		//Dbg.PrintfInfo("%s [decode] -->  the XML data is:\n\n%s\n\n", logTag, spew.Sdump(xmlDecodeBuffer))
     		
 			// Now decode the messages and pass them to the state table
 			switch int(result) {
@@ -742,7 +743,7 @@ func decode(data []byte, uuid string) []interface{} {
 		}
 	}
 
-    totalUlMsgs += len (returnedMsgs)
+    totalUlMsgs += len(returnedMsgs)
     totalUlBytes += int(used)
     lastUlMsgTime = time.Now()
     

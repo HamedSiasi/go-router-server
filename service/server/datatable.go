@@ -15,6 +15,7 @@ package server
 import (
     "time"
     "github.com/davecgh/go-spew/spew"
+	"github.com/robmeades/utm/service/globals"
 )
 
 //--------------------------------------------------------------------
@@ -88,7 +89,7 @@ func operateDataTable() {
 	deviceLatestStateList := make(map[string]*LatestState)    	
     checkConnections := time.NewTicker (time.Second * 10)
     
-    Dbg.PrintfTrace("%s --> datatable command channel created and now being serviced.\n", logTag)
+    globals.Dbg.PrintfTrace("%s [datatable] --> command channel created and now being serviced.\n", globals.LogTag)
     
     // Deal with the check connections timer
     // If we know the reporting interval we can say a device
@@ -102,12 +103,12 @@ func operateDataTable() {
                     if state.LatestIntervalsData.HeartbeatSnapToRtc {
                         if time.Now().After (state.LastHeardFrom.Add(time.Hour + time.Minute * 10)) {
                             state.Connected = false;
-                            Dbg.PrintfTrace("%s --> device %s no longer connected (last heard from @ %s).\n", logTag, uuid, state.LastHeardFrom.String())
+                            globals.Dbg.PrintfTrace("%s [datatable] --> device %s is no longer connected (last heard from @ %s).\n", globals.LogTag, uuid, state.LastHeardFrom.String())
                         }
                     } else {
                         if time.Now().After (state.LastHeardFrom.Add(time.Duration(state.LatestIntervalsData.HeartbeatSeconds * (state.LatestIntervalsData.ReportingInterval + 2)) * time.Second)) {                   
                             state.Connected = false;
-                            Dbg.PrintfTrace("%s --> device %s no longer connected  (last heard from @ %s).\n", logTag, uuid, state.LastHeardFrom.String())
+                            globals.Dbg.PrintfTrace("%s [datatable] --> device %s is no longer connected  (last heard from @ %s).\n", globals.LogTag, uuid, state.LastHeardFrom.String())
                         }   
                     }                
                 }    
@@ -115,7 +116,7 @@ func operateDataTable() {
         }
     }()
     
-    // Deal with messages on the channel
+    // Deal with commands on the channel
     go func() {
         for cmd := range channel {
             switch value := cmd.(type) {
@@ -131,7 +132,8 @@ func operateDataTable() {
     	                    state.LatestTrafficVolumeData = &TrafficVolumeData {}
     	                }	                
     	                state.LatestTrafficVolumeData = updateTrafficVolumeData (state.LatestTrafficVolumeData, value)
-    	            }    
+    					globals.Dbg.PrintfTrace("%s [datatable] --> connection state for device %s updated.\n", globals.LogTag, value.DeviceUuid)
+    	            }
 			                	
 	            // Handle message containers holding somethings of interest
 	            case *MessageContainer:
@@ -142,11 +144,11 @@ func operateDataTable() {
             			state = &LatestState{};
             			deviceLatestStateList[value.DeviceUuid] = state;
                         state.LastHeardFrom = time.Now().Local()
-                        Dbg.PrintfTrace("%s --> datatable has heard from a new device, UUID %s.\n", logTag, value.DeviceUuid)
+                        globals.Dbg.PrintfTrace("%s [datatable] --> heard from a new device, UUID %s.\n", globals.LogTag, value.DeviceUuid)
                         // TODO: find a way to send a get intervals request for a new device, but not from here
             		}
             		
-                    Dbg.PrintfTrace("%s --> datatable received a message from UUID %s.\n", logTag, value.DeviceUuid)
+                    globals.Dbg.PrintfTrace("%s [datatable] --> storing data for UUID %s...\n", globals.LogTag, value.DeviceUuid)
             		
 	            	switch utmMsg := value.Message.(type) {
 			            case *InitIndUlMsg:
@@ -314,6 +316,7 @@ func operateDataTable() {
 			                    state.LatestActivityReportData = makeActivityReportData1(data, value.Timestamp)
 			                }
 	            	}
+					globals.Dbg.PrintfTrace("%s [datatable] --> storage completed.\n", globals.LogTag)
 	            	
 	            // Return the latest state for a given UUID 
 	            case *DeviceLatestStateChannel:
@@ -323,7 +326,7 @@ func operateDataTable() {
    	            	if state != nil {
 		                // Duplicate the memory pointed to into a new LatestState struct,
 		                // post it and close the channel
-		                Dbg.PrintfTrace("%s --> fetching latest state for UUID %s.\n", logTag, value.DeviceUuid)
+		                globals.Dbg.PrintfTrace("%s [datatable] --> fetching latest state for UUID %s.\n", globals.LogTag, value.DeviceUuid)
 		                latest := LatestState{}
 		                latest.Connected = state.Connected
 		                latest.LastHeardFrom = state.LastHeardFrom
@@ -344,9 +347,9 @@ func operateDataTable() {
 		                latest.LatestActivityReportData = state.LatestActivityReportData.DeepCopy()
 		                value.State <- latest
 		                close(value.State)
-		                Dbg.PrintfTrace("%s --> datatable provided latest state and closed channel.\n", logTag)
+		                globals.Dbg.PrintfTrace("%s [datatable] --> provided latest state and closed channel.\n", globals.LogTag)
 		            } else {
-		                Dbg.PrintfTrace("%s --> datatable asked for latest state for unknown UUID (%s).\n", logTag, value.DeviceUuid)
+		                globals.Dbg.PrintfTrace("%s [datatable] --> asked for latest state for unknown UUID %s.\n", globals.LogTag, value.DeviceUuid)
 		            }
 	            // Return the latest state for all UUIDs 
 	            case *chan []DeviceLatestState:
@@ -378,14 +381,14 @@ func operateDataTable() {
     		        }    
 	                *value <- allStates
 	                close(*value)
-	                Dbg.PrintfTrace("%s --> datatable provided latest state for all devices and closed channel.\n", logTag)
+	                globals.Dbg.PrintfTrace("%s [datatable] --> provided latest state for all devices and closed channel.\n", globals.LogTag)
 		                
 	            default:
-	                Dbg.PrintfTrace("%s --> unrecognised datatable message, ignoring:\n\n%s\n", logTag, spew.Sdump(cmd))
+	                globals.Dbg.PrintfTrace("%s [datatable] --> unrecognised command into channel, ignoring:\n\n%s\n", globals.LogTag, spew.Sdump(cmd))
             }
         }
 
-        Dbg.PrintfTrace("%s --> datatable command channel closed, stopping.\n", logTag)
+        globals.Dbg.PrintfTrace("%s [datatable] --> command channel closed, stopping.\n", globals.LogTag)
         checkConnections.Stop();
     }()
 }

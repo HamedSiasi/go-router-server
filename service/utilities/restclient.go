@@ -17,7 +17,24 @@ import (
     "encoding/json"
     "fmt"
     "net/http"
+    "github.com/robmeades/utm/service/globals"
 )
+
+func ValidateGetRequest (request *http.Request) *globals.Error {
+	// Ensure this is a GET request
+	if (request.Method != "GET") || (request.Method == "") {
+        globals.Dbg.PrintfError("%s [dl_msgs] --> received unsupported REST request %s %s.\n", globals.LogTag, request.Method, request.URL)
+        return ClientError("unsupported method", http.StatusBadRequest)
+	}
+	
+	return nil    
+}
+
+func MakeOkResponse (response http.ResponseWriter) {
+	// Make an "OK" response
+	response.Header().Set("Content-Type", "application/json")
+	response.WriteHeader(http.StatusOK)
+}
 
 /// Definition of a REST client
 type RestClient struct {

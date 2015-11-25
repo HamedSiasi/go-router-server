@@ -23,6 +23,7 @@ func LoadRoutes() *mux.Router {
 	index := controllers.Index{}
 	auth := controllers.Auth{}
 	user := controllers.User{}
+    //sendDlMsg := controllers.SendDlMsg{}
 
 	router := mux.NewRouter()
 

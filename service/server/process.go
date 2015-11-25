@@ -16,6 +16,7 @@ import (
     "time"
     "reflect"
     "github.com/davecgh/go-spew/spew"
+	"github.com/robmeades/utm/service/globals"
 )
 
 //--------------------------------------------------------------------
@@ -34,15 +35,15 @@ var processMsgs chan<- interface{}
 
 func operateProcess() {
 	deviceList := make(map[string]bool)    	
-    msgs := make(chan interface{})
-    processMsgs = msgs
+    channel := make(chan interface{})
+    processMsgs = channel
     
-    Dbg.PrintfTrace("%s --> message processing channel created and now being serviced.\n", logTag)
+    globals.Dbg.PrintfTrace("%s [process] --> channel created and now being serviced.\n", globals.LogTag)
     
-    // Process messages on the msgs channel
+    // Process commands on the channel
     go func() {
-        for msg := range msgs {
-            switch value := msg.(type) {
+        for cmd := range channel {
+            switch value := cmd.(type) {
             	
 	            // Handle message containers holding somethings of interest,
 	            // throw everything else away
@@ -60,7 +61,7 @@ func operateProcess() {
             		       }
             		}
             		
-					Dbg.PrintfTrace("%s --> processing message from UUID %s:\n\n%s\n\n", logTag, value.DeviceUuid, spew.Sdump(msg))
+					globals.Dbg.PrintfTrace("%s [process] --> processing message from UUID %s...\n\n%s\n\n", globals.LogTag, value.DeviceUuid, spew.Sdump(cmd))
             		
 	            	switch utmMsg := value.Message.(type) {
         				
@@ -76,7 +77,7 @@ func operateProcess() {
 			                responseId = RESPONSE_PING_CNF
 
 			            case *InitIndUlMsg:
-        					Dbg.PrintfInfo("%s --> UUID %s has protocol revision %d, which is different to this server (%d)", logTag, value.DeviceUuid, utmMsg.RevisionLevel, RevisionLevel)
+        					globals.Dbg.PrintfInfo("%s [process] --> UUID %s has protocol revision %d, which is different to this server (%d)", globals.LogTag, value.DeviceUuid, utmMsg.RevisionLevel, RevisionLevel)
         					// Get the reporting intervals for this device
 		                    encodeAndEnqueue (&IntervalsGetReqDlMsg{}, value.DeviceUuid)
         					
@@ -183,30 +184,35 @@ func operateProcess() {
 			                
 			            default:
     			            // Ignore any unknown UTM messages
-        	                Dbg.PrintfTrace("%s --> unrecognised UTM message, ignoring.\n", logTag)
-        	                //Dbg.PrintfTrace("%s --> unrecognised UTM message, ignoring:\n\n%s\n", logTag, spew.Sdump(msg))
+        	                globals.Dbg.PrintfTrace("%s [process] --> unrecognised UTM message, ignoring.\n", globals.LogTag)
+        	                globals.Dbg.PrintfInfo("%s [process] --> unrecognised UTM message was:\n\n%s\n", globals.LogTag, spew.Sdump(utmMsg))
 	            	}
 	            	
                 	// If this was a response message, take it out of the expected list for this UUID
                 	if responseId != RESPONSE_NONE {
+    					globals.Dbg.PrintfTrace("%s [process] --> response ID %d received from UUID %s.\n", globals.LogTag, responseId, value.DeviceUuid)
                     	list := deviceExpectedMsgList[value.DeviceUuid]
                 		if list != nil {
-                		    for index, expectedMsg := range list {
+        					globals.Dbg.PrintfTrace("%s [process] --> found UUID %s in the expected message store, %d items in its list.\n", globals.LogTag, value.DeviceUuid, len(*list))
+                		    for index, expectedMsg := range *list {
                 		        if expectedMsg.ResponseId == responseId {
-                		            list = append(list[:index], list[index + 1:] ...)
+                		            *list = append((*list)[:index], (*list)[index + 1:] ...)
+                					globals.Dbg.PrintfTrace("%s [process] --> response ID %d removed from list for UUID %s.\n", globals.LogTag, responseId, value.DeviceUuid)
                 		            break
                 		        }
                 		    }
                 		}
                 	}
+                	
+					globals.Dbg.PrintfTrace("%s [process] --> processing completed.\n", globals.LogTag)
 	            	
 	            default:
-	                Dbg.PrintfTrace("%s --> unrecognised message, ignoring.\n", logTag)
-	                //Dbg.PrintfTrace("%s --> unrecognised message, ignoring:\n\n%s\n", logTag, spew.Sdump(msg))
+	                globals.Dbg.PrintfTrace("%s [process] --> unrecognised command, ignoring.\n", globals.LogTag)
+	                globals.Dbg.PrintfInfo("%s [process] --> unrecognised command was:\n\n%s\n", globals.LogTag, spew.Sdump(cmd))
             }
         }
 
-        Dbg.PrintfTrace("%s --> message processing command channel closed, stopping.\n", logTag)
+        globals.Dbg.PrintfTrace("%s [process] --> command channel closed, stopping.\n", globals.LogTag)
     }()
 }
 

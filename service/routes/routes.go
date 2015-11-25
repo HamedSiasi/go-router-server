@@ -30,7 +30,7 @@ func LoadRoutes() *mux.Router {
 	router.HandleFunc("/sitemap", index.Sitemap)
 
 	a := router.PathPrefix("/auth").Subrouter()
-	a.HandleFunc("/login", auth.Login).Methods("POST")
+	//a.HandleFunc("/login", auth.Login).Methods("POST")
 	a.HandleFunc("/logout", auth.Logout).Methods("GET")
 	a.HandleFunc("/user", auth.User).Methods("GET")
 	a.HandleFunc("/users", auth.Users).Methods("GET")

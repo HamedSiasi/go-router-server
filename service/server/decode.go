@@ -162,12 +162,15 @@ import "C"  // There must be no line breaks between this and the commented-out s
 import (
 	"encoding/hex"
 	"github.com/davecgh/go-spew/spew"
+	"github.com/robmeades/utm/service/utilities"
+	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 	"time"
 	"unsafe"
 )
 
 //--------------------------------------------------------------------
-// Enums
+// Types
 //--------------------------------------------------------------------
 
 type ModeEnum uint32
@@ -359,6 +362,10 @@ func decode(data []byte, uuid string) []interface{} {
 			Dbg.PrintfTrace("%s --> decode received uplink message: %+v.\n\n-----## %s ##----- \n\n", logTag, result, ulDecodeTypeDisplay[int(result)])
 			Dbg.PrintfInfo("%s --> XML buffer pointer 0x%08x, used %d, left %d:.\n", logTag, *ppXmlBuffer, C.uint32_t(len(xmlDecodeBuffer)) - xmlBufferLen, xmlBufferLen)
 	
+    		//Store XmlData in MongoDB
+    		//XmlDataStore(xmlDecodeBuffer, uuid)
+    		//Dbg.PrintfInfo("%s -->  the XML data is:\n\n%s\n\n", logTag, spew.Sdump(xmlDecodeBuffer))
+    		
 			// Now decode the messages and pass them to the state table
 			switch int(result) {
 				case C.DECODE_RESULT_TRANSPARENT_UL_DATAGRAM:
@@ -740,6 +747,32 @@ func decode(data []byte, uuid string) []interface{} {
     lastUlMsgTime = time.Now()
     
 	return returnedMsgs
+}
+
+// TODO: Rob to understand this later
+func XmlDataStore(xmlData [8192]C.char, uuid string) {
+
+	//TODO: an attempt to store only xml
+	//and ignore the rest of the array
+	for i := 0; i < len(xmlData); i++ {
+		if xmlData[i] == 0 {
+			break
+		}
+	}
+
+	utmXml := utilities.UtmXml{}
+	utmXml.Id = bson.NewObjectId()
+	utmXml.Date = time.Now()
+	utmXml.Uuid = uuid
+	//utmXml.XmlData = xmlData
+
+	xml_Session, err := mgo.Dial("127.0.0.1:27017")
+	defer xml_Session.Close()
+	if err == nil {
+		xml_collection := xml_Session.DB("utm-db").C("xmLData")
+		xml_collection.Insert(&utmXml)
+	}
+
 }
 
 /* End Of File */

@@ -40,7 +40,7 @@ var Summary = React.createClass({
           return (
 
               <div>
-                {rows[1]}
+                {rows[0]}
              </div>
           );
       }

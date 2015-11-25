@@ -32,25 +32,51 @@ type Auth struct{}
 // an HTTP request and returns an HTTP response.
 // A session is created if successful.
 func (a *Auth) Login(w http.ResponseWriter, r *http.Request) {
-    decoder := json.NewDecoder(r.Body)
-    credentials := new(Credentials)
-    err := decoder.Decode(&credentials)
-    if err != nil {
-        panic(err)
-    }
+	fmt.Fprintf(w, "Welcome to the login page!")
+	// decoder := json.NewDecoder(r.Body)
+	// credentials := new(Credentials)
+	// err := decoder.Decode(&credentials)
+	// if err != nil {
+	// 	panic(err)
+	// }
 
-    db := utilities.GetDB(r)
-    user := new(models.User)
-    err = user.Authenticate(db, credentials.Email, credentials.Password)
-    if err == nil {
-        session := sessions.GetSession(r)
-        session.Set("user_id", user.ID.Hex())
-        session.Set("user_company", user.Company)
-        session.Set("user_email", user.Email)
-        w.WriteHeader(202)
-    } else {
-        w.WriteHeader(404)
-    }
+	// db := utilities.GetDB(r)
+	// user := new(models.User)
+	// err = user.Authenticate(db, credentials.Email, credentials.Password)
+	// if err == nil {
+	// 	session := sessions.GetSession(r)
+	// 	session.Set("user_id", user.ID.Hex())
+	// 	session.Set("user_company", user.Company)
+	// 	session.Set("user_email", user.Email)
+	// 	w.WriteHeader(202)
+
+	// } else {
+	// 	w.WriteHeader(404)
+	// }
+
+	email := r.FormValue("email")
+	password := r.FormValue("password")
+
+	db := utilities.GetDB(r)
+	user := new(models.User)
+	err := user.Authenticate(db, email, password)
+	if err == nil {
+		//session := sessions.GetSession(request)
+		// session.Set("user_id", user.ID.Hex())
+		// session.Set("user_company", user.Company)
+		// session.Set("user_email", user.Email)
+		//response.WriteHeader(202)
+		http.Redirect(w, r, "http://localhost:3000", 202)
+		http.Redirect(w, r, "/", 202)
+		fmt.Fprintf(w, "error is nil!")
+		//http.Redirect(response, request, "/", 202)
+
+	} else {
+		//fmt.Fprintf(w, "There is Error!")
+		//http.Redirect(w, r, "http://localhost:3000", 202)
+		// http.Redirect(w, r, "http://localhost:3000/lastestState", 202)
+		// w.WriteHeader(404)
+	}
 }
 
 /// Logout method for the authentication struct that takes
@@ -145,24 +171,21 @@ func (a *Auth) UserUEs(w http.ResponseWriter, r *http.Request) {
     }
 }
 
-/// TODO
+/// TODO: Rob to understand this later
 func (a *Auth) Register(w http.ResponseWriter, r *http.Request) {
-    decoder := json.NewDecoder(r.Body)
-    data := map[string]string{"company": "", "firstName": "", "last Name": "", "userName": "", "email": "", "password": ""}
-    err := decoder.Decode(&data)
-    if err != nil {
-        panic(err)
-    }
+	fmt.Fprintf(w, "Welcome to the register page!")
+	// decoder := json.NewDecoder(r.Body)
+	// data := map[string]string{"company": "", "firstName": "", "lastName": "", "email": "", "password": ""}
+	// err := decoder.Decode(&data)
+	// if err != nil {
+	// 	panic(err)
+	// }
 
-    db := utilities.GetDB(r)
-    user := new(models.User)
+	// db := utilities.GetDB(r)
+	// user := new(models.User)
 
-    //temporary
-    // uuid := new(models.Uuid)
-    // uuid.Insert(db)
-    user.NewUser(db, data["company"], data["firstName"], data["lastName"], data["userName"], data["email"], data["password"])
-    fmt.Println(user)
-
+	// user.NewUser(db, data["company"], data["firstName"], data["lastName"], data["email"], data["password"])
+	// fmt.Println(user)
 }
 
 /* End Of File */

@@ -16,7 +16,8 @@ import (
     "encoding/json"
     "fmt"
     "github.com/brettlangdon/forge"
-    "github.com/robmeades/utm/service/utilities"
+	//"github.com/gorilla/mux"
+	"github.com/robmeades/utm/service/utilities"
     "log"
 	"net/http"
     //"os"
@@ -25,6 +26,7 @@ import (
     "github.com/davecgh/go-spew/spew"
     "github.com/goincremental/negroni-sessions"
     "github.com/goincremental/negroni-sessions/cookiestore"
+    "github.com/robmeades/utm/service/models"
     "github.com/robmeades/utm/service/routes"
 )
 
@@ -87,6 +89,40 @@ func failOnError (err error, msg string) {
         log.Fatalf("%s: %s", msg, err)
 	    panic(fmt.Sprintf("%s: %s", msg, err))
     }
+}
+
+func loginHandler(response http.ResponseWriter, request *http.Request) {
+
+	email := request.FormValue("email")
+	password := request.FormValue("password")
+	session := sessions.GetSession(request)
+
+	db := utilities.GetDB(request)
+	user := new(models.User)
+	err := user.Authenticate(db, email, password)
+	if err == nil {
+		session.Set("user_id", user.ID.Hex())
+		session.Set("user_company", user.Company)
+		session.Set("user_email", user.Email)
+		//Fmt.Fprintf(response, "User %s success!\n", session.Get("user_email"))
+		http.Redirect(response, request, "/", 302)
+	}
+}
+
+func registerHandler(response http.ResponseWriter, request *http.Request) {
+
+	company := request.FormValue("company_name")
+	firstName := request.FormValue("user_firstName")
+	lastName := request.FormValue("user_lastName")
+	email := request.FormValue("email")
+	password := request.FormValue("password")
+
+	db := utilities.GetDB(request)
+	user := new(models.User)
+
+	user.NewUser(db, company, firstName, lastName, email, password)
+	//Fmt.Fprintf(response, "User %s created successfully!\n", firstName)
+	http.Redirect(response, request, "/login", 302)
 }
 
 /// Get the summary data for the front page
@@ -245,7 +281,9 @@ func Run() {
 	router := routes.LoadRoutes()
 
 	router.Handle("/frontPageData", utilities.Handler(getFrontPageData))
-
+	router.HandleFunc("/register", registerHandler)
+	router.HandleFunc("/login", loginHandler)
+	
 	n := negroni.Classic()
 	static := negroni.NewStatic(http.Dir("static"))
 	static.Prefix = "/static"

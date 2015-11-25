@@ -24,21 +24,19 @@ import (
 
 /// Definition of a user
 type User struct {
-    ID        bson.ObjectId `bson:"_id,omitempty" json:"id"`
-    Company   string        `bson:"company" json:"company"`
-    FirstName string        `bson:"firstName" json:"firstName"`
-    LastName  string        `bson:"lastName" json:"lastName"`
-    UserName  string        `bson:"userName" json:"userName"`
-    Email     string        `bson:"email" json:"email"`
-    Password  string        `bson:"password" json:"password"`
+	ID        bson.ObjectId `bson:"_id,omitempty" json:"id"`
+	Company   string        `bson:"company" json:"company"`
+	FirstName string        `bson:"firstName" json:"firstName"`
+	LastName  string        `bson:"lastName" json:"lastName"`
+	Email     string        `bson:"email" json:"email"`
+	Password  string        `bson:"password" json:"password"`
 }
 
 /// Add a user to the database
-func (u *User) NewUser(db *mgo.Database, company, firstName, lastName, userName, email, password string) {
+func (u *User) NewUser(db *mgo.Database, company, firstName, lastName, email, password string) {
     u.Company = company
     u.FirstName = firstName
     u.LastName = lastName
-    u.UserName = userName
     u.Email = email
     u.ID = bson.NewObjectId()
     h := md5.New()
@@ -58,8 +56,8 @@ func (u *User) Get(db *mgo.Database, id string) error {
     }
 }
 
-/// Get all the users for a company
-func (u *User) GetCompanyUsers(db *mgo.Database, company string) (users []User) {
+// TODO Rob to understand this later
+func (u *User) GetCompanyUsers(db *mgo.Database, company string) (users []UtmMsg) {
 
     err := db.C("users").Find(bson.M{"company": company}).All(&users)
 
@@ -69,8 +67,8 @@ func (u *User) GetCompanyUsers(db *mgo.Database, company string) (users []User) 
     return users
 }
 
-/// Get all the UUIDs for a user
-func (u *User) GetUserUuids(db *mgo.Database, id string) (uuids []Uuid) {
+// TODO Rob to understand this later
+func (u *User) GetUserUuids(db *mgo.Database, id string) (uuids []UtmMsg) {
 
     err := db.C("uuids").Find(bson.M{"user": id}).Limit(50).All(&uuids)
 
@@ -92,7 +90,7 @@ func (u *User) Authenticate(db *mgo.Database, email string, password string) err
     return err
 }
 
-/// TODO
+/// TODO Rob to understand this later
 // I think this gets all the response messages for devices owned by a given user, based on their e-mail
 func (u *User) GetUEs(db *mgo.Database, email string) (ues []AmqpResponseMessage) {
 

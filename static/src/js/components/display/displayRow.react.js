@@ -66,7 +66,7 @@ var DisplayRow = React.createClass({
                                     <thead>
                                       <tr className="info">
                                         <th> <input type="checkbox" style={{width: 15}} /> All</th>
-                                        <th>NameBLAH/Uuid</th>
+                                        <th>Name/Uuid</th>
                                         <th>Uplink</th>
                                         <th>Downlink</th>
                                         <th>RSRP </th>

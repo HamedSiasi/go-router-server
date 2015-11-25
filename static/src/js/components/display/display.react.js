@@ -35,15 +35,6 @@ var Display = React.createClass({
     pollState(function(data) {
       // fixup missing state properties to avoid muliple levels of missing attribute tests
       [
-        // "Connection",
-        // "LatestRssi",
-        // "LatestRssiDisplay",
-        // "LatestPowerState",
-        // "LatestPowerStateDisplay",
-        // "LatestDataVolume",
-        // "InitIndUlMsg",
-        // "LatestPollIndUlMsg",
-        // "LatestTrafficReportIndUlMsg",
         "LatestDisplayRow"
       ].map(function(property) {
         if (!data[property]) {
@@ -57,7 +48,7 @@ var Display = React.createClass({
         data.json = "";
       }
 
-     
+     console.log(data);
 
       this.setState({data: data})
 

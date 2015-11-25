@@ -18,14 +18,14 @@ var Header = React.createClass({
               <i className="fa fa-user fa-fw" /> User <i className="fa fa-caret-down" />
             </a>
             <ul className="dropdown-menu dropdown-user">
-              <li><a href="#"><i className="fa fa-user fa-fw" /> Add User</a>
+              <li><Link href="#/register"><i className="fa fa-user fa-fw" /> Add User</Link>
               </li>
               <li><a href="#"><i className="fa fa-user fa-fw" /> User Profile</a>
               </li>
               <li className="divider" />
-              <li><a href="login.html"><i className="fa fa-sign-out fa-fw" /> Logout</a>
+              <li><Link href="#/login"><i className="fa fa-sign-out fa-fw" /> Logout</Link>
               </li>
-              <li><a href="login.html"><i className="fa fa-sign-in fa-fw" /> Login</a>
+              <li><Link href="#/login"><i className="fa fa-sign-in fa-fw" /> Login</Link>
               </li>
             </ul>
             {/* /.dropdown-user */}

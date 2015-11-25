@@ -18,6 +18,29 @@ function _setReportingInterval(uuid){
 }
 function _reboot(uuid){
 }
+function addUser(company, firstName, lastName, email, password) {
+  obj = {};
+  obj.company = company;
+  obj.firstName = firstName;
+  obj.lastName = lastName;
+  obj.email = email;
+  obj.password = password;
+
+  $.ajax({
+        url: 'http://localhost:3000/register',
+        dataType: 'json',
+        method: 'put',
+        async: false,
+        data: obj,
+        success: function(data) {
+          return  
+        },
+        error: function(xhr, status, err) {
+          console.error('/', status, err.toString());
+        }
+    });
+  return
+}
 
   var AppStore = assign(EventEmitter.prototype, {
   emitChange: function(){

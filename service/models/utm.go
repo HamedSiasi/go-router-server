@@ -15,14 +15,15 @@ package models
 import (
     "gopkg.in/mgo.v2"
     "gopkg.in/mgo.v2/bson"
+    "time"
 )
 
-// Definition of a UTM
-type Uuid struct {
+// TODO Rob to understand this later
+type UtmMsg struct {
     id      bson.ObjectId `bson:"_id,omitempty" json:"id"`
-    uid     string        `bson:"uid" json:"uid"`
-    rssi    string        `bson:"rssi" json:"rssi"`
-    company string        `bson:"company" json:"company"`
+  	date    time.Time     `bson:"date" json:"date"`
+    uuid    string        `bson:"uuid" json:"uuid"`
+    msg     string        `bson:"msg" json:"msg"`
 }
 
 // Representations of the AMQP comms
@@ -52,24 +53,16 @@ type AmqpErrorMessage struct {
     reason  string `bson:"reason" json:"reason"`
 }
 
-/// Test data
-var v = [...]Uuid{
-    {uid: "861f9e8c-5b8d-11e5-885d-feff819cdc9a", rssi: "20", company: "u-blox"},
-    {uid: "861fa274-5b8d-11e5-885d-feff819cdc9b", rssi: "27", company: "u-blox"},
-    {uid: "861fa3fa-5b8d-11e5-885d-feff819cdc9c", rssi: "32", company: "u-blox"},
-    {uid: "861fa53a-5b8d-11e5-885d-feff819cdc9d", rssi: "62", company: "vodafone"},
-    {uid: "861fa670-5b8d-11e5-885d-feff819cdc9e", rssi: "72", company: "vodafone"},
-    {uid: "861fa79c-5b8d-11e5-885d-feff819cdc9f", rssi: "52", company: "vodafone"},
-}
+func (u *UtmMsg) Insert(db *mgo.Database, uuid string, msg string) {
 
-// Add a UTM to the database based on UUID
-func (u *Uuid) Insert(db *mgo.Database) {
+	Msg := UtmMsg{}
+	utmColl := db.C("UtmMsgs")
+	Msg.id = bson.NewObjectId()
+	Msg.date = time.Now()
+	Msg.uuid = uuid
+	Msg.msg = msg
+	utmColl.Insert(&Msg)
 
-    c := db.C("uuids")
-    for _, e := range v {
-        e.id = bson.NewObjectId()
-        c.Insert(&e)
-    }
 }
 
 /* End Of File */

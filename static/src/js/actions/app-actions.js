@@ -37,6 +37,16 @@ var AppActions = {
       actionType: AppConstants.REBOOT,
       uuid: uuid
     })
+  },
+  addUser: function(company, firstName, lastName, email, password){
+    AppDispatcher.handleViewAction({
+      actionType: AppConstants.ADD_USER,
+      company: company,
+      firstName: firstName,
+      lastName: lastName,
+      email: email,
+      password: password
+    })
   }
 }
 

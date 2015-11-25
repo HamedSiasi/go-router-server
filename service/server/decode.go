@@ -341,7 +341,7 @@ func decode(data []byte, uuid string) []interface{} {
 	for bytesRemaining > 0 {
 		decoderCount = decoderCount + 1
 
-		Dbg.PrintfTrace("%s --> decoding message number (%v) of AMQP datagram number (%v).\n", logTag, decoderCount, amqpCount)
+		Dbg.PrintfTrace("%s --> decoding message number %d of AMQP message number %d.\n", logTag, decoderCount, amqpMessageCount)
 
 		Dbg.PrintfInfo("%s -----## show buffer data ##-----\n\n%s\n\n", logTag, spew.Sdump(inputBuffer))
 		used := C.pointerSub(pNext, pStart)
@@ -525,7 +525,7 @@ func decode(data []byte, uuid string) []interface{} {
     									IsSyncedWithRssi:   bool(value.measurements.rsrp.isSyncedWithRssi),
     								},
     								RssiPresent:         bool(value.measurements.rssiPresent),
-    								Rssi:                Rssi(value.measurements.rsrp.value),
+    								Rssi:                Rssi(value.measurements.rssi),
     								TemperaturePresent:  bool(value.measurements.temperaturePresent),
     								Temperature:         Temperature(value.measurements.temperature),
     								PowerStatePresent:   bool(value.measurements.powerStatePresent),
@@ -561,7 +561,7 @@ func decode(data []byte, uuid string) []interface{} {
     									IsSyncedWithRssi:   bool(value.measurements.rsrp.isSyncedWithRssi),
     								},
     								RssiPresent:         bool(value.measurements.rssiPresent),
-    								Rssi:                Rssi(value.measurements.rsrp.value),
+    								Rssi:                Rssi(value.measurements.rssi),
     								TemperaturePresent:  bool(value.measurements.temperaturePresent),
     								Temperature:         Temperature(value.measurements.temperature),
     								PowerStatePresent:   bool(value.measurements.powerStatePresent),

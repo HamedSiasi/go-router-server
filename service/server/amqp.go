@@ -22,18 +22,14 @@ import (
     //"gopkg.in/mgo.v2/bson"
 )
 
+// Generic struct describing an AMQP message
 type AmqpMessage struct {
     DeviceUuid   string `bson:"device_uuid" json:"device_uuid"`
     EndpointUuid int    `bson:"endpoint_uuid" json:"endpoint_uuid"`
     Payload      []int  `bson:"payload" json:"payload"`
 }
 
-type AmqpReceiveMessage struct {
-    AmqpMessage
-    DeviceName string `bson:"device_name" json:"device_name"`
-    Id         string `bson:"id" json:"id"`
-}
-
+// Struct describing an AMQP response (i.e. uplink) message
 type AmqpResponseMessage struct {
     AmqpMessage
     DeviceName string `bson:"device_name" json:"device_name"`
@@ -41,6 +37,7 @@ type AmqpResponseMessage struct {
     Data       []byte `bson:"data" json:"data"`
 }
 
+// Struct describing an AMQP error message
 type AmqpErrorMessage struct {
     AmqpMessage
     Queue   string `bson:"queue" json:"queue"`
@@ -48,6 +45,7 @@ type AmqpErrorMessage struct {
     Reason  string `bson:"reason" json:"reason"`
 }
 
+// Struct describing an AMQP queue
 type Queue struct {
     Conn     *amqp.Connection
     Quit     chan interface{}
@@ -55,6 +53,8 @@ type Queue struct {
     Downlink chan AmqpMessage
 }
 
+
+// Set up a channel to consume a queue
 func consumeQueue(channel *amqp.Channel, chanName string) (<-chan amqp.Delivery, error) {
     msgChan, err := channel.Consume(
         chanName, // Queue
@@ -73,6 +73,9 @@ func consumeQueue(channel *amqp.Channel, chanName string) (<-chan amqp.Delivery,
     return msgChan, nil
 }
 
+/// Open an AMQP and loop around UL and DL message processing.
+// Note that the UL and DL message processing is in separate loops,
+// otherwise they can block each other.
 func OpenQueue(username, amqpAddress string) (*Queue, error) {
     q := Queue{}
     q.Quit = make(chan interface{})
@@ -81,25 +84,24 @@ func OpenQueue(username, amqpAddress string) (*Queue, error) {
 
     Conn, err := amqp.Dial(amqpAddress)
     if err != nil {
-        return nil, fmt.Errorf("--> connecting to RabbitMQ: %s", err.Error())
+        return nil, fmt.Errorf("--> connecting to RabbitMQ: \"%s\"", err.Error())
     }
     q.Conn = Conn
 
     channel, err := Conn.Channel()
     if err != nil {
+        q.Close()
         return nil, err
     }
 
-    receiveChan, err := consumeQueue(channel, username+".receive")
-    if err != nil {
-        return nil, err
-    }
     responseChan, err := consumeQueue(channel, username+".response")
     if err != nil {
+        q.Close()
         return nil, err
     }
     errorChan, err := consumeQueue(channel, username+".error")
     if err != nil {
+        q.Close()
         return nil, err
     }
 
@@ -110,11 +112,7 @@ func OpenQueue(username, amqpAddress string) (*Queue, error) {
     // res_Collection := amqpSession.DB("utm-db").C("responsemessages")
     // err_Collection := amqpSession.DB("utm-db").C("errormessages")
 
-    if err != nil {
-        panic(err)
-    }
-
-    //var m AmqpMessage
+    // Uplink loop
     go func() {
         defer func() {
             // Close the downlinkMessages channel when
@@ -124,43 +122,68 @@ func OpenQueue(username, amqpAddress string) (*Queue, error) {
             //amqpSession.Close()
         }()
         
-        // Continually process AMQP messages until commanded to Quit
+        // Continually process AMQP UL messages until commanded to Quit
         for {
             var msg amqp.Delivery
+            var ok bool
             receivedMsg := false
+	        Dbg.PrintfTrace("%s --> AMQP waiting for UL stimulus.\n", logTag)
             select {
 	            case <-q.Quit:
+        	        Dbg.PrintfTrace("%s --> AMQP UL quitting.\n", logTag)
 	                return
-	            case msg = <-receiveChan:
-	                receivedMsg = true
-	                m := AmqpReceiveMessage{}
-	                err = json.Unmarshal(msg.Body, &m)
-	                if err == nil {
-	                    Dbg.PrintfTrace("%s --> sending the following downlink message:\n\n%+v\n\n", logTag, &m)
-	                    q.Msgs <- &m
-	                } else {
-		                Dbg.PrintfError("%s -->maybe there is an error here...\n\n%+v\n\n", logTag, &m)	                	
+	            case msg, ok = <-responseChan:
+	                if (!ok) {
+	                    return
 	                }
-	            case msg = <-responseChan:
 	                receivedMsg = true
 	                m := AmqpResponseMessage{}
 	                err = json.Unmarshal(msg.Body, &m)
 	                if err == nil {
 	                    q.Msgs <- &m
 	                    Dbg.PrintfTrace("%s --> UTM UUID is %+v.\n", logTag, m.DeviceUuid)
-	                    Dbg.PrintfTrace("%s --> UTM name is '%+v'.\n", logTag, m.DeviceName)
+	                    Dbg.PrintfTrace("%s --> UTM name is \"%+v\".\n", logTag, m.DeviceName)
 	                }
-	            case msg = <-errorChan:
+	            case msg, ok = <-errorChan:
+	                if (!ok) {
+	                    return
+	                }
 	                receivedMsg = true
+        	        Dbg.PrintfTrace("%s --> AMQP error channel says %v.\n", logTag, msg)
 	                m := AmqpErrorMessage{}
 	                err = json.Unmarshal(msg.Body, &m)
 	                if err == nil {
-	                    q.Msgs <- &m
+    					Dbg.PrintfTrace("%s--> error is %v.\n", logTag, m)
 	                }
-	            case dlMsg := <-q.Downlink:
+    					
+            }
+            
+            if receivedMsg {
+                if err == nil {
+                    Dbg.PrintfTrace("%s --> received UL:\n\n%+v\n\n", logTag, string(msg.Body))
+                } else {
+                    Dbg.PrintfTrace("%s --> received UL:\n\n%+v\n\n...which is undecodable: \"%s\".\n", logTag, string(msg.Body), err.Error())
+                }
+            }
+        }
+    }()
+    
+    // Downlink loop
+    go func() {        
+        // Continually process DL AMQP Uplink messages until commanded to Quit
+        for {
+	        Dbg.PrintfTrace("%s --> AMQP waiting for DL stimulus.\n", logTag)
+            select {
+	            case <-q.Quit:
+        	        Dbg.PrintfTrace("%s --> AMQP DL loop quitting.\n", logTag)
+	                return
+	            case dlMsg, ok := <-q.Downlink:
+	                if (!ok) {
+	                    return
+	                }
 	                serialisedData, err := json.Marshal(dlMsg)
 	                if err != nil {
-	                    Dbg.PrintfError("%s --> attempting to JSONify AMQP message:\n\n%+v\n\n...results in error: %s.\n", logTag, dlMsg, err.Error())
+	                    Dbg.PrintfError("%s --> attempting to JSONify DL AMQP message:\n\n%+v\n\n...results in error: \"%s\".\n", logTag, dlMsg, err.Error())
 	                } else {
 	                    publishedMsg := amqp.Publishing{
 	                        DeliveryMode: amqp.Persistent,
@@ -170,20 +193,12 @@ func OpenQueue(username, amqpAddress string) (*Queue, error) {
 	                    }
 	                    err = channel.Publish(username, "send", false, false, publishedMsg)
 	                    if err != nil {
-	                        Dbg.PrintfError("%s --> unable to publish downlink message:\n\n%+v\n\n...due to error: %s.\n", logTag, publishedMsg, err.Error())
+	                        Dbg.PrintfError("%s --> unable to publish DL message:\n\n%+v\n\n...due to error: \"%s\".\n", logTag, publishedMsg, err.Error())
 	                    } else {
-	                        Dbg.PrintfTrace("%s --> published downlink message:\n\n%+v\n\n%s\n", logTag, publishedMsg, string(serialisedData))
+	                        Dbg.PrintfTrace("%s --> published DL message:\n\n%+v\n\n%s\n", logTag, publishedMsg, string(serialisedData))
 	                    }
 	                }
-            }
-            
-            if receivedMsg {
-                if err == nil {
-                    Dbg.PrintfTrace("%s --> received:\n\n%+v\n\n", logTag, string(msg.Body))
-                } else {
-                    Dbg.PrintfTrace("%s --> received:\n\n%+v\n\n...which is undecodable: %s.\n", logTag, string(msg.Body), err.Error())
-                }
-            }
+            }            
         }
     }()
     

@@ -72,7 +72,10 @@ var deviceExpectedMsgList map[string]ExpectedMsgList
 var downlinkMessages chan<- AmqpMessage
 
 // Count of AMQP messages received
-var amqpCount int
+var amqpMessageCount int
+
+// Count of the number of times we've (re)starte AMQP
+var amqpRetryCount int
 
 //--------------------------------------------------------------------
 // Functions
@@ -107,50 +110,42 @@ func getFrontPageData (response http.ResponseWriter, request *http.Request) *uti
 	return nil
 }
 
-// Process messages from the AMQP queues
-func processAmqp(username, amqpAddress string) {
-
-	q, err := OpenQueue(username, amqpAddress)
-
-	failOnError(err, "Queue")
-	defer q.Close()
-	downlinkMessages = q.Downlink
-
+// Process datagrams from the AMQP queue
+func processDatagrams(q *Queue) {
+    
 	for {
-		amqpCount = amqpCount + 1
-		Dbg.PrintfInfo("\n=====================> processing datagram number %v in AMQP channel =====================================\n", amqpCount)
-
-		select {
-			case msg := <-q.Msgs:
-				Dbg.PrintfTrace("%s --> decoded msg:\n\n%+v\n\n", logTag, msg)
-
-				switch value := msg.(type) {
-					case *AmqpReceiveMessage:
-						Dbg.PrintfTrace("%s --> is receive.\n", logTag)
-
-					case *AmqpResponseMessage:
-						Dbg.PrintfTrace("%s --> is response.\n", logTag)
-						if value.Command == "UART_data" {
-						    savedUlMsgs := totalUlMsgs
-						    savedUlBytes := totalUlBytes
-						    savedDlMsgs := totalDlMsgs
-						    savedDlBytes := totalDlBytes
-							// UART data from the UTM-API which needs to be decoded
+		amqpMessageCount++
+    	select {
+    		case msg, ok := <-q.Msgs:
+                if (!ok) {
+                    return
+                }
+    			Dbg.PrintfTrace("%s --> decoded msg:\n\n%+v\n\n", logTag, msg)
+    
+    			switch value := msg.(type) {
+    				case *AmqpResponseMessage:
+    					Dbg.PrintfTrace("%s --> is response.\n", logTag)
+    					if value.Command == "UART_data" {
+    					    savedUlMsgs := totalUlMsgs
+    					    savedUlBytes := totalUlBytes
+    					    savedDlMsgs := totalDlMsgs
+    					    savedDlBytes := totalDlBytes
+    						// UART data from the UTM-API which needs to be decoded
                 			// Decode the messages
-							msgs := decode(value.Data, value.DeviceUuid)
-
-							// Pass the messages to the data table for recording
-							// and pass them to processing to see if any responses
-							// are required
-							if msgs != nil {
-    							for _, msg := range msgs {
-                            		dataTableChannel <- msg							    
-        							processMsgs <- msg
+    						dlMsgs := decode(value.Data, value.DeviceUuid)
+    
+    						// Pass the messages to the data table for recording
+    						// and pass them to processing to see if any responses
+    						// are required
+    						if dlMsgs != nil {
+    							for _, dlMsg := range dlMsgs {
+                            		dataTableChannel <- dlMsg							    
+        							processMsgs <- dlMsg
     							}
     						}							
-
-							// Send the datatable a message indicating that this device
-							// has been heard from							
+    
+    						// Send the datatable a message with connection
+    						// data for this device				
                 			dataTableChannel <- &Connection {
                 			    DeviceUuid: value.DeviceUuid,
                 			    DeviceName: value.DeviceName,
@@ -160,16 +155,48 @@ func processAmqp(username, amqpAddress string) {
                                 DlMsgs:     totalDlMsgs - savedDlMsgs,
                                 DlBytes:    totalDlBytes - savedDlBytes,
               			    }
-						}
+    					}
+    
+    				case *error:
+    					// If an error has occurred, drop out of the loop
+    					Dbg.PrintfTrace("%s --> AMQP error received (%s), dropping out...\n", logTag, (*value).Error())
+    					return
+    
+    				default:
+    					Dbg.PrintfTrace("%s --> message type: %+v.\n", logTag, msg)
+    					log.Fatal(logTag, "invalid message type.")
+    			}
+    	}
+    }	
+}
 
-					case *AmqpErrorMessage:
-						Dbg.PrintfTrace("%s--> is error.\n", logTag)
+// Process messages from the AMQP queues
+func processAmqp(username, amqpAddress string) {
 
-					default:
-						Dbg.PrintfTrace("%s --> message type: %+v.\n", logTag, msg)
-						log.Fatal(logTag, "invalid message type.")
-				}
-		}
+    // Open the queue and then begin processing messages
+    // If we drop out of the processing function, wait
+    // a little while and try again
+	for {
+    	fmt.Printf("######################################################################################################\n")
+    	fmt.Printf("UTM-API service (%s) REST interface opening %s...\n", logTag, amqpAddress)
+
+    	q, err := OpenQueue(username, amqpAddress)
+
+    	if err == nil {
+        	defer q.Close()
+    
+        	fmt.Printf("%s --> connection opened.\n", logTag)
+    	
+        	downlinkMessages = q.Downlink
+    
+            processDatagrams (q)    
+    	} else {
+    		Dbg.PrintfTrace("%s --> error opening AMQP queue (%s).\n", logTag, err.Error())    	    
+    	}
+    	
+		amqpRetryCount++;
+		Dbg.PrintfTrace("%s --> waiting before trying again...\n", logTag)    	        	
+    	time.Sleep (time.Second * 10)	
 	}
 }
 
@@ -213,9 +240,6 @@ func Run() {
 
 	// Set up logging
 	log.SetFlags(log.LstdFlags)
-
-	fmt.Printf("######################################################################################################\n")
-	fmt.Printf("UTM-API service (%s) REST interface listening on %s.\n", logTag, amqpAddress)
 
 	store := cookiestore.New([]byte("secretkey789"))
 	router := routes.LoadRoutes()

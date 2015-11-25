@@ -61,7 +61,7 @@
 
 // Flags that can indicate empty values (top bit set, not 0xFF as negative
 // values can be used).
-#define BYTE_NOT_PRESENT_VALUE 0x80
+#define BYTE_NOT_PRESENT_VALUE (char) 0x80
 
 // ----------------------------------------------------------------
 // TYPES
@@ -73,25 +73,25 @@ typedef enum WakeUpCodeTag_t
 {
 	WAKE_UP_CODE_OK,                          //!< A good wake-up, no problems.
 	WAKE_UP_CODE_WATCHDOG,                    //!< Wake-up due to the watchdog
-	                                          //! firing.
-  WAKE_UP_CODE_NETWORK_PROBLEM,             //!< Wake-up after assert due to
-                                            //! problems with the network.
-  WAKE_UP_CODE_SD_CARD_PROBLEM,             //!< Wake-up after assert due to
-                                            //! a problem with the SD card.
-  WAKE_UP_CODE_SUPPLY_PROBLEM,              //!< Wake-up after assert due to
-                                            //! a problem with the power supply.
-  WAKE_UP_CODE_PROTOCOL_PROBLEM,            //!< Wake-up after assert due to
-                                            //! a protocol problem.
-  WAKE_UP_CODE_MODULE_NOT_RESPONDING,       //!< Wake-up after assert due to
-                                            //! the modem not waking up.
-  WAKE_UP_CODE_HW_PROBLEM,                  //!< Wake-up after assert due to
-                                            //! problems with the HW.
+									          //! firing.
+    WAKE_UP_CODE_NETWORK_PROBLEM,             //!< Wake-up after assert due to
+                                              //! problems with the network.
+    WAKE_UP_CODE_SD_CARD_PROBLEM,             //!< Wake-up after assert due to
+                                              //! a problem with the SD card.
+    WAKE_UP_CODE_SUPPLY_PROBLEM,              //!< Wake-up after assert due to
+                                              //! a problem with the power supply.
+    WAKE_UP_CODE_PROTOCOL_PROBLEM,            //!< Wake-up after assert due to
+                                              //! a protocol problem.
+    WAKE_UP_CODE_MODULE_NOT_RESPONDING,       //!< Wake-up after assert due to
+                                              //! the modem not waking up.
+    WAKE_UP_CODE_HW_PROBLEM,                  //!< Wake-up after assert due to
+                                              //! problems with the HW.
 	WAKE_UP_CODE_MEMORY_ALLOC_PROBLEM,        //!< Wake-up after assert due to
-						       	                        //! memory allocation issues.
+						       			      //! memory allocation issues.
 	WAKE_UP_CODE_GENERIC_FAILURE,             //!< Wake-up after a generic failure.
 	WAKE_UP_CODE_REBOOT,                      //!< Waking up after a commanded reboot.
-	MAX_NUM_WAKE_UP_CODES                     //!< The maximum number of 
-                   								          //! decode results.
+	MAX_NUM_WAKE_UP_CODES                     //!< The maximum number of
+									          //! decode results.
 } WakeUpCode_t;
 
 /// The operating modes, most be codeable into 3 bits.

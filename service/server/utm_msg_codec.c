@@ -724,7 +724,7 @@ bool decodeMeasurements(const char ** ppBuffer, Measurements_t * pMeasurements, 
     {
         uint8_t y;
 
-        y = (uint8_t) * *ppBuffer;
+        y = (uint8_t) **ppBuffer;
         (*ppBuffer)++;
 
         if (x < MAX_BITMAP_BYTES)
@@ -1664,7 +1664,7 @@ uint32_t logHeartbeat(char * pBuffer, uint32_t *pBufferSize, uint32_t heartbeatV
 /// Log the RSSI
 uint32_t logRssi(char * pBuffer, uint32_t *pBufferSize, Rssi_t rssi)
 {
-    uint32_t bytesUsed = snprintf(pBuffer, *pBufferSize, "<Rssi Value=\"%d\" Units=\"dBm\" />", (double) rssi / 10);
+    uint32_t bytesUsed = snprintf(pBuffer, *pBufferSize, "<Rssi Value=\"%.1f\" Units=\"dBm\" />", (double) rssi / 10);
     return calcBytesUsed(pBufferSize, bytesUsed);
 }
 
@@ -1672,12 +1672,13 @@ uint32_t logRssi(char * pBuffer, uint32_t *pBufferSize, Rssi_t rssi)
 uint32_t logRsrp(char * pBuffer, uint32_t *pBufferSize, Rssi_t rsrp, bool isSyncedWithRssi)
 {
 	// TODO: for reasons I have not yet determined, if the string value and the float
-	// value are included in this log point I get a segmentation fault out of snprintf().
+	// value are included in this log point I get a segmentation fault out of snprintf()
+    // when running on the PC (compiled under GCC with the MinGW win32 libraries).
 	// I've printf'ed all the values around here and everything seems in order, the string
 	// isn't actually getting too large for the supplied buffer.  If I don't do the float
 	// the problem goes away.  Don't understand.  Be afraid, be moderately afraid.
     //uint32_t bytesUsed = snprintf(pBuffer, *pBufferSize, "<Rrsp Value=\"%.1f\" Units=\"dBm\" IsSyncedWithRssi=\"%s\" />", (double) rsrp / 10, getStringBoolean(isSyncedWithRssi));
-    uint32_t bytesUsed = snprintf(pBuffer, *pBufferSize, "<Rrsp Value=\"%d.%d\" Units=\"dBm\" IsSyncedWithRssi=\"%s\" />", rsrp / 10, rsrp % 10, getStringBoolean(isSyncedWithRssi));
+    uint32_t bytesUsed = snprintf(pBuffer, *pBufferSize, "<Rrsp Value=\"%d.%.1d\" Units=\"dBm\" IsSyncedWithRssi=\"%s\" />", rsrp / 10, rsrp % 10, getStringBoolean(isSyncedWithRssi));
 	return calcBytesUsed(pBufferSize, bytesUsed);
 }
 
@@ -3114,31 +3115,22 @@ uint32_t encodeActivityReportIndUlMsg(char * pBuffer, ActivityReportIndUlMsg_t *
     numBytesEncoded += encodeUint32(&(pBuffer[numBytesEncoded]), pMsg->totalTransmitMilliseconds);
     numBytesEncoded += encodeUint32(&(pBuffer[numBytesEncoded]), pMsg->totalReceiveMilliseconds);
     numBytesEncoded += encodeUint32(&(pBuffer[numBytesEncoded]), pMsg->upTimeSeconds);
+    pBuffer[numBytesEncoded] = BYTE_NOT_PRESENT_VALUE;
     if (pMsg->txPowerDbmPresent)
     {
         pBuffer[numBytesEncoded] = pMsg->txPowerDbm;
     }
-    else
-    {
-        pBuffer[numBytesEncoded] = BYTE_NOT_PRESENT_VALUE;
-    }
     numBytesEncoded++;
+    pBuffer[numBytesEncoded] = BYTE_NOT_PRESENT_VALUE;
     if (pMsg->ulMcsPresent)
     {
         pBuffer[numBytesEncoded] = pMsg->ulMcs;
     }
-    else
-    {
-        pBuffer[numBytesEncoded] = BYTE_NOT_PRESENT_VALUE;
-    }
     numBytesEncoded++;
+    pBuffer[numBytesEncoded] = BYTE_NOT_PRESENT_VALUE;
     if (pMsg->dlMcsPresent)
     {
         pBuffer[numBytesEncoded] = pMsg->dlMcs;
-    }
-    else
-    {
-        pBuffer[numBytesEncoded] = BYTE_NOT_PRESENT_VALUE;
     }
     numBytesEncoded++;
     pBuffer[numBytesEncoded] = calculateChecksum(&(pBuffer[0]), numBytesEncoded);
@@ -3196,31 +3188,22 @@ uint32_t encodeActivityReportGetCnfUlMsg(char * pBuffer, ActivityReportGetCnfUlM
     numBytesEncoded += encodeUint32(&(pBuffer[numBytesEncoded]), pMsg->totalTransmitMilliseconds);
     numBytesEncoded += encodeUint32(&(pBuffer[numBytesEncoded]), pMsg->totalReceiveMilliseconds);
     numBytesEncoded += encodeUint32(&(pBuffer[numBytesEncoded]), pMsg->upTimeSeconds);
+    pBuffer[numBytesEncoded] = BYTE_NOT_PRESENT_VALUE;
     if (pMsg->txPowerDbmPresent)
     {
         pBuffer[numBytesEncoded] = pMsg->txPowerDbm;
     }
-    else
-    {
-        pBuffer[numBytesEncoded] = BYTE_NOT_PRESENT_VALUE;
-    }
     numBytesEncoded++;
+    pBuffer[numBytesEncoded] = BYTE_NOT_PRESENT_VALUE;
     if (pMsg->ulMcsPresent)
     {
         pBuffer[numBytesEncoded] = pMsg->ulMcs;
     }
-    else
-    {
-        pBuffer[numBytesEncoded] = BYTE_NOT_PRESENT_VALUE;
-    }
     numBytesEncoded++;
+    pBuffer[numBytesEncoded] = BYTE_NOT_PRESENT_VALUE;
     if (pMsg->dlMcsPresent)
     {
         pBuffer[numBytesEncoded] = pMsg->dlMcs;
-    }
-    else
-    {
-        pBuffer[numBytesEncoded] = BYTE_NOT_PRESENT_VALUE;
     }
     numBytesEncoded++;
     pBuffer[numBytesEncoded] = calculateChecksum(&(pBuffer[0]), numBytesEncoded);
@@ -4666,29 +4649,33 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                     if (pOutBuffer != NULL)
                     {
                         pOutBuffer->activityReportIndUlMsg.txPowerDbmPresent = false;
+                        pOutBuffer->activityReportIndUlMsg.txPowerDbm = BYTE_NOT_PRESENT_VALUE; // An obviously wrong value in case the compare below doesn't work
                         pOutBuffer->activityReportIndUlMsg.ulMcsPresent = false;
+                        pOutBuffer->activityReportIndUlMsg.ulMcs = BYTE_NOT_PRESENT_VALUE; // An obviously wrong value in case the compare below doesn't work
                         pOutBuffer->activityReportIndUlMsg.dlMcsPresent = false;
+                        pOutBuffer->activityReportIndUlMsg.dlMcs = BYTE_NOT_PRESENT_VALUE; // An obviously wrong value in case the compare below doesn't work
+
                         pOutBuffer->activityReportIndUlMsg.totalTransmitMilliseconds = decodeUint32(ppInBuffer);
                         pOutBuffer->activityReportIndUlMsg.totalReceiveMilliseconds = decodeUint32(ppInBuffer);
                         pOutBuffer->activityReportIndUlMsg.upTimeSeconds = decodeUint32(ppInBuffer);
-                        pOutBuffer->activityReportIndUlMsg.txPowerDbm = (int8_t) **ppInBuffer;
-                        (*ppInBuffer)++;
-                        if (pOutBuffer->activityReportIndUlMsg.txPowerDbm != BYTE_NOT_PRESENT_VALUE)
+                        if (**ppInBuffer != BYTE_NOT_PRESENT_VALUE)
                         {
                             pOutBuffer->activityReportIndUlMsg.txPowerDbmPresent = true;
+                            pOutBuffer->activityReportIndUlMsg.txPowerDbm = (int8_t) **ppInBuffer;
                         }
-                        pOutBuffer->activityReportIndUlMsg.ulMcs = (uint8_t) **ppInBuffer;
                         (*ppInBuffer)++;
-                        if (pOutBuffer->activityReportIndUlMsg.ulMcs != BYTE_NOT_PRESENT_VALUE)
+                        if (**ppInBuffer != BYTE_NOT_PRESENT_VALUE)
                         {
                             pOutBuffer->activityReportIndUlMsg.ulMcsPresent = true;
+                            pOutBuffer->activityReportIndUlMsg.ulMcs = (uint8_t) **ppInBuffer;
                         }
-                        pOutBuffer->activityReportIndUlMsg.dlMcs = (uint8_t) **ppInBuffer;
                         (*ppInBuffer)++;
-                        if (pOutBuffer->activityReportIndUlMsg.dlMcs != BYTE_NOT_PRESENT_VALUE)
+                        if (**ppInBuffer != BYTE_NOT_PRESENT_VALUE)
                         {
                             pOutBuffer->activityReportIndUlMsg.dlMcsPresent = true;
+                            pOutBuffer->activityReportIndUlMsg.dlMcs = (uint8_t) **ppInBuffer;
                         }
+                        (*ppInBuffer)++;
                         if (calculateChecksum(pBufferAtStart, *ppInBuffer - pBufferAtStart) != **ppInBuffer)
                         {
                             decodeResult = DECODE_RESULT_BAD_CHECKSUM;
@@ -4720,29 +4707,33 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                     if (pOutBuffer != NULL)
                     {
                         pOutBuffer->activityReportGetCnfUlMsg.txPowerDbmPresent = false;
+                        pOutBuffer->activityReportGetCnfUlMsg.txPowerDbm = BYTE_NOT_PRESENT_VALUE; // An obviously wrong value in case the compare below doesn't work
                         pOutBuffer->activityReportGetCnfUlMsg.ulMcsPresent = false;
+                        pOutBuffer->activityReportGetCnfUlMsg.ulMcs = BYTE_NOT_PRESENT_VALUE; // An obviously wrong value in case the compare below doesn't work
                         pOutBuffer->activityReportGetCnfUlMsg.dlMcsPresent = false;
+                        pOutBuffer->activityReportGetCnfUlMsg.dlMcs = BYTE_NOT_PRESENT_VALUE; // An obviously wrong value in case the compare below doesn't work
+
                         pOutBuffer->activityReportGetCnfUlMsg.totalTransmitMilliseconds = decodeUint32(ppInBuffer);
                         pOutBuffer->activityReportGetCnfUlMsg.totalReceiveMilliseconds = decodeUint32(ppInBuffer);
                         pOutBuffer->activityReportGetCnfUlMsg.upTimeSeconds = decodeUint32(ppInBuffer);
-                        pOutBuffer->activityReportGetCnfUlMsg.txPowerDbm = (int8_t) **ppInBuffer;
-                        (*ppInBuffer)++;
-                        if (pOutBuffer->activityReportGetCnfUlMsg.txPowerDbm != BYTE_NOT_PRESENT_VALUE)
+                        if (**ppInBuffer != BYTE_NOT_PRESENT_VALUE)
                         {
                             pOutBuffer->activityReportGetCnfUlMsg.txPowerDbmPresent = true;
+                            pOutBuffer->activityReportGetCnfUlMsg.txPowerDbm = (int8_t) **ppInBuffer;
                         }
-                        pOutBuffer->activityReportGetCnfUlMsg.ulMcs = (uint8_t) **ppInBuffer;
                         (*ppInBuffer)++;
-                        if (pOutBuffer->activityReportGetCnfUlMsg.ulMcs != BYTE_NOT_PRESENT_VALUE)
+                        if (**ppInBuffer != BYTE_NOT_PRESENT_VALUE)
                         {
                             pOutBuffer->activityReportGetCnfUlMsg.ulMcsPresent = true;
+                            pOutBuffer->activityReportGetCnfUlMsg.ulMcs = (uint8_t) **ppInBuffer;
                         }
-                        pOutBuffer->activityReportGetCnfUlMsg.dlMcs = (uint8_t) **ppInBuffer;
                         (*ppInBuffer)++;
-                        if (pOutBuffer->activityReportGetCnfUlMsg.dlMcs != BYTE_NOT_PRESENT_VALUE)
+                        if (**ppInBuffer != BYTE_NOT_PRESENT_VALUE)
                         {
                             pOutBuffer->activityReportGetCnfUlMsg.dlMcsPresent = true;
+                            pOutBuffer->activityReportGetCnfUlMsg.dlMcs = (uint8_t) **ppInBuffer;
                         }
+                        (*ppInBuffer)++;
                         if (calculateChecksum(pBufferAtStart, *ppInBuffer - pBufferAtStart) != **ppInBuffer)
                         {
                             decodeResult = DECODE_RESULT_BAD_CHECKSUM;

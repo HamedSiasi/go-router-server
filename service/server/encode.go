@@ -225,8 +225,8 @@ func encodeAndEnqueue(msg interface{}, uuid string) error {
     			msg.Payload = append(msg.Payload, int(v))
     		}
     
-    		downlinkMessages <- msg
-    		
+    		Dbg.PrintfTrace("%s --> %d byte message for AMQP downlink:\n\n%+v\n", logTag, byteCount, msg)
+    		downlinkMessages <- msg    		
     		Dbg.PrintfTrace("%s --> encoded %d bytes into AMQP message:\n\n%+v\n", logTag, byteCount, msg)
 			Dbg.PrintfInfo("%s --> XML buffer pointer 0x%08x, used %d, left %d:.\n", logTag, *ppXmlBuffer, C.uint32_t(len(xmlEncodeBuffer)) - xmlBufferLen, xmlBufferLen)
     		

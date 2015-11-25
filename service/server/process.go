@@ -14,6 +14,7 @@ package server
 
 import (
     "time"
+    "reflect"
     "github.com/davecgh/go-spew/spew"
 )
 
@@ -32,6 +33,7 @@ var processMsgs chan<- interface{}
 //--------------------------------------------------------------------
 
 func operateProcess() {
+	deviceList := make(map[string]bool)    	
     msgs := make(chan interface{})
     processMsgs = msgs
     
@@ -45,9 +47,19 @@ func operateProcess() {
 	            // Handle message containers holding somethings of interest,
 	            // throw everything else away
 	            case *MessageContainer:
-	            
     		        responseId := RESPONSE_NONE
 
+            		// If the device is not in our list, add it and send an IntervalsGetReq
+            		// if we aren't going to send one anyway lower down because of an InitIndUlmsg
+            		// (or of course, if this is already an IntervalsGetCnfUlMsg)
+            		if deviceList[value.DeviceUuid] == false {
+            		    deviceList[value.DeviceUuid] = true
+            		    if reflect.TypeOf (value.Message) != reflect.TypeOf((*InitIndUlMsg)(nil)).Elem() &&
+            		       reflect.TypeOf (value.Message) != reflect.TypeOf((*IntervalsGetCnfUlMsg)(nil)).Elem() {
+    	                    encodeAndEnqueue (&IntervalsGetReqDlMsg{}, value.DeviceUuid)        		           
+            		       }
+            		}
+            		
 					Dbg.PrintfTrace("%s --> processing message from UUID %s:\n\n%s\n\n", logTag, value.DeviceUuid, spew.Sdump(msg))
             		
 	            	switch utmMsg := value.Message.(type) {

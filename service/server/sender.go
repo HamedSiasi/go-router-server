@@ -1,4 +1,8 @@
 /* Structs to send DL messages via the client interface from the UTM 
+ * NOTE: strictly speaking this functionality should be a part of the
+ * controllers package, however none of the data we are manipulating
+ * is in the model, it is all in the message codec/datable which have
+ * been put in the server so the functionality has to be right here.
  *
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -252,8 +256,60 @@ func (msg *ClientSendMsg) Send(response http.ResponseWriter, request *http.Reque
 func (m *Msg) Send(uuid string) error {
     switch m.MsgType {
         case CLIENT_SEND_PING:
-            globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send ping request.\n", globals.LogTag)                    
+            globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send PingReq.\n", globals.LogTag)                    
             encodeAndEnqueue (&PingReqDlMsg{}, uuid)
+        case CLIENT_SEND_REBOOT:
+            globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send RebootReq.\n", globals.LogTag)                    
+            // TODO
+            // encodeAndEnqueue (&RebootReqDlMsg{}, uuid)
+        case CLIENT_SEND_DATE_TIME_SET:
+            globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send DateTimeSetReq [TODO].\n", globals.LogTag)                    
+            // TODO
+            // encodeAndEnqueue (&DateTimeSetReqDlMsg{}, uuid)
+        case CLIENT_SEND_DATE_TIME_GET:
+            globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send DateTimeGetReq.\n", globals.LogTag)                    
+            encodeAndEnqueue (&DateTimeGetReqDlMsg{}, uuid)
+        case CLIENT_SEND_MODE_SET:
+            globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send ModeSetReq [TODO].\n", globals.LogTag)                    
+            // TODO
+            //encodeAndEnqueue (&ModeSetReqDlMsg{}, uuid)
+        case CLIENT_SEND_MODE_GET:
+            globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send ModeGetReq.\n", globals.LogTag)                    
+            encodeAndEnqueue (&ModeGetReqDlMsg{}, uuid)
+        case CLIENT_SEND_HEARTBEAT_SET:
+            globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send HeartbeatSetReq [TODO].\n", globals.LogTag)
+            // TODO
+            //encodeAndEnqueue (&HeartbeatSetReqDlMsg{}, uuid)
+        case CLIENT_SEND_REPORTING_INTERVAL_SET:
+            globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send ReportingIntervalSetReq [TODO].\n", globals.LogTag)                    
+            // TODO
+            //encodeAndEnqueue (&ReportingIntervalSetReqDlMsg{}, uuid)
+        case CLIENT_SEND_INTERVALS_GET:
+            globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send IntervalsGetReq.\n", globals.LogTag)                    
+            encodeAndEnqueue (&IntervalsGetReqDlMsg{}, uuid)
+        case CLIENT_SEND_MEASUREMENTS_GET:
+            globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send MeasurementsGetReq.\n", globals.LogTag)                    
+            encodeAndEnqueue (&MeasurementsGetReqDlMsg{}, uuid)
+        // TODO
+        //case CLIENT_SEND_MEASUREMENT_CONTROL_SET:
+        //case CLIENT_SEND_MEASUREMENTS_CONTROL_GET:
+        //case CLIENT_SEND_MEASUREMENTS_CONTROL_DEFAULTS_SET:
+        case CLIENT_SEND_TRAFFIC_REPORT_GET:
+            globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send TrafficReportGetReq.\n", globals.LogTag)                    
+            encodeAndEnqueue (&TrafficReportGetReqDlMsg{}, uuid)
+        case CLIENT_SEND_TRAFFIC_TEST_MODE_PARAMETERS_SET:
+            globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send TrafficTestModeParametersSetReq [TODO].\n", globals.LogTag)                    
+            // TODO
+            //encodeAndEnqueue (&TrafficTestModeParametersSetReqDlMsg{}, uuid)
+        case CLIENT_SEND_TRAFFIC_TEST_MODE_PARAMETERS_GET:
+            globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send TrafficTestModeParametersGetReq.\n", globals.LogTag)                    
+            encodeAndEnqueue (&TrafficTestModeParametersGetReqDlMsg{}, uuid)
+        case CLIENT_SEND_TRAFFIC_TEST_MODE_REPORT_GET:
+            globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send TrafficTestModeReportGetReq.\n", globals.LogTag)                    
+            encodeAndEnqueue (&TrafficTestModeReportGetReqDlMsg{}, uuid)
+        case CLIENT_SEND_ACTIVITY_REPORT_GET:
+            globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send ActivityReportGetReq.\n", globals.LogTag)                    
+            encodeAndEnqueue (&ActivityReportGetReqDlMsg{}, uuid)
         default:
             globals.Dbg.PrintfTrace ("%s [dl_msgs] --> asked to send an unknown message type: %d.\n", globals.LogTag, m.MsgType)                    
             return errors.New("Unknown message type")

@@ -82,7 +82,7 @@ const (
 // Variables
 //--------------------------------------------------------------------
 
-const clientSendEnumString map[string]ClientSendEnum = map[string]ClientSendEnum {
+var clientSendEnumString map[string]ClientSendEnum = map[string]ClientSendEnum {
     "SEND_NULL":                              CLIENT_SEND_NULL,
     "SEND_PING":                              CLIENT_SEND_PING,
     "SEND_REBOOT":                            CLIENT_SEND_REBOOT,
@@ -104,7 +104,7 @@ const clientSendEnumString map[string]ClientSendEnum = map[string]ClientSendEnum
     "SEND_ACTIVITY_REPORT_GET":               CLIENT_SEND_ACTIVITY_REPORT_GET,
 }
 
-const clientModeEnumString map[string]ClientModeEnum = map[string]ClientModeEnum {
+var clientModeEnumString map[string]ClientModeEnum = map[string]ClientModeEnum {
     "MODE_NULL":           CLIENT_MODE_NULL,
     "MODE_SELF_TEST":      CLIENT_MODE_SELF_TEST,
     "MODE_COMMISSIONING":  CLIENT_MODE_COMMISSIONING,

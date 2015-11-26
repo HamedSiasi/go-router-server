@@ -30,10 +30,14 @@ func ValidateGetRequest (request *http.Request) *globals.Error {
 	return nil    
 }
 
-func MakeOkResponse (response http.ResponseWriter) {
-	// Make an "OK" response
-	response.Header().Set("Content-Type", "application/json")
-	response.WriteHeader(http.StatusOK)
+func ValidatePostRequest (request *http.Request) *globals.Error {
+	// Ensure this is a POST request
+	if (request.Method != "POST") || (request.Method == "") {
+        globals.Dbg.PrintfError("%s [dl_msgs] --> received unsupported REST request %s %s.\n", globals.LogTag, request.Method, request.URL)
+        return ClientError("unsupported method", http.StatusBadRequest)
+	}
+	
+	return nil    
 }
 
 /// Definition of a REST client

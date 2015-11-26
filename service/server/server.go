@@ -209,11 +209,12 @@ func Run() {
 	router := routes.LoadRoutes()
 
 	router.Handle("/frontPageData", utilities.Handler(getFrontPageData))
-	//router.Handle("/sendPingReqDlMsg", utilities.Handler (sendPingReq))
-    //router.HandleFunc("/sendHeartbeatSetReqDlMsg", hb.Set).Methods("POST")
 	router.HandleFunc("/register", registerHandler)
 	router.HandleFunc("/login", loginHandler)
-	
+
+    sendMsg := ClientSendMsg{}
+    router.HandleFunc("/sendMsg", sendMsg.Send).Methods("POST")
+
 	n := negroni.Classic()
 	static := negroni.NewStatic(http.Dir("static"))
 	static.Prefix = "/static"

@@ -26,31 +26,31 @@ type User struct{}
 /// Method for the user struct that takes an HTTP request and
 // returns an HTTP response containing the user's details for
 // their ID.
-func (u *User) Get(w http.ResponseWriter, r *http.Request) {
-    vars := mux.Vars(r)
+func (u *User) Get(response http.ResponseWriter, request *http.Request) {
+    vars := mux.Vars(request)
     id := vars["id"]
 
-    db := utilities.GetDB(r)
+    db := utilities.GetDB(request)
     user := new(models.User)
     err := user.Get(db, id)
     if err != nil {
-        w.WriteHeader(404)
+        response.WriteHeader(404)
     } else {
         user.Password = ""
         out, _ := json.Marshal(user)
-        w.Write(out)
+        response.Write(out)
     }
 }
 
 // TODO
-func (u *User) Profile(w http.ResponseWriter, r *http.Request) {
-    user_id, _ := utilities.GetUserId(r)
-    db := utilities.GetDB(r)
+func (u *User) Profile(response http.ResponseWriter, request *http.Request) {
+    user_id, _ := utilities.GetUserId(request)
+    db := utilities.GetDB(request)
     user := new(models.User)
     user.Get(db, user_id)
     user.Password = ""
     out, _ := json.Marshal(user)
-    w.Write(out)
+    response.Write(out)
 }
 
 /* End Of File */

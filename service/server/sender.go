@@ -24,6 +24,8 @@ import (
     "io/ioutil"
     "time"
     "errors"
+    "reflect"
+    "strconv"
 )
 
 //--------------------------------------------------------------------
@@ -65,37 +67,9 @@ const (
     CLIENT_SEND_ACTIVITY_REPORT_GET
 )
 
-// TODO
-// type ClientMeasurementControlGeneric struct
-// type ClientMeasurementControlPowerState struct
-// type ClientMeasurementControlUnion union
-
-// ClientPingReq
-type ClientPingReq struct {
-    // Empty
-}
-
-// ClientRebootReq
-type ClientRebootReq struct {
-    SdCardNotRequired bool      `bson:"sd_card_not_required" json:"sd_card_not_required"`
-    DisableModemDebug bool      `bson:"disable_modem_debug" json:"disable_modem_debug"`
-    DisableButton     bool      `bson:"disable_button" json:"disable_button"`
-    DisableServerPing bool      `bson:"disable_server_ping" json:"disable_server_ping"`
-}
-
-// ClientDateTimeSetReq
-type ClientDateTimeSetReq struct {
-    UtmTime           time.Time `bson:"time" json:"time"`
-    SetDateOnly       bool      `bson:"set_date_only" json:"set_date_only"`
-}
-
-// ClientDateTimeGetReq
-type ClientDateTimeGetReq struct {
-    // Empty    
-}
-
 type ClientModeEnum uint32
 
+// IMPORTANT: these must be in the same order as the mode enum in decode.go
 const (
     CLIENT_MODE_NULL          ClientModeEnum = iota
     CLIENT_MODE_SELF_TEST
@@ -104,115 +78,162 @@ const (
     CLIENT_MODE_TRAFFIC_TEST
 )
 
-// ClientModeSetReq
-type ClientModeSetReq struct {
-    Mode        ClientModeEnum  `bson:"mode" json:"mode"`
-}
-
-// ClientModeGetReq
-type ClientModeGetReq struct {
-    // Empty    
-}
-
-// ClientIntervalsGetReq
-type ClientIntervalsGetReq struct {
-    // Empty    
-}
-
-// ClientReportingIntervalSetReq
-type ClientReportingIntervalSetReq struct {
-    ReportingInterval uint32  `bson:"reporting_interval" json:"reporting_interval"`
-}
-
-// ClientHeartbeatSetReq
-type ClientHeartbeatSetReq struct {
-    HeartbeatSeconds   uint32  `bson:"heartbeat_seconds" json:"heartbeat_seconds"`
-    HeartbeatSnapToRtc bool    `bson:"heartbeat_snap_to_rtc" json:"heartbeat_snap_to_rtc"`
-}
-
-// ClientMeasurementsGetReq
-type ClientMeasurementsGetReq struct {
-    // Empty
-}
-
-// TODO
-// type ClientMeasurementControlSetReq struct
-// type ClientMeasurementsControlDefaultsSetReq struct
-
-// ClientTrafficReportGetReq
-type ClientTrafficReportGetReq struct {
-    // Empty
-}
-
-// ClientTrafficTestModeParametersSetReq
-type ClientTrafficTestModeParametersSetReq struct {
-    NumUlDatagrams      uint32  `bson:"num_ul_datagrams" json:"num_ul_datagrams"`
-    LenUlDatagram       uint32  `bson:"len_ul_datagram" json:"len_ul_datagram"`
-    NumDlDatagrams      uint32  `bson:"num_dl_datagrams" json:"num_dl_datagrams"`
-    LenDlDatagram       uint32  `bson:"len_dl_datagram" json:"len_dl_datagram"`
-    TimeoutSeconds      uint32  `bson:"timeout_seconds" json:"timeout_seconds"`
-    NoReportsDuringTest bool
-}
-
-// ClientTrafficTestModeParametersGetReq
-type ClientTrafficTestModeParametersGetReq struct {
-    // Empty
-}
-
-// ClientTrafficTestModeReportGetReq
-type ClientTrafficTestModeReportGetReq struct {
-    // Empty
-}
-
-// ClientActivityReportGetReq
-type ClientActivityReportGetReq struct {
-    // Empty
-}
-
 //--------------------------------------------------------------------
 // Variables
 //--------------------------------------------------------------------
 
 var clientSendEnumString map[string]ClientSendEnum = map[string]ClientSendEnum {
-    "CLIENT_SEND_NULL":                              CLIENT_SEND_NULL,
-    "CLIENT_SEND_PING":                              CLIENT_SEND_PING,
-    "CLIENT_SEND_REBOOT":                            CLIENT_SEND_REBOOT,
-    "CLIENT_SEND_DATE_TIME_SET":                     CLIENT_SEND_DATE_TIME_SET,
-    "CLIENT_SEND_DATE_TIME_GET":                     CLIENT_SEND_DATE_TIME_GET,
-    "CLIENT_SEND_MODE_SET":                          CLIENT_SEND_MODE_SET,
-    "CLIENT_SEND_MODE_GET":                          CLIENT_SEND_MODE_GET,
-    "CLIENT_SEND_HEARTBEAT_SET":                     CLIENT_SEND_HEARTBEAT_SET,
-    "CLIENT_SEND_REPORTING_INTERVAL_SET":            CLIENT_SEND_REPORTING_INTERVAL_SET,
-    "CLIENT_SEND_INTERVALS_GET":                     CLIENT_SEND_INTERVALS_GET,
-    "CLIENT_SEND_MEASUREMENTS_GET":                  CLIENT_SEND_MEASUREMENTS_GET,
-    "CLIENT_SEND_MEASUREMENT_CONTROL_SET":           CLIENT_SEND_MEASUREMENT_CONTROL_SET,
-    "CLIENT_SEND_MEASUREMENTS_CONTROL_GET":          CLIENT_SEND_MEASUREMENTS_CONTROL_GET,
-    "CLIENT_SEND_MEASUREMENTS_CONTROL_DEFAULTS_SET": CLIENT_SEND_MEASUREMENTS_CONTROL_DEFAULTS_SET,
-    "CLIENT_SEND_TRAFFIC_REPORT_GET":                CLIENT_SEND_TRAFFIC_REPORT_GET,
-    "CLIENT_SEND_TRAFFIC_TEST_MODE_PARAMETERS_SET":  CLIENT_SEND_TRAFFIC_TEST_MODE_PARAMETERS_SET,
-    "CLIENT_SEND_TRAFFIC_TEST_MODE_PARAMETERS_GET":  CLIENT_SEND_TRAFFIC_TEST_MODE_PARAMETERS_GET,
-    "CLIENT_SEND_TRAFFIC_TEST_MODE_REPORT_GET":      CLIENT_SEND_TRAFFIC_TEST_MODE_REPORT_GET,
-    "CLIENT_SEND_ACTIVITY_REPORT_GET":               CLIENT_SEND_ACTIVITY_REPORT_GET,
+    "SEND_NULL":                              CLIENT_SEND_NULL,
+    "SEND_PING":                              CLIENT_SEND_PING,
+    "SEND_REBOOT":                            CLIENT_SEND_REBOOT,
+    "SEND_DATE_TIME_SET":                     CLIENT_SEND_DATE_TIME_SET,
+    "SEND_DATE_TIME_GET":                     CLIENT_SEND_DATE_TIME_GET,
+    "SEND_MODE_SET":                          CLIENT_SEND_MODE_SET,
+    "SEND_MODE_GET":                          CLIENT_SEND_MODE_GET,
+    "SEND_HEARTBEAT_SET":                     CLIENT_SEND_HEARTBEAT_SET,
+    "SEND_REPORTING_INTERVAL_SET":            CLIENT_SEND_REPORTING_INTERVAL_SET,
+    "SEND_INTERVALS_GET":                     CLIENT_SEND_INTERVALS_GET,
+    "SEND_MEASUREMENTS_GET":                  CLIENT_SEND_MEASUREMENTS_GET,
+    "SEND_MEASUREMENT_CONTROL_SET":           CLIENT_SEND_MEASUREMENT_CONTROL_SET,
+    "SEND_MEASUREMENTS_CONTROL_GET":          CLIENT_SEND_MEASUREMENTS_CONTROL_GET,
+    "SEND_MEASUREMENTS_CONTROL_DEFAULTS_SET": CLIENT_SEND_MEASUREMENTS_CONTROL_DEFAULTS_SET,
+    "SEND_TRAFFIC_REPORT_GET":                CLIENT_SEND_TRAFFIC_REPORT_GET,
+    "SEND_TRAFFIC_TEST_MODE_PARAMETERS_SET":  CLIENT_SEND_TRAFFIC_TEST_MODE_PARAMETERS_SET,
+    "SEND_TRAFFIC_TEST_MODE_PARAMETERS_GET":  CLIENT_SEND_TRAFFIC_TEST_MODE_PARAMETERS_GET,
+    "SEND_TRAFFIC_TEST_MODE_REPORT_GET":      CLIENT_SEND_TRAFFIC_TEST_MODE_REPORT_GET,
+    "SEND_ACTIVITY_REPORT_GET":               CLIENT_SEND_ACTIVITY_REPORT_GET,
 }
 
 var clientModeEnumString map[string]ClientModeEnum = map[string]ClientModeEnum {
-    "CLIENT_MODE_NULL":           CLIENT_MODE_NULL,
-    "CLIENT_MODE_SELF_TEST":      CLIENT_MODE_SELF_TEST,
-    "CLIENT_MODE_COMMISSIONING":  CLIENT_MODE_COMMISSIONING,
-    "CLIENT_MODE_STANDARD_TRX":   CLIENT_MODE_STANDARD_TRX,
-    "CLIENT_MODE_TRAFFIC_TEST":   CLIENT_MODE_TRAFFIC_TEST,
+    "MODE_NULL":           CLIENT_MODE_NULL,
+    "MODE_SELF_TEST":      CLIENT_MODE_SELF_TEST,
+    "MODE_COMMISSIONING":  CLIENT_MODE_COMMISSIONING,
+    "MODE_STANDARD_TRX":   CLIENT_MODE_STANDARD_TRX,
+    "MODE_TRAFFIC_TEST":   CLIENT_MODE_TRAFFIC_TEST,
 }
+
+// BootReq tags
+const sdCardNotRequiredTag string = "sd_card_not_required"
+const disableModemDebugTag string = "disable_modem_debug"
+const disableButtonTag string = "disable_button"
+const disableServerPingTag string = "disable_server_ping"
+
+// DateTimeSetReq tags
+const timeTag string = "time"
+const setDateOnlyTag string = "set_date_only"
+
+const dateTimeFormat ="2006-01-02 15:04:05"
+
+// Mode tags
+const modeTag string = "mode"
+
+// Reporting Interval tags
+const reportingIntervalTag string = "reporting_interval"
+
+// Heartbeat tags
+const heartbeatSecondsTag string = "heartbeat_seconds"
+const heartbeatSnapToRtcTag string = "heartbeat_snap_to_rtc"
+
+// Traffic Test Mode Parameters tags
+const numUlDatagramsTag string = "num_ul_datagrams"
+const lenUlDatagramTag string = "len_ul_datagram"
+const numDlDatagramsTag string = "num_dl_datagrams"
+const lenDlDatagramTag string = "len_dl_datagram"
+const timeoutSecondsTag string = "timeout_seconds"
+
+// TODO
+// type clientMeasurementControlSetReqFields
+// type clientMeasurementsControlDefaultsSetReqFields
 
 //--------------------------------------------------------------------
 // Functions
 //--------------------------------------------------------------------
 
-// Send a message to the UTM on command from the client
+func GetValueString (body interface{}, tag string) (error, string) {
+
+    globals.Dbg.PrintfTrace ("%s [dl_msgs] --> tag is \"%s\".\n", globals.LogTag, tag)
+
+    if body != nil && reflect.TypeOf(body).Kind() == reflect.Map {
+        bodyMap := reflect.ValueOf (body).Interface().(map[string]interface{})
+        globals.Dbg.PrintfTrace ("%s [dl_msgs] --> map is %+v.\n", globals.LogTag, bodyMap)
+        valueInterface := bodyMap[tag]
+        if valueInterface != nil {
+            if reflect.TypeOf(valueInterface).Kind() == reflect.String {
+                valueString := reflect.ValueOf (valueInterface).Interface().(string)
+                if valueString != "" {
+                        globals.Dbg.PrintfTrace ("%s [dl_msgs] --> string value is \"%s\".\n", globals.LogTag, valueString)
+                    return nil, valueString
+                } else {
+                    return errors.New("string from interface{} is null"), ""
+                }
+            } else {
+                return errors.New("interface{} in map is not of type string"),""
+            }
+        } else {
+            return errors.New("map does not have tag in it"), ""
+        }       
+    }
+    
+    return errors.New("body empty or is not a map"), ""
+}
+
+func GetValueUint32 (body interface{}, tag string) (error, uint32) {
+
+    err, valueString := GetValueString (body, tag)
+    if err == nil {
+        value, err := strconv.ParseUint (valueString, 10, 32)
+        if err == nil {
+            globals.Dbg.PrintfTrace ("%s [dl_msgs] --> value is %d.\n", globals.LogTag, value)
+            return nil, uint32 (value)                    
+        } else {
+            return errors.New("cannot convert value into uint32"), 0
+        }
+    } else {
+        return err, 0
+    }
+}
+
+func GetValueBool (body interface{}, tag string) (error, bool) {
+
+    err, valueString := GetValueString (body, tag)
+    if err == nil {
+        value, err := strconv.ParseBool (valueString)
+        if err == nil {
+            globals.Dbg.PrintfTrace ("%s [dl_msgs] --> value is %v.\n", globals.LogTag, value)
+            return nil, value                    
+        } else {
+            return errors.New("cannot convert value into bool"), false
+        }
+    } else {
+        return err, false
+    }
+}
+
+func GetValueTime (body interface{}, tag string) (error, time.Time) {
+
+    var value time.Time
+    var err error
+    
+    err, valueString := GetValueString (body, tag)
+    if err == nil {
+        value, err = time.Parse(dateTimeFormat, valueString)
+        if err == nil {
+            globals.Dbg.PrintfTrace ("%s [dl_msgs] --> value is %T.\n", globals.LogTag, value)
+            return nil, value
+        } else {
+            return errors.New("cannot convert value into time"), value
+        }
+    } else {
+        return err, value
+    }
+}
+
+// Determine what message to the UTM is requested by the REST interface
 func (msg *ClientSendMsg) Send(response http.ResponseWriter, request *http.Request) {
 	err := utilities.ValidatePostRequest (request)
 	
 	if err != nil {
-        response.WriteHeader(403)
+        response.WriteHeader(404)
         return
     } else {
         globals.Dbg.PrintfTrace ("%s [dl_msgs] --> sendMsg request received from client.\n", globals.LogTag)
@@ -254,62 +275,134 @@ func (msg *ClientSendMsg) Send(response http.ResponseWriter, request *http.Reque
 
 // Send the messages
 func (m *Msg) Send(uuid string) error {
+    var err error
+    
     switch m.MsgType {
         case CLIENT_SEND_PING:
             globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send PingReq.\n", globals.LogTag)                    
             encodeAndEnqueue (&PingReqDlMsg{}, uuid)
+            
         case CLIENT_SEND_REBOOT:
             globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send RebootReq.\n", globals.LogTag)                    
-            // TODO
-            // encodeAndEnqueue (&RebootReqDlMsg{}, uuid)
+            msg := &RebootReqDlMsg {}
+            err, msg.SdCardNotRequired = GetValueBool (m.MsgBody, sdCardNotRequiredTag)
+            if err == nil {
+                err, msg.DisableModemDebug = GetValueBool (m.MsgBody, disableModemDebugTag)                
+                if err == nil {
+                    err, msg.DisableButton = GetValueBool (m.MsgBody, disableButtonTag)                
+                    if err == nil {
+                        err, msg.DisableServerPing = GetValueBool (m.MsgBody, disableServerPingTag)                
+                    }
+                }
+            }
+            if err == nil {
+                encodeAndEnqueue (msg, uuid)
+            }            
+            
         case CLIENT_SEND_DATE_TIME_SET:
-            globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send DateTimeSetReq [TODO].\n", globals.LogTag)                    
-            // TODO
-            // encodeAndEnqueue (&DateTimeSetReqDlMsg{}, uuid)
+            globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send DateTimeSetReq.\n", globals.LogTag)                    
+            msg := &DateTimeSetReqDlMsg {}
+            err, msg.UtmTime = GetValueTime (m.MsgBody, timeTag)
+            if err == nil {
+                err, msg.SetDateOnly = GetValueBool (m.MsgBody, setDateOnlyTag)            
+            }
+
+            if err == nil {
+               encodeAndEnqueue (msg, uuid)                
+            }
+            
         case CLIENT_SEND_DATE_TIME_GET:
             globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send DateTimeGetReq.\n", globals.LogTag)                    
             encodeAndEnqueue (&DateTimeGetReqDlMsg{}, uuid)
+            
         case CLIENT_SEND_MODE_SET:
-            globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send ModeSetReq [TODO].\n", globals.LogTag)                    
-            // TODO
-            //encodeAndEnqueue (&ModeSetReqDlMsg{}, uuid)
+            globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send ModeSetReq.\n", globals.LogTag)                    
+            var modeString string
+            err, modeString = GetValueString (m.MsgBody, modeTag)
+            if err == nil {
+                msg := &ModeSetReqDlMsg {}
+                msg.Mode = ModeEnum(clientModeEnumString[modeString]) + MODE_NULL
+                if msg.Mode != MODE_NULL {
+                    encodeAndEnqueue (msg, uuid)
+                } else {
+                    globals.Dbg.PrintfTrace ("%s [dl_msgs] --> unknown mode \"%s\".\n", globals.LogTag, modeString)                    
+                }
+            }
+            
         case CLIENT_SEND_MODE_GET:
             globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send ModeGetReq.\n", globals.LogTag)                    
             encodeAndEnqueue (&ModeGetReqDlMsg{}, uuid)
+            
         case CLIENT_SEND_HEARTBEAT_SET:
             globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send HeartbeatSetReq [TODO].\n", globals.LogTag)
-            // TODO
-            //encodeAndEnqueue (&HeartbeatSetReqDlMsg{}, uuid)
+            // Retrieve the values from the map that JSON has created for the message body
+            msg := &HeartbeatSetReqDlMsg {}
+            err, msg.HeartbeatSeconds = GetValueUint32 (m.MsgBody, heartbeatSecondsTag)
+            if err == nil {
+                err, msg.HeartbeatSnapToRtc = GetValueBool (m.MsgBody, heartbeatSnapToRtcTag)                
+            }
+            if err == nil {
+                encodeAndEnqueue (msg, uuid)
+            }           
+            
         case CLIENT_SEND_REPORTING_INTERVAL_SET:
             globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send ReportingIntervalSetReq [TODO].\n", globals.LogTag)                    
-            // TODO
-            //encodeAndEnqueue (&ReportingIntervalSetReqDlMsg{}, uuid)
+            msg := &ReportingIntervalSetReqDlMsg {}
+            err, msg.ReportingInterval = GetValueUint32 (m.MsgBody, reportingIntervalTag)
+            if err == nil {
+                encodeAndEnqueue (msg, uuid)
+            }           
+            
         case CLIENT_SEND_INTERVALS_GET:
             globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send IntervalsGetReq.\n", globals.LogTag)                    
             encodeAndEnqueue (&IntervalsGetReqDlMsg{}, uuid)
+            
         case CLIENT_SEND_MEASUREMENTS_GET:
             globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send MeasurementsGetReq.\n", globals.LogTag)                    
             encodeAndEnqueue (&MeasurementsGetReqDlMsg{}, uuid)
+            
         // TODO
         //case CLIENT_SEND_MEASUREMENT_CONTROL_SET:
         //case CLIENT_SEND_MEASUREMENTS_CONTROL_GET:
         //case CLIENT_SEND_MEASUREMENTS_CONTROL_DEFAULTS_SET:
+        
         case CLIENT_SEND_TRAFFIC_REPORT_GET:
             globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send TrafficReportGetReq.\n", globals.LogTag)                    
             encodeAndEnqueue (&TrafficReportGetReqDlMsg{}, uuid)
+            
         case CLIENT_SEND_TRAFFIC_TEST_MODE_PARAMETERS_SET:
-            globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send TrafficTestModeParametersSetReq [TODO].\n", globals.LogTag)                    
-            // TODO
-            //encodeAndEnqueue (&TrafficTestModeParametersSetReqDlMsg{}, uuid)
+            globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send TrafficTestModeParametersSetReq.\n", globals.LogTag)                    
+            msg := &TrafficTestModeParametersSetReqDlMsg {}
+
+            err, msg.NumUlDatagrams = GetValueUint32 (m.MsgBody, numUlDatagramsTag)
+            if err == nil {
+                err, msg.LenUlDatagram = GetValueUint32 (m.MsgBody, lenUlDatagramTag)                
+                if err == nil {
+                    err, msg.NumDlDatagrams = GetValueUint32 (m.MsgBody, numDlDatagramsTag)                
+                    if err == nil {
+                        err, msg.LenDlDatagram = GetValueUint32 (m.MsgBody, lenDlDatagramTag)                
+                        if err == nil {
+                            err, msg.TimeoutSeconds = GetValueUint32 (m.MsgBody, timeoutSecondsTag)                
+                        }
+                    }
+                }
+            }
+            if err == nil {
+                encodeAndEnqueue (msg, uuid)
+            }            
+            
         case CLIENT_SEND_TRAFFIC_TEST_MODE_PARAMETERS_GET:
             globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send TrafficTestModeParametersGetReq.\n", globals.LogTag)                    
             encodeAndEnqueue (&TrafficTestModeParametersGetReqDlMsg{}, uuid)
+            
         case CLIENT_SEND_TRAFFIC_TEST_MODE_REPORT_GET:
             globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send TrafficTestModeReportGetReq.\n", globals.LogTag)                    
             encodeAndEnqueue (&TrafficTestModeReportGetReqDlMsg{}, uuid)
+            
         case CLIENT_SEND_ACTIVITY_REPORT_GET:
             globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send ActivityReportGetReq.\n", globals.LogTag)                    
             encodeAndEnqueue (&ActivityReportGetReqDlMsg{}, uuid)
+            
         default:
             globals.Dbg.PrintfTrace ("%s [dl_msgs] --> asked to send an unknown message type: %d.\n", globals.LogTag, m.MsgType)                    
             return errors.New("Unknown message type")
@@ -317,72 +410,5 @@ func (m *Msg) Send(uuid string) error {
     
     return nil
 }
-
-/*
-/// Send a ping request to a device
-func sendPingReq (response http.ResponseWriter, request *http.Request) *globals.Error {
-	err := utilities.ValidateGetRequest (request)
-	if err == nil {
-        // Send the ping request
-        //encodeAndEnqueue (&PingReqDlMsg{}, "61d25940-5307-11e5-80a4-c549fb2d6313") // TODO
-        
-    	// Set up the response
-    	utilities.MakeOkResponse (response)
-    }
-	
-	return err
-}
-
-/// Send a heartbeat set request to a device
-func sendHeartbeatSetReq (response http.ResponseWriter, request *http.Request) *globals.Error {
-	err := utilities.ValidateGetRequest (request)
-	if err == nil {
-        heartbeatSetReq := &HeartbeatSetReqDlMsg {
-            HeartbeatSeconds:   18,    // TODO
-            HeartbeatSnapToRtc: false, // TODO       
-        }
-        // Send the ping request
-        //encodeAndEnqueue (heartbeatSetReq, "61d25940-5307-11e5-80a4-c549fb2d6313") // TODO
-        
-    	// Set up the response
-    	utilities.MakeOkResponse (response)
-    }	
-
-	return err
-}
-
-/// Send  reporting interval set request to a device
-func sendReportingIntervalSetReq (response http.ResponseWriter, request *http.Request) *globals.Error {
-	err := utilities.ValidateGetRequest (request)
-	if err == nil {
-        reportingIntervalSetReq := &ReportingIntervalSetReqDlMsg {
-            ReportingInterval:   1,    // TODO
-        }
-        // Send the ping request
-        //encodeAndEnqueue (reportingIntervalSetReq, "61d25940-5307-11e5-80a4-c549fb2d6313") // TODO
-        
-    	// Set up the response
-    	utilities.MakeOkResponse (response)
-    }	
-
-	return err
-}
-
-/// Send intervals get request to a device
-func sendIntervalsGetReq (response http.ResponseWriter, request *http.Request) *globals.Error {
-	err := utilities.ValidateGetRequest (request)
-	if err == nil {
-
-        // Send the ping request
-        //encodeAndEnqueue (&IntervalsGetReqDlMsg{}, "61d25940-5307-11e5-80a4-c549fb2d6313") // TODO
-        
-    	// Set up the response
-    	utilities.MakeOkResponse (response)
-    }	
-
-	return err
-}
-
-*/
 
 /* End Of File */

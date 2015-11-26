@@ -16,6 +16,25 @@ import (
     "time"
 )
 
+// Storage for the "interesting" flag
+// This shoudl be set if something other than a boring RF or
+// status update has arrived from the device, something which
+// requires the user to go beyond the front page
+type Interesting struct {
+    Timestamp      time.Time    
+    IsInteresting  bool
+}
+func (value *Interesting) DeepCopy() *Interesting {
+    if value == nil {
+        return nil
+    }
+    result := &Interesting {
+        Timestamp:       value.Timestamp,  
+        IsInteresting:   value.IsInteresting,
+    }
+    return result
+}
+
 // Storage for traffic volume data
 type TrafficVolumeData struct {
     TotalUlMsgs       int

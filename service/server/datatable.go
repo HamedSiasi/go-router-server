@@ -28,6 +28,7 @@ type LatestState struct {
     Connected                            bool                           `json:"Connected,omitempty"`
     DeviceName                           string                         `json:"DeviceName,omitempty"`
     LastHeardFrom                        time.Time                      `json:"LastHeardFrom,omitempty"`
+    LatestInterest                       *Interesting                   `json:"Interesting,omitempty"`
     LatestTrafficVolumeData              *TrafficVolumeData             `json:"LatestTrafficVolumeData,omitempty"`
     LatestInitIndData                    *InitIndData                   `json:"LatestInitIndData,omitempty"`
     LatestIntervalsData                  *IntervalsData                 `json:"LatestIntervalsData,omitempty"`
@@ -83,11 +84,28 @@ var dataTableChannel chan<- interface{}
 // Functions
 //--------------------------------------------------------------------
 
+// Set the interesting flag to true and now
+func (i * Interesting) Set () {
+    if i != nil {
+        i.IsInteresting = true
+        i.Timestamp = time.Now().UTC()
+    }    
+}
+
+// Unset the interesting flag to true and now
+func (i * Interesting) UnSet () {
+    if i != nil {
+        i.IsInteresting = false
+    }    
+}
+
+// Run the whole shebang
 func operateDataTable() {
     channel := make(chan interface{})
     dataTableChannel = channel
 	deviceLatestStateList := make(map[string]*LatestState)    	
     checkConnections := time.NewTicker (time.Second * 10)
+    checkInteresting := time.NewTicker (time.Second * 30)
     
     globals.Dbg.PrintfTrace("%s [datatable] --> command channel created and now being serviced.\n", globals.LogTag)
     
@@ -102,15 +120,31 @@ func operateDataTable() {
                    state.LatestIntervalsData.ReportingInterval > 0 {
                     if state.LatestIntervalsData.HeartbeatSnapToRtc {
                         if time.Now().After (state.LastHeardFrom.Add(time.Hour + time.Minute * 10)) {
-                            state.Connected = false;
+                            state.Connected = false
                             globals.Dbg.PrintfTrace("%s [datatable] --> device %s is no longer connected (last heard from @ %s).\n", globals.LogTag, uuid, state.LastHeardFrom.String())
                         }
                     } else {
                         if time.Now().After (state.LastHeardFrom.Add(time.Duration(state.LatestIntervalsData.HeartbeatSeconds * (state.LatestIntervalsData.ReportingInterval + 2)) * time.Second)) {                   
-                            state.Connected = false;
+                            state.Connected = false
                             globals.Dbg.PrintfTrace("%s [datatable] --> device %s is no longer connected  (last heard from @ %s).\n", globals.LogTag, uuid, state.LastHeardFrom.String())
                         }   
                     }                
+                }    
+            }     
+        }
+    }()
+    
+    // Deal with the check interesting timer
+    // If a device has been interesting for more than
+    // a minute then slap it down
+    go func() {
+        for _ = range checkInteresting.C {
+            for uuid, state := range deviceLatestStateList {
+                if state.LatestInterest != nil && state.LatestInterest.IsInteresting {
+                    if time.Now().After (state.LatestInterest.Timestamp.Add(time.Minute)) {
+                        state.LatestInterest.UnSet()
+                        globals.Dbg.PrintfTrace("%s [datatable] --> device %s has become less interesting (last interesting @ %s).\n", globals.LogTag, uuid, state.LatestInterest.Timestamp.String())
+                    }
                 }    
             }     
         }
@@ -143,7 +177,11 @@ func operateDataTable() {
             		if state == nil {
             			state = &LatestState{};
             			deviceLatestStateList[value.DeviceUuid] = state;
-                        state.LastHeardFrom = time.Now().Local()
+                        state.LastHeardFrom = time.Now().UTC()
+    	                if state.LatestInterest == nil {
+    	                    state.LatestInterest = &Interesting {}
+    	                }    
+                        state.LatestInterest.Set()
                         globals.Dbg.PrintfTrace("%s [datatable] --> heard from a new device, UUID %s.\n", globals.LogTag, value.DeviceUuid)
                         // TODO: find a way to send a get intervals request for a new device, but not from here
             		}
@@ -159,7 +197,11 @@ func operateDataTable() {
 			                    // TODO: I _think_ the values that were here all get garbage collected
 			                    // as there seems to be no way to do an explicit free.  But I'd really
 			                    // like to check.
-                                state.LastHeardFrom = time.Now().Local()
+                                state.LastHeardFrom = time.Now().UTC()
+            	                if state.LatestInterest == nil {
+            	                    state.LatestInterest = &Interesting {}
+            	                }    
+    	                        state.LatestInterest.Set()
 			                    state.LatestTrafficVolumeData = nil
                                 state.LatestIntervalsData = nil
                                 state.LatestModeData = nil
@@ -177,18 +219,21 @@ func operateDataTable() {
 			                }
 			
 			            case *IntervalsGetCnfUlMsg:
+	                        state.LatestInterest.Set()
 			                data := utmMsg.DeepCopy()
 			                if data != nil {
 			                    state.LatestIntervalsData = makeIntervalsData0(data, value.Timestamp)
 			                }
 			
 			            case *ReportingIntervalSetCnfUlMsg:
+	                        state.LatestInterest.Set()
 			                data := utmMsg.DeepCopy()
 			                if data != nil {
 			                    state.LatestIntervalsData = makeIntervalsData1(data, value.Timestamp)
 			                }
 			
 			            case *HeartbeatSetCnfUlMsg:
+	                        state.LatestInterest.Set()
 			                data := utmMsg.DeepCopy()
 			                if data != nil {
 			                    state.LatestIntervalsData = makeIntervalsData2(data, value.Timestamp)
@@ -207,18 +252,21 @@ func operateDataTable() {
 			                }
 			
 			            case *DateTimeGetCnfUlMsg:
+	                        state.LatestInterest.Set()
 			                data := utmMsg.DeepCopy()
 			                if data != nil {
 			                    state.LatestDateTimeData = makeDateTimeData2(data, value.Timestamp)
 			                }
 			
 			            case *ModeSetCnfUlMsg:
+	                        state.LatestInterest.Set()
 			                data := utmMsg.DeepCopy()
 			                if data != nil {
 			                    state.LatestModeData = makeModeData0(data, value.Timestamp)
 			                }
 			
 			            case *ModeGetCnfUlMsg:
+	                        state.LatestInterest.Set()
 			                data := utmMsg.DeepCopy()
 			                if data != nil {
 			                    state.LatestModeData = makeModeData1(data, value.Timestamp)
@@ -274,24 +322,28 @@ func operateDataTable() {
 			                }
 			
 			            case *TrafficReportGetCnfUlMsg:
+	                        state.LatestInterest.Set()
 			                data := utmMsg.DeepCopy()
 			                if data != nil {
 			                    state.LatestTrafficReportData = makeTrafficReportData1(data, value.Timestamp)
 			                }
 			
 			            case *TrafficTestModeParametersSetCnfUlMsg:
+	                        state.LatestInterest.Set()
 			                data := utmMsg.DeepCopy()
 			                if data != nil {
 			                    state.LatestTrafficTestModeParametersData = makeTrafficTestModeParametersData0(data, value.Timestamp)
 			                }
 			
 			            case *TrafficTestModeParametersGetCnfUlMsg:
+	                        state.LatestInterest.Set()
 			                data := utmMsg.DeepCopy()
 			                if data != nil {
 			                    state.LatestTrafficTestModeParametersData = makeTrafficTestModeParametersData1(data, value.Timestamp)
 			                }
 			
 			            case *TrafficTestModeReportIndUlMsg:
+	                        state.LatestInterest.Set()
 			                data := utmMsg.DeepCopy()
 			                if data != nil {
         			            // TODO check for a pass/fail result 
@@ -299,6 +351,7 @@ func operateDataTable() {
 			                }
 			
 			            case *TrafficTestModeReportGetCnfUlMsg:
+	                        state.LatestInterest.Set()
 			                data := utmMsg.DeepCopy()
 			                if data != nil {
 			                    state.LatestTrafficTestModeReportData = makeTrafficTestModeReportData1(data, value.Timestamp)
@@ -311,6 +364,7 @@ func operateDataTable() {
 			                }
 			
 			            case *ActivityReportGetCnfUlMsg:
+	                        state.LatestInterest.Set()
 			                data := utmMsg.DeepCopy()
 			                if data != nil {
 			                    state.LatestActivityReportData = makeActivityReportData1(data, value.Timestamp)
@@ -330,6 +384,8 @@ func operateDataTable() {
 		                latest := LatestState{}
 		                latest.Connected = state.Connected
 		                latest.LastHeardFrom = state.LastHeardFrom
+		                latest.LatestInterest = state.LatestInterest.DeepCopy()
+                        state.LatestInterest.UnSet() // Reseting interestingness after answering a specific query
 	                    latest.LatestTrafficVolumeData = state.LatestTrafficVolumeData.DeepCopy()
 		                latest.LatestInitIndData = state.LatestInitIndData.DeepCopy()
 		                latest.LatestIntervalsData = state.LatestIntervalsData.DeepCopy()
@@ -361,6 +417,7 @@ func operateDataTable() {
 		                latest := DeviceLatestState{}
 		                latest.State.Connected = state.Connected
 		                latest.State.LastHeardFrom = state.LastHeardFrom
+		                latest.State.LatestInterest = state.LatestInterest.DeepCopy()
 	                    latest.State.LatestTrafficVolumeData = state.LatestTrafficVolumeData.DeepCopy()
 		                latest.State.LatestInitIndData = state.LatestInitIndData.DeepCopy()
 		                latest.State.LatestIntervalsData = state.LatestIntervalsData.DeepCopy()

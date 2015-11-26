@@ -82,7 +82,7 @@ const (
 // Variables
 //--------------------------------------------------------------------
 
-var clientSendEnumString map[string]ClientSendEnum = map[string]ClientSendEnum {
+const clientSendEnumString map[string]ClientSendEnum = map[string]ClientSendEnum {
     "SEND_NULL":                              CLIENT_SEND_NULL,
     "SEND_PING":                              CLIENT_SEND_PING,
     "SEND_REBOOT":                            CLIENT_SEND_REBOOT,
@@ -104,7 +104,7 @@ var clientSendEnumString map[string]ClientSendEnum = map[string]ClientSendEnum {
     "SEND_ACTIVITY_REPORT_GET":               CLIENT_SEND_ACTIVITY_REPORT_GET,
 }
 
-var clientModeEnumString map[string]ClientModeEnum = map[string]ClientModeEnum {
+const clientModeEnumString map[string]ClientModeEnum = map[string]ClientModeEnum {
     "MODE_NULL":           CLIENT_MODE_NULL,
     "MODE_SELF_TEST":      CLIENT_MODE_SELF_TEST,
     "MODE_COMMISSIONING":  CLIENT_MODE_COMMISSIONING,
@@ -118,7 +118,7 @@ const disableModemDebugTag string = "disable_modem_debug"
 const disableButtonTag string = "disable_button"
 const disableServerPingTag string = "disable_server_ping"
 
-// DateTimeSetReq tags
+// DateTimeSetReq tags and format
 const timeTag string = "time"
 const setDateOnlyTag string = "set_date_only"
 
@@ -149,6 +149,7 @@ const timeoutSecondsTag string = "timeout_seconds"
 // Functions
 //--------------------------------------------------------------------
 
+// Get the value of a string token with the given tag
 func GetValueString (body interface{}, tag string) (error, string) {
 
     globals.Dbg.PrintfTrace ("%s [dl_msgs] --> tag is \"%s\".\n", globals.LogTag, tag)
@@ -177,6 +178,7 @@ func GetValueString (body interface{}, tag string) (error, string) {
     return errors.New("body empty or is not a map"), ""
 }
 
+// Get the value of a UInt32 token with the given tag
 func GetValueUint32 (body interface{}, tag string) (error, uint32) {
 
     err, valueString := GetValueString (body, tag)
@@ -193,6 +195,7 @@ func GetValueUint32 (body interface{}, tag string) (error, uint32) {
     }
 }
 
+// Get the value of a Boolean token with the given tag
 func GetValueBool (body interface{}, tag string) (error, bool) {
 
     err, valueString := GetValueString (body, tag)
@@ -209,6 +212,7 @@ func GetValueBool (body interface{}, tag string) (error, bool) {
     }
 }
 
+// Get the value of a time token with the given tag
 func GetValueTime (body interface{}, tag string) (error, time.Time) {
 
     var value time.Time
@@ -346,7 +350,7 @@ func (m *Msg) Send(uuid string) error {
             }           
             
         case CLIENT_SEND_REPORTING_INTERVAL_SET:
-            globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send ReportingIntervalSetReq [TODO].\n", globals.LogTag)                    
+            globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send ReportingIntervalSetReq.\n", globals.LogTag)                    
             msg := &ReportingIntervalSetReqDlMsg {}
             err, msg.ReportingInterval = GetValueUint32 (m.MsgBody, reportingIntervalTag)
             if err == nil {

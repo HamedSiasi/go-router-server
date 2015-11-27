@@ -16,7 +16,7 @@ var Login = React.createClass({
                                   <input type="email" name="email" id="email" className="form-control input-sm" placeholder="Email Address" required autofocus />
                               </div>
                               <div className="form-group">
-                                  <input type="password" name="user_password" id="user_password" className="form-control input-sm" placeholder="User password"  required />
+                                  <input type="password" name="password" id="password" className="form-control input-sm" placeholder="User password"  required />
 
                               </div>
                               <input  type="submit" value="Login" className="btn btn-info" />

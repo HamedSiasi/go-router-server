@@ -35,23 +35,15 @@ var Display = React.createClass({
     pollState(function(data) {
       // fixup missing state properties to avoid muliple levels of missing attribute tests
       [
-        "LatestDisplayRow"
+       "SummaryData",
+       "DeviceData"
       ].map(function(property) {
         if (!data[property]) {
           data[property] = {};
         }
       });
 
-      if (window.location.hash == "#debug") {
-        data.json = JSON.stringify(data, null, "  ");
-      } else {
-        data.json = "";
-      }
-
-     console.log(data);
-
-      this.setState({data: data})
-
+      this.setState({data: data});
     }.bind(this), 10000);
 
   },
@@ -60,9 +52,9 @@ var Display = React.createClass({
     return (
             <div><br />
               <Configure />
-              <Summary data = { this.state.data} />  
-      
-              <DisplayRow data = { this.state.data} />
+              <Summary SummaryData = { this.state.data["SummaryData"]} />  
+              <DisplayRow DeviceData = { this.state.data["DeviceData"]} />  
+    
             </div>
         );
 
@@ -92,7 +84,7 @@ function pollState(updateState) {
       }
     };
 
-    x.open("GET", "latestState", true);
+    x.open("GET", "frontPageData", true);
     x.send();
   }
   pollLoop();

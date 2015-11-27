@@ -38,9 +38,6 @@ var Mode = React.createClass({
         </div> 
         <div className="col-lg-4">
 
-              <div className="ScrolledContent" style={{float:'right', width:'300px', height:'100px'}}>
-    a<br />a<br />a<br />a<br />a<br />a<br />a<br />a<br />a<br />a<br />a<br />a
-              </div>
 
         </div>
         <div className="row">

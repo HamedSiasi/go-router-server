@@ -7,9 +7,9 @@ var Header = React.createClass({
 
       <nav className="navbar navbar-default navbar-static-top" role="navigation" style={{marginBottom: 0}}>
         <div className="navbar-header">               
-          <a className="brand " href="#/utmlist">
+          <Link href="/Display">
             <img src="static/dist/assets/images/logo.png" alt="u-blox" style={{maxWidth: 130, padding: 5}} />
-          </a>
+          </Link>
         </div>
         {/* /.navbar-header */}
         <ul className="nav navbar-top-links navbar-right">
@@ -23,7 +23,7 @@ var Header = React.createClass({
               <li><a href="#"><i className="fa fa-user fa-fw" /> User Profile</a>
               </li>
               <li className="divider" />
-              <li><Link href="#/login"><i className="fa fa-sign-out fa-fw" /> Logout</Link>
+              <li><Link href="#/logout"><i className="fa fa-sign-out fa-fw" /> Logout</Link>
               </li>
               <li><Link href="#/login"><i className="fa fa-sign-in fa-fw" /> Login</Link>
               </li>
@@ -36,8 +36,8 @@ var Header = React.createClass({
               <i className="fa fa-cloud-download" /> Setting  <i className="fa fa-caret-down" />
             </a>
             <ul className="dropdown-menu dropdown-user">
-              <li><Link href="/mode"><i className="fa fa-exchange" /> Mode</Link></li>
-              <li><Link href="/"><i className="fa fa-tachometer" /> Dash Board</Link></li>
+              <li><Link href="#/mode"><i className="fa fa-exchange" /> Mode</Link></li>
+              <li><Link href="#/display"><i className="fa fa-tachometer" /> Dash Board</Link></li>
               <li><a href="#"><i className="fa fa-file-archive-o" /> Upload Files</a></li>
               <li><a href="#"><i className="fa fa-file-excel-o" /> Download Files</a></li>
             </ul>

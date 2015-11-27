@@ -11,10 +11,12 @@ var DisplayRow = React.createClass({
 
         var rows = [];
 
-        this.props.data.forEach(function(uuid, i) {
-       
+          if(this.props["DeviceData"] !== undefined){   
 
-        rows.push(       
+            this.props["DeviceData"].forEach(function(uuid, i) {
+
+             
+            rows.push(       
     
               <tr className="even gradeC" key={i}>
                         <td style={{width: 15}}>
@@ -27,23 +29,23 @@ var DisplayRow = React.createClass({
                             <li><b>Uuid:</b> {uuid["Uuid"]}</li>
                             <li><b>Mode:</b> {uuid["Mode"]}</li>
                             <li><b>Name:</b> {uuid["UnitName"]}</li>
-                             <li><b>Reporting Interval:</b> {uuid["ReportingInterval"]}</li>
-                              <li><b>Heart Beat:</b> {uuid["HeartbeatSeconds"]}</li>
+                             <li><b>Reporting Interval:</b> {uuid["Reporting"]}</li>
+                              <li><b>Heart Beat:</b> {uuid["Heartbeat"]}</li>
                           </ul>   
                         </td>
                         <td>
                           <ul className="SmallPadding">
-                            <li><b>Total Msg:</b> {uuid["UTotalMsgs"]}</li>
-                            <li><b>Total Bytes:</b> {uuid["UTotalBytes"]}</li>
-                            <li><b>Last Msg RX:</b> {uuid["UlastMsgReceived"]}</li>
+                            <li><b>Total Msg:</b> {uuid["TotalUlMsgs"]}</li>
+                            <li><b>Total Bytes:</b> {uuid["TotalUlBytes"]}</li>
+                            <li><b>Last Msg RX:</b> {uuid["LastUlMsgTime"]}</li>
                           </ul> 
                         </td>
                         <td className="center">
-                          <li><b>Total Msg:</b> {uuid["DTotalMsgs"]}</li>
-                          <li><b>Total Bytes:</b> {uuid["DTotalBytes"]}</li>
-                          <li><b>Last Msg RX:</b> {uuid["DlastMsgReceived"]}</li>
+                          <li><b>Total Msg:</b> {uuid["TotalDlMsgs"]}</li>
+                          <li><b>Total Bytes:</b> {uuid["TotalDlBytes"]}</li>
+                          <li><b>Last Msg RX:</b> {uuid["LastDlMsgTime"]}</li>
                         </td>
-                        <td className="center">{uuid["RSRP"]}</td>
+                        <td className="center">{uuid["Rsrp"]}</td>
                         <td className="center" style={{width: 105}}>
                           <i className="fa fa-floppy-o" /> {uuid["DiskSpaceLeft"]}<br />
                           <i className="fa fa-battery-full" /> {uuid["BatteryLevel"]}
@@ -56,6 +58,7 @@ var DisplayRow = React.createClass({
          
    
        });
+}
                 return (
                         <div className="row" >
                           <div className="panel panel-default" >
@@ -85,7 +88,6 @@ var DisplayRow = React.createClass({
                           </div>
                         </div>
                 );
-
 
 
     }

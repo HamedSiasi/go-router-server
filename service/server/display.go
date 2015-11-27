@@ -32,7 +32,7 @@ type FrontPageSummaryData struct {
 type FrontPageDeviceData struct {
     Uuid               string     `json:"Uuid, omitempty"`
     DeviceName         string     `json:"DeviceName, omitempty"`
-    Interesting        bool       `json:"Interesting, omitempty"`
+    Interesting        *time.Time `json:"Interesting, omitempty"`
     Mode               string     `json:"Mode, omitempty"`
     TotalUlMsgs        int        `json:"TotalUlMsgs, omitempty"`
     TotalUlBytes       int        `json:"TotalUlBytes, omitempty"`
@@ -78,7 +78,7 @@ func displayFrontPageData () *FrontPageData {
 	    deviceData.Uuid             = deviceState.DeviceUuid
         deviceData.DeviceName       = deviceState.State.DeviceName
         if deviceState.State.LatestInterest != nil {
-            deviceData.Interesting      = deviceState.State.LatestInterest.IsInteresting
+            deviceData.Interesting      = &deviceState.State.LatestInterest.Timestamp
         }
         if deviceState.State.LatestModeData != nil {
             deviceData.Mode             = deviceState.State.LatestModeData.Mode

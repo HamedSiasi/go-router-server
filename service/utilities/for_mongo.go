@@ -37,8 +37,8 @@ func SetDB(request *http.Request, db *mgo.Database) {
 // works if passed a pointer to a struct.
 func InsertDB (collectionString string, documents ...interface{}) error {    
 	session, err := mgo.Dial("127.0.0.1:27017")
-	defer session.Close()
 	if err == nil {
+    	defer session.Close()
         db := session.DB("utm-db")
 		collection := db.C(collectionString)
         for _, document := range documents {

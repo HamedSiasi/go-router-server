@@ -22,15 +22,11 @@ import (
 func MgoMiddleware(response http.ResponseWriter, request *http.Request, nextFunc http.HandlerFunc) {
     session, err := mgo.Dial("127.0.0.1:27017")
 
-    if err != nil {
-        panic(err)
+    if err == nil {
+        dbs := session.DB("utm-db")
+        utilities.SetDB(request, dbs)
     }
 
-    //reqSession := session.Clone()
-    //defer reqSession.Close()
-    //defer session.Close()
-    dbs := session.DB("utm-db")
-    utilities.SetDB(request, dbs)
     nextFunc(response, request)
 }
 

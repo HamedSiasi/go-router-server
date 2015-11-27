@@ -81,18 +81,22 @@ func loginHandler(response http.ResponseWriter, request *http.Request) {
 	session := sessions.GetSession(request)
 
 	db := utilities.GetDB(request)
-	user := new(models.User)
-	err := user.Authenticate(db, email, password)
-	globals.Dbg.PrintfTrace("Calling login User session \n%s\n", spew.Sdump(user.ID))
-	if err == nil {
-		session.Set("user_id", user.ID.Hex())
-		session.Set("user_company", user.Company)
-		session.Set("user_email", user.Email)
-		http.Redirect(response, request, "/display", 302)
-	} else {
-		http.Redirect(response, request, "/", 302)
-
-	}
+    if db != nil {
+    	user := new(models.User)
+    	err := user.Authenticate(db, email, password)
+    	globals.Dbg.PrintfTrace("Calling login User session \n%s\n", spew.Sdump(user.ID))
+    	if err == nil {
+    		session.Set("user_id", user.ID.Hex())
+    		session.Set("user_company", user.Company)
+    		session.Set("user_email", user.Email)
+    		http.Redirect(response, request, "/display", 302)
+    	} else {
+    		http.Redirect(response, request, "/", 302)
+    
+    	}
+    } else {
+        response.WriteHeader(404)        
+    }        	
 }
 
 func registerHandler(response http.ResponseWriter, request *http.Request) {
@@ -104,11 +108,15 @@ func registerHandler(response http.ResponseWriter, request *http.Request) {
 	password := request.FormValue("password")
 
 	db := utilities.GetDB(request)
-	user := new(models.User)
-
-	user.NewUser(db, company, firstName, lastName, email, password)
-
-	http.Redirect(response, request, "/display", 302)
+    if db != nil {
+    	user := new(models.User)
+    
+    	user.NewUser(db, company, firstName, lastName, email, password)
+    
+    	http.Redirect(response, request, "/display", 302)
+    } else {
+        response.WriteHeader(404)        
+    }        	
 }
 
 /// Get the summary data for the front page

@@ -19,14 +19,18 @@ import (
 )
 
 /// Return the current database from an HTTP request
-func GetDB(r *http.Request) *mgo.Database {
-    db := context.Get(r, "db")
-    return db.(*mgo.Database)
+func GetDB(request *http.Request) *mgo.Database {
+    db := context.Get(request, "db")
+    if db != nil {
+        return db.(*mgo.Database)
+    }
+    
+    return nil
 }
 
 /// Set up the database from an HTTP request
-func SetDB(r *http.Request, db *mgo.Database) {
-    context.Set(r, "db", db)
+func SetDB(request *http.Request, db *mgo.Database) {
+    context.Set(request, "db", db)
 }
 
 // Insert a struct into the database.  Note that this only

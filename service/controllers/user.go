@@ -31,26 +31,34 @@ func (u *User) Get(response http.ResponseWriter, request *http.Request) {
     id := vars["id"]
 
     db := utilities.GetDB(request)
-    user := new(models.User)
-    err := user.Get(db, id)
-    if err != nil {
-        response.WriteHeader(404)
+    if db != nil {
+        user := new(models.User)
+        err := user.Get(db, id)
+        if err != nil {
+            response.WriteHeader(404)
+        } else {
+            user.Password = ""
+            out, _ := json.Marshal(user)
+            response.Write(out)
+        }
     } else {
-        user.Password = ""
-        out, _ := json.Marshal(user)
-        response.Write(out)
-    }
+        response.WriteHeader(404)        
+    }    
 }
 
 // TODO
 func (u *User) Profile(response http.ResponseWriter, request *http.Request) {
     user_id, _ := utilities.GetUserId(request)
     db := utilities.GetDB(request)
-    user := new(models.User)
-    user.Get(db, user_id)
-    user.Password = ""
-    out, _ := json.Marshal(user)
-    response.Write(out)
+    if db != nil {
+        user := new(models.User)
+        user.Get(db, user_id)
+        user.Password = ""
+        out, _ := json.Marshal(user)
+        response.Write(out)
+    } else {
+        response.WriteHeader(404)        
+    }    
 }
 
 /* End Of File */

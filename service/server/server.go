@@ -41,7 +41,7 @@ type ExpectedMsg struct {
 
 // Conection details for a device
 type Connection struct {
-	DeviceUuid string
+	DeviceUuid string  `bson:"DeviceUuid" json:"DeviceUuid"`
 	DeviceName string
 	Timestamp  time.Time
 	UlMsgs     int

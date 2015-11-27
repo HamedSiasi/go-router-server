@@ -16,6 +16,7 @@ import (
     "time"
     "github.com/davecgh/go-spew/spew"
 	"github.com/robmeades/utm/service/globals"
+	"github.com/robmeades/utm/service/utilities"
 )
 
 //--------------------------------------------------------------------
@@ -25,25 +26,26 @@ import (
 // NOTE: if you ever add anything here, don't forget to add it to the InitIndUlMsg handling
 // and to the copying under DeviceLatestState and AllDevicesLatestState
 type LatestState struct {
-    Connected                            bool                           `json:"Connected,omitempty"`
-    DeviceName                           string                         `json:"DeviceName,omitempty"`
-    LastHeardFrom                        time.Time                      `json:"LastHeardFrom,omitempty"`
-    LatestInterest                       *Interesting                   `json:"Interesting,omitempty"`
-    LatestTrafficVolumeData              *TrafficVolumeData             `json:"LatestTrafficVolumeData,omitempty"`
-    LatestInitIndData                    *InitIndData                   `json:"LatestInitIndData,omitempty"`
-    LatestIntervalsData                  *IntervalsData                 `json:"LatestIntervalsData,omitempty"`
-    LatestModeData                       *ModeData                      `json:"LatestModeData,omitempty"`
-    LatestDateTimeData                   *DateTimeData                  `json:"LatestDateTimeData,omitempty"`
-    LatestUtmStatusData                  *UtmStatusData                 `json:"LatestUtmStatusData,omitempty"`
-    LatestGnssData                       *GnssData                      `json:"LatestGnssData,omitempty"`
-    LatestCellIdData                     *CellIdData                    `json:"LatestCellIdData,omitempty"`
-    LatestSignalStrengthData             *SignalStrengthData            `json:"LatestSignalStrengthData,omitempty"`
-    LatestTemperatureData                *TemperatureData               `json:"LatestTemperatureData,omitempty"`
-    LatestPowerStateData                 *PowerStateData                `json:"LatestPowerStateData,omitempty"`
-    LatestTrafficReportData              *TrafficReportData             `json:"LatestTrafficReportData,omitempty"`
-    LatestTrafficTestModeParametersData  *TrafficTestModeParametersData `json:"LatestTrafficTestModeParametersData,omitempty"`
-    LatestTrafficTestModeReportData      *TrafficTestModeReportData     `json:"LatestTrafficTestModeReportData,omitempty"`
-    LatestActivityReportData             *ActivityReportData            `json:"LatestActivityReportData,omitempty"`
+    DeviceUuid                           string                         `json:"Uuid, omitempty"`
+    DeviceName                           string                         `json:"Name, omitempty"`
+    Connected                            bool                           `json:"Connected, omitempty"`
+    LastHeardFrom                        time.Time                      `json:"LastHeardFrom, omitempty"`
+    LatestInterest                       *Interesting                   `json:"Interesting, omitempty"`
+    LatestTrafficVolumeData              *TrafficVolumeData             `json:"LatestTrafficVolumeData, omitempty"`
+    LatestInitIndData                    *InitIndData                   `json:"LatestInitIndData, omitempty"`
+    LatestIntervalsData                  *IntervalsData                 `json:"LatestIntervalsData, omitempty"`
+    LatestModeData                       *ModeData                      `json:"LatestModeData, omitempty"`
+    LatestDateTimeData                   *DateTimeData                  `json:"LatestDateTimeData, omitempty"`
+    LatestUtmStatusData                  *UtmStatusData                 `json:"LatestUtmStatusData, omitempty"`
+    LatestGnssData                       *GnssData                      `json:"LatestGnssData, omitempty"`
+    LatestCellIdData                     *CellIdData                    `json:"LatestCellIdData, omitempty"`
+    LatestSignalStrengthData             *SignalStrengthData            `json:"LatestSignalStrengthData, omitempty"`
+    LatestTemperatureData                *TemperatureData               `json:"LatestTemperatureData, omitempty"`
+    LatestPowerStateData                 *PowerStateData                `json:"LatestPowerStateData, omitempty"`
+    LatestTrafficReportData              *TrafficReportData             `json:"LatestTrafficReportData, omitempty"`
+    LatestTrafficTestModeParametersData  *TrafficTestModeParametersData `json:"LatestTrafficTestModeParametersData, omitempty"`
+    LatestTrafficTestModeReportData      *TrafficTestModeReportData     `json:"LatestTrafficTestModeReportData, omitempty"`
+    LatestActivityReportData             *ActivityReportData            `json:"LatestActivityReportData, omitempty"`
 }
 
 // Structure to allow the latest state for a particular
@@ -51,12 +53,6 @@ type LatestState struct {
 type DeviceLatestStateChannel struct {
 	DeviceUuid   string
 	State        chan LatestState
-}
-
-// Structure to describe the state of a device
-type DeviceLatestState struct {
-	DeviceUuid   string
-	State        LatestState
 }
 
 //--------------------------------------------------------------------
@@ -159,6 +155,7 @@ func operateDataTable() {
 	            case *Connection:
 	            	state := deviceLatestStateList[value.DeviceUuid]
             		if state != nil {
+            		    state.DeviceUuid = value.DeviceUuid
     	                state.DeviceName = value.DeviceName;
     	                state.Connected = true;
                         state.LastHeardFrom = value.Timestamp
@@ -166,9 +163,15 @@ func operateDataTable() {
     	                    state.LatestTrafficVolumeData = &TrafficVolumeData {}
     	                }	                
     	                state.LatestTrafficVolumeData = updateTrafficVolumeData (state.LatestTrafficVolumeData, value)
+				
     					globals.Dbg.PrintfTrace("%s [datatable] --> connection state for device %s updated.\n", globals.LogTag, value.DeviceUuid)
+                        // Store latest state in MongoDB
+                		err := utilities.InsertDB ("blah", state)
+                		if err != nil {
+        					globals.Dbg.PrintfTrace("%s [datatable] --> unable to inserted into database though (\"%s\").\n", globals.LogTag, err)
+                		}
     	            }
-			                	
+            		
 	            // Handle message containers holding somethings of interest
 	            case *MessageContainer:
 	            
@@ -177,6 +180,7 @@ func operateDataTable() {
             		if state == nil {
             			state = &LatestState{};
             			deviceLatestStateList[value.DeviceUuid] = state;
+            		    state.DeviceUuid = value.DeviceUuid
                         state.LastHeardFrom = time.Now().UTC()
     	                if state.LatestInterest == nil {
     	                    state.LatestInterest = &Interesting {}
@@ -382,6 +386,8 @@ func operateDataTable() {
 		                // post it and close the channel
 		                globals.Dbg.PrintfTrace("%s [datatable] --> fetching latest state for UUID %s.\n", globals.LogTag, value.DeviceUuid)
 		                latest := LatestState{}
+		                latest.DeviceUuid = state.DeviceUuid
+		                latest.DeviceName = state.DeviceName
 		                latest.Connected = state.Connected
 		                latest.LastHeardFrom = state.LastHeardFrom
 		                latest.LatestInterest = state.LatestInterest.DeepCopy()
@@ -408,32 +414,33 @@ func operateDataTable() {
 		                globals.Dbg.PrintfTrace("%s [datatable] --> asked for latest state for unknown UUID %s.\n", globals.LogTag, value.DeviceUuid)
 		            }
 	            // Return the latest state for all UUIDs 
-	            case *chan []DeviceLatestState:
+	            case *chan []LatestState:
 	            
-   	            	var allStates []DeviceLatestState
-	                for uuid, state := range deviceLatestStateList {
+   	            	var allStates []LatestState
+	                for _, state := range deviceLatestStateList {
 		                // Duplicate the memory pointed to into a new LatestState struct,
 		                // post it and close the channel
-		                latest := DeviceLatestState{}
-		                latest.State.Connected = state.Connected
-		                latest.State.LastHeardFrom = state.LastHeardFrom
-		                latest.State.LatestInterest = state.LatestInterest.DeepCopy()
-	                    latest.State.LatestTrafficVolumeData = state.LatestTrafficVolumeData.DeepCopy()
-		                latest.State.LatestInitIndData = state.LatestInitIndData.DeepCopy()
-		                latest.State.LatestIntervalsData = state.LatestIntervalsData.DeepCopy()
-		                latest.State.LatestModeData = state.LatestModeData.DeepCopy()
-		                latest.State.LatestDateTimeData = state.LatestDateTimeData.DeepCopy()
-		                latest.State.LatestUtmStatusData = state.LatestUtmStatusData.DeepCopy()
-		                latest.State.LatestGnssData = state.LatestGnssData.DeepCopy()
-		                latest.State.LatestCellIdData = state.LatestCellIdData.DeepCopy()
-		                latest.State.LatestSignalStrengthData = state.LatestSignalStrengthData.DeepCopy()
-		                latest.State.LatestTemperatureData = state.LatestTemperatureData.DeepCopy()
-		                latest.State.LatestPowerStateData = state.LatestPowerStateData.DeepCopy()
-		                latest.State.LatestTrafficReportData = state.LatestTrafficReportData.DeepCopy()
-		                latest.State.LatestTrafficTestModeParametersData = state.LatestTrafficTestModeParametersData.DeepCopy()
-		                latest.State.LatestTrafficTestModeReportData = state.LatestTrafficTestModeReportData.DeepCopy()
-		                latest.State.LatestActivityReportData = state.LatestActivityReportData.DeepCopy()
-		                latest.DeviceUuid = uuid
+		                latest := LatestState{}
+		                latest.DeviceUuid = state.DeviceUuid
+		                latest.DeviceName = state.DeviceName
+		                latest.Connected = state.Connected
+		                latest.LastHeardFrom = state.LastHeardFrom
+		                latest.LatestInterest = state.LatestInterest.DeepCopy()
+	                    latest.LatestTrafficVolumeData = state.LatestTrafficVolumeData.DeepCopy()
+		                latest.LatestInitIndData = state.LatestInitIndData.DeepCopy()
+		                latest.LatestIntervalsData = state.LatestIntervalsData.DeepCopy()
+		                latest.LatestModeData = state.LatestModeData.DeepCopy()
+		                latest.LatestDateTimeData = state.LatestDateTimeData.DeepCopy()
+		                latest.LatestUtmStatusData = state.LatestUtmStatusData.DeepCopy()
+		                latest.LatestGnssData = state.LatestGnssData.DeepCopy()
+		                latest.LatestCellIdData = state.LatestCellIdData.DeepCopy()
+		                latest.LatestSignalStrengthData = state.LatestSignalStrengthData.DeepCopy()
+		                latest.LatestTemperatureData = state.LatestTemperatureData.DeepCopy()
+		                latest.LatestPowerStateData = state.LatestPowerStateData.DeepCopy()
+		                latest.LatestTrafficReportData = state.LatestTrafficReportData.DeepCopy()
+		                latest.LatestTrafficTestModeParametersData = state.LatestTrafficTestModeParametersData.DeepCopy()
+		                latest.LatestTrafficTestModeReportData = state.LatestTrafficTestModeReportData.DeepCopy()
+		                latest.LatestActivityReportData = state.LatestActivityReportData.DeepCopy()
 		                allStates = append(allStates, latest)
     		        }    
 	                *value <- allStates

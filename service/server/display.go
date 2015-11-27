@@ -70,37 +70,37 @@ func displayFrontPageData () *FrontPageData {
 	// This is very "go" syntax.  It means, create a channel called "get".  Pass the address
 	// of the channel into the dataTableChannel (where it is populated).  Then, pass the
 	// channel into the variable state.  All of these things are of type []LatestState.
-	get := make(chan []DeviceLatestState)
+	get := make(chan []LatestState)
 	dataTableChannel <- &get
 	allDevicesState := <- get
 	
 	for _, deviceState := range allDevicesState {
 	    deviceData.Uuid             = deviceState.DeviceUuid
-        deviceData.DeviceName       = deviceState.State.DeviceName
-        if deviceState.State.LatestInterest != nil {
-            deviceData.Interesting      = &deviceState.State.LatestInterest.Timestamp
+        deviceData.DeviceName       = deviceState.DeviceName
+        if deviceState.LatestInterest != nil {
+            deviceData.Interesting      = &deviceState.LatestInterest.Timestamp
         }
-        if deviceState.State.LatestModeData != nil {
-            deviceData.Mode             = deviceState.State.LatestModeData.Mode
+        if deviceState.LatestModeData != nil {
+            deviceData.Mode             = deviceState.LatestModeData.Mode
         }    
-        if deviceState.State.LatestTrafficVolumeData != nil {
-            deviceData.TotalUlMsgs      = deviceState.State.LatestTrafficVolumeData.TotalUlMsgs
-            deviceData.TotalUlBytes     = deviceState.State.LatestTrafficVolumeData.TotalUlBytes
-            deviceData.LastUlMsgTime    = &deviceState.State.LatestTrafficVolumeData.LastUlMsgTime
-            deviceData.TotalDlMsgs      = deviceState.State.LatestTrafficVolumeData.TotalDlMsgs
-            deviceData.TotalDlBytes     = deviceState.State.LatestTrafficVolumeData.TotalDlBytes
-            deviceData.LastDlMsgTime    = &deviceState.State.LatestTrafficVolumeData.LastDlMsgTime            
+        if deviceState.LatestTrafficVolumeData != nil {
+            deviceData.TotalUlMsgs      = deviceState.LatestTrafficVolumeData.TotalUlMsgs
+            deviceData.TotalUlBytes     = deviceState.LatestTrafficVolumeData.TotalUlBytes
+            deviceData.LastUlMsgTime    = &deviceState.LatestTrafficVolumeData.LastUlMsgTime
+            deviceData.TotalDlMsgs      = deviceState.LatestTrafficVolumeData.TotalDlMsgs
+            deviceData.TotalDlBytes     = deviceState.LatestTrafficVolumeData.TotalDlBytes
+            deviceData.LastDlMsgTime    = &deviceState.LatestTrafficVolumeData.LastDlMsgTime            
         }
-        if deviceState.State.LatestSignalStrengthData != nil {
-            deviceData.Rsrp             = deviceState.State.LatestSignalStrengthData.RsrpDbm            
+        if deviceState.LatestSignalStrengthData != nil {
+            deviceData.Rsrp             = deviceState.LatestSignalStrengthData.RsrpDbm            
         }
-        if deviceState.State.LatestUtmStatusData != nil {
-            deviceData.BatteryLevel     = deviceState.State.LatestUtmStatusData.EnergyLeft
-            deviceData.DiskSpaceLeft    = deviceState.State.LatestUtmStatusData.DiskSpaceLeft
+        if deviceState.LatestUtmStatusData != nil {
+            deviceData.BatteryLevel     = deviceState.LatestUtmStatusData.EnergyLeft
+            deviceData.DiskSpaceLeft    = deviceState.LatestUtmStatusData.DiskSpaceLeft
         }
-        if deviceState.State.LatestIntervalsData != nil {
-            deviceData.Reporting        = getReportingString (deviceState.State.LatestIntervalsData)
-            deviceData.Heartbeat        = getHeartbeatString (deviceState.State.LatestIntervalsData)
+        if deviceState.LatestIntervalsData != nil {
+            deviceData.Reporting        = getReportingString (deviceState.LatestIntervalsData)
+            deviceData.Heartbeat        = getHeartbeatString (deviceState.LatestIntervalsData)
         }
         data.DeviceData = append (data.DeviceData, deviceData)
 	}

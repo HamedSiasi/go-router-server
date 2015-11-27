@@ -29,4 +29,22 @@ func SetDB(r *http.Request, db *mgo.Database) {
     context.Set(r, "db", db)
 }
 
+// Insert a struct into the database.  Note that this only
+// works if passed a pointer to a struct.
+func InsertDB (collectionString string, documents ...interface{}) error {    
+	session, err := mgo.Dial("127.0.0.1:27017")
+	defer session.Close()
+	if err == nil {
+        db := session.DB("utm-db")
+		collection := db.C(collectionString)
+        for _, document := range documents {
+    		err = collection.Insert(document)
+    		if err != nil {
+    		    break
+    		}
+        }
+	}    
+	return err
+}
+
 /* End Of File */

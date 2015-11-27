@@ -18,21 +18,20 @@ import (
     "net/http"
 )
 
-var logTag string = "UTM"
-
-/// TODO
-func MgoMiddleware(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+// A handler function pulled in by Negroni to establish a database session
+func MgoMiddleware(response http.ResponseWriter, request *http.Request, nextFunc http.HandlerFunc) {
     session, err := mgo.Dial("127.0.0.1:27017")
 
     if err != nil {
         panic(err)
     }
 
-    reqSession := session.Clone()
-    defer reqSession.Close()
-    dbs := reqSession.DB("utm-db")
-    utilities.SetDB(r, dbs)
-    next(rw, r)
+    //reqSession := session.Clone()
+    //defer reqSession.Close()
+    //defer session.Close()
+    dbs := session.DB("utm-db")
+    utilities.SetDB(request, dbs)
+    nextFunc(response, request)
 }
 
 /* End Of File */

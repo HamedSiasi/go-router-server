@@ -166,7 +166,7 @@ func (value *IntervalsData) DeepCopy() *IntervalsData {
     }
     return result
 }
-func makeIntervalsData0(newData *IntervalsGetCnfUlMsg, Time time.Time) *IntervalsData {
+func makeIntervalsData(newData *IntervalsGetCnfUlMsg, Time time.Time) *IntervalsData {
     data := IntervalsData {
         Timestamp:                Time,
         ReportingIntervalPresent: true,
@@ -177,20 +177,29 @@ func makeIntervalsData0(newData *IntervalsGetCnfUlMsg, Time time.Time) *Interval
     }
     return &data
 }
-func makeIntervalsData1(newData *ReportingIntervalSetCnfUlMsg, Time time.Time) *IntervalsData {
+func updateIntervalsData0(oldData *IntervalsData, newData *ReportingIntervalSetCnfUlMsg, Time time.Time) *IntervalsData {
     data := IntervalsData {
         Timestamp:                Time,
         ReportingIntervalPresent: true,
         ReportingInterval:        newData.ReportingInterval,
     }
+    if oldData != nil {
+        data.HeartbeatPresent = oldData.HeartbeatPresent
+        data.HeartbeatSeconds = oldData.HeartbeatSeconds
+        data.HeartbeatSnapToRtc = oldData.HeartbeatSnapToRtc
+    }
     return &data
 }
-func makeIntervalsData2(newData *HeartbeatSetCnfUlMsg, Time time.Time) *IntervalsData {
+func updateIntervalsData1(oldData *IntervalsData, newData *HeartbeatSetCnfUlMsg, Time time.Time) *IntervalsData {
     data := IntervalsData {
         Timestamp:            Time,
         HeartbeatPresent:     true,
         HeartbeatSeconds:     newData.HeartbeatSeconds,
         HeartbeatSnapToRtc:   newData.HeartbeatSnapToRtc,
+    }
+    if oldData != nil {
+        data.ReportingIntervalPresent = oldData.ReportingIntervalPresent
+        data.ReportingInterval = oldData.ReportingInterval
     }
     return &data
 }

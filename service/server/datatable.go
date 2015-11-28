@@ -226,21 +226,21 @@ func operateDataTable() {
 	                        state.LatestInterest.Set()
 			                data := utmMsg.DeepCopy()
 			                if data != nil {
-			                    state.LatestIntervalsData = makeIntervalsData0(data, value.Timestamp)
+			                    state.LatestIntervalsData = makeIntervalsData(data, value.Timestamp)
 			                }
 			
 			            case *ReportingIntervalSetCnfUlMsg:
 	                        state.LatestInterest.Set()
 			                data := utmMsg.DeepCopy()
 			                if data != nil {
-			                    state.LatestIntervalsData = makeIntervalsData1(data, value.Timestamp)
+			                    state.LatestIntervalsData = updateIntervalsData0(state.LatestIntervalsData, data, value.Timestamp)
 			                }
 			
 			            case *HeartbeatSetCnfUlMsg:
 	                        state.LatestInterest.Set()
 			                data := utmMsg.DeepCopy()
 			                if data != nil {
-			                    state.LatestIntervalsData = makeIntervalsData2(data, value.Timestamp)
+			                    state.LatestIntervalsData = updateIntervalsData1(state.LatestIntervalsData, data, value.Timestamp)
 			                }
 			
 			            case *DateTimeIndUlMsg:

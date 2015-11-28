@@ -75,15 +75,15 @@ func (value *TrafficVolumeData) DeepCopy() *TrafficVolumeData {
     return result
 }
 func updateTrafficVolumeData(trafficData *TrafficVolumeData, connection *Connection) *TrafficVolumeData {
-    trafficData.UlMsgs   = connection.UlMsgs
-    trafficData.UlBytes  = connection.UlBytes
-    if connection.UlMsgs > 0 {
-        trafficData.LastUlMsgTime = connection.Timestamp
+    trafficData.UlMsgs   = connection.UlDevice.Msgs
+    trafficData.UlBytes  = connection.UlDevice.Bytes
+    if connection.UlDevice.Msgs > 0 {
+        trafficData.LastUlMsgTime = connection.UlDevice.Timestamp
     }
-    trafficData.DlMsgs   = connection.DlMsgs
-    trafficData.DlBytes  = connection.DlBytes
-    if connection.DlMsgs > 0 {
-        trafficData.LastDlMsgTime = connection.Timestamp
+    trafficData.DlMsgs   = connection.DlDevice.Msgs
+    trafficData.DlBytes  = connection.DlDevice.Bytes
+    if connection.DlDevice.Msgs > 0 {
+        trafficData.LastDlMsgTime = connection.DlDevice.Timestamp
     }
     if connection.UlTotals != nil {
         if trafficData.UlTotals == nil {

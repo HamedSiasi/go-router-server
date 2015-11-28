@@ -59,15 +59,12 @@ type TotalsState struct {
 
 // Conection details for a device
 type Connection struct {
-	DeviceUuid string  `bson:"DeviceUuid" json:"DeviceUuid"`
-	DeviceName string
-	Timestamp  time.Time
-	UlMsgs     int
-	UlBytes    int
-	DlMsgs     int
-	DlBytes    int
-    UlTotals   *TotalsState 
-    DlTotals   *TotalsState	
+	DeviceUuid  string  `bson:"DeviceUuid" json:"DeviceUuid"`
+	DeviceName  string
+	UlDevice    TotalsState
+	DlDevice    TotalsState
+    UlTotals    *TotalsState 
+    DlTotals    *TotalsState	
 }
 
 //--------------------------------------------------------------------
@@ -159,23 +156,28 @@ func processDatagrams(q *Queue) {
         					// Send the datatable a message with connection
         					// data for this device plus the totals
         					ulTotals := TotalsState {
-        					    Timestamp:    time.Now().UTC(),
+        					    Timestamp:    totalsDecodeState.Timestamp,
                                 Msgs:         totalsDecodeState.Msgs,
                                 Bytes:        totalsDecodeState.Bytes,
         					}
         					dlTotals := TotalsState {
-        					    Timestamp:    time.Now().UTC(),
+        					    Timestamp:    encodeState.Timestamp,
                                 Msgs:         encodeState.Totals.Msgs,
                                 Bytes:        encodeState.Totals.Bytes,
         					}
-        					dataTableChannel <- &Connection{
-        						DeviceUuid: value.DeviceUuid,
-        						DeviceName: value.DeviceName,
-        						Timestamp:  time.Now().UTC(),
-        						UlMsgs:     decodeState.Msgs,
-        						UlBytes:    decodeState.Bytes,
-        						DlMsgs:     encodeState.Msgs,
-        						DlBytes:    encodeState.Bytes,
+        					dataTableChannel <- &Connection {
+        						DeviceUuid:         value.DeviceUuid,
+        						DeviceName:         value.DeviceName,
+        						UlDevice: TotalsState {
+            						Timestamp: totalsDecodeState.Timestamp,
+            						Msgs:      totalsDecodeState.Msgs,
+            						Bytes:     totalsDecodeState.Bytes,
+        						},
+        						DlDevice: TotalsState {
+            						Timestamp: encodeState.Timestamp,
+            						Msgs:      encodeState.Msgs,
+            						Bytes:     encodeState.Bytes,
+        						},
                                 UlTotals:   &ulTotals, 
                                 DlTotals:   &dlTotals,	
         					}

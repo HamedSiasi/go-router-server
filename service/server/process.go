@@ -255,6 +255,7 @@ func operateProcess() {
                         encodeState.Timestamp = time.Now().UTC()
 	                    encodeState.Msgs += msgCount
 	                    encodeState.Bytes += byteCount
+	                    totalsEncodeState.Timestamp = encodeState.Timestamp
 	                    totalsEncodeState.Msgs += msgCount
 	                    totalsEncodeState.Bytes += byteCount
 	                }    
@@ -287,6 +288,7 @@ func operateProcess() {
    	            	    encodeState.Msgs += value.State.Msgs
    	            	    encodeState.Bytes += value.State.Bytes
    	            	    if encodeState.Totals != nil {
+    	                    encodeState.Totals.Timestamp = value.State.Timestamp
        	            	    encodeState.Totals.Msgs += value.State.Msgs
        	            	    encodeState.Totals.Bytes += value.State.Bytes
        	            	}    

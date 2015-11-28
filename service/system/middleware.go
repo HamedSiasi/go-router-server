@@ -13,21 +13,46 @@
 package system
 
 import (
-    "github.com/mmanjoura/utm-admin-v0.8/service/utilities"
+    "github.com/robmeades/utm/service/utilities"
     "gopkg.in/mgo.v2"
     "net/http"
 )
 
-// A handler function pulled in by Negroni to establish a database session
-func MgoMiddleware(response http.ResponseWriter, request *http.Request, nextFunc http.HandlerFunc) {
-    session, err := mgo.Dial("127.0.0.1:27017")
+var initialSession *mgo.Session = nil
 
-    if err == nil {
-        dbs := session.DB("utm-db")
-        utilities.SetDB(request, dbs)
+// A handler function pulled in by Negroni to establish a database session
+func MgoOpenDbSession(response http.ResponseWriter, request *http.Request, nextFunc http.HandlerFunc) {
+
+    var err error = nil
+    
+    if initialSession == nil {
+        initialSession, err = mgo.Dial("127.0.0.1:27017")
     }
 
+    if err == nil {
+        session := initialSession.Clone()
+        db := session.DB("utm-db")
+        utilities.SetDB(request, db)
+    }
+    
     nextFunc(response, request)
+}
+
+// A handler function pulled in by Negroni to release a database session
+func MgoCloseDbSession(response http.ResponseWriter, request *http.Request, nextFunc http.HandlerFunc) {
+    db := utilities.GetDB(request)
+    if db != nil {
+        db.Session.Close()
+    }    
+
+    nextFunc(response, request)
+}
+
+// A clean-up function that should be called at end of time to close the initial session
+func MgoCleanup() {
+    if initialSession != nil {
+        initialSession.Close()
+    }    
 }
 
 /* End Of File */

@@ -16,6 +16,7 @@ import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"time"
+	"bytes"
 )
 
 type UtmXml struct {
@@ -25,25 +26,23 @@ type UtmXml struct {
 	XmlData string        `bson:"xmldata" json:"xmldata"`
 }
 
-// TODO Rob to understand this later
-func (u *UtmXml) Insert(db *mgo.Database, xmlData string, uuid string) {
+// Store a byte array of XML to the database
+func XmlDataStore(data []byte, uuid string) error {
 
-	var utmXml = UtmXml{}
+	utmXml := UtmXml{}
+	utmXml.Id = bson.NewObjectId()
+	utmXml.Date = time.Now()
+	utmXml.Uuid = uuid
+	utmXml.XmlData = string(data[:bytes.IndexByte(data, 0)])
+	
+	session, err := mgo.Dial("127.0.0.1:27017")
+	if err == nil {
+    	defer session.Close()
+		collection := session.DB("utm-db").C("xmlData")
+		err = collection.Insert(&utmXml)
+	}
 
-	xml := db.C("UtmsXml")
-	u.Id = bson.NewObjectId()
-	u.Date = time.Now()
-	u.Uuid = uuid
-	u.XmlData = xmlData
-	xml.Insert(&utmXml)
-
-}
-
-// TODO Rob to understand this later
-func (u *UtmXml) Get(db *mgo.Database, uuid string) error {
-
-	return db.C("UtmsXml").FindId(bson.ObjectIdHex(uuid)).One(&u)
-
+    return err
 }
 
 /* End Of File */

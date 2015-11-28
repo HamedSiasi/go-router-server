@@ -223,9 +223,11 @@ func Run() {
 	static := negroni.NewStatic(http.Dir("static"))
 	static.Prefix = "/static"
 	n.Use(static)
-	n.Use(negroni.HandlerFunc(system.MgoMiddleware))
+	n.Use(negroni.HandlerFunc(system.MgoOpenDbSession))
 	n.Use(sessions.Sessions("global_session_store", store))
 	n.UseHandler(router)
+	n.Use(negroni.HandlerFunc(system.MgoCloseDbSession))
+	defer system.MgoCleanup()
 	n.Run(port)
 }
 

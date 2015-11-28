@@ -162,10 +162,8 @@ import "C"  // There must be no line breaks between this and the commented-out s
 import (
 	"encoding/hex"
 	"github.com/davecgh/go-spew/spew"
-	"github.com/robmeades/utm/service/utilities"
 	"github.com/robmeades/utm/service/globals"
-	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
+	"github.com/robmeades/utm/service/utilities"
 	"time"
 	"unsafe"
 )
@@ -271,9 +269,6 @@ const MaxDatagramSizeRaw uint32 = C.MAX_DATAGRAM_SIZE_RAW
 
 const RevisionLevel uint32 = C.REVISION_LEVEL
 
-var inputBuffer C.union_UlMsgUnionTag_t
-var xmlDecodeBuffer [8192]C.char
-
 var totalUlMsgs int
 var totalUlBytes int
 var lastUlMsgTime time.Time
@@ -328,7 +323,9 @@ func decode(data []byte, uuid string) []interface{} {
 	var bytesRemaining C.uint32_t = 1
 	var returnedMsgs []interface{} = nil
 	var used C.uint32_t
-	
+    var inputBuffer C.union_UlMsgUnionTag_t
+    var xmlDecodeBuffer = make([]byte, 8192, 8192)
+
 	// Holder for the extracted message
 	pBuffer := (*C.UlMsgUnion_t)(unsafe.Pointer(&inputBuffer))
 	
@@ -364,8 +361,8 @@ func decode(data []byte, uuid string) []interface{} {
 			globals.Dbg.PrintfInfo("%s [decode] --> XML buffer pointer 0x%08x, used %d, left %d:.\n", globals.LogTag, *ppXmlBuffer, C.uint32_t(len(xmlDecodeBuffer)) - xmlBufferLen, xmlBufferLen)
 	
     		//Store XmlData in MongoDB
-    		//XmlDataStore(xmlDecodeBuffer, uuid)
-    		//Dbg.PrintfInfo("%s [decode] -->  the XML data is:\n\n%s\n\n", logTag, spew.Sdump(xmlDecodeBuffer))
+    		utilities.XmlDataStore(xmlDecodeBuffer, uuid)
+    		globals.Dbg.PrintfInfo("%s [decode] -->  the XML data is:\n\n%s\n\n", globals.LogTag, spew.Sdump(xmlDecodeBuffer))
     		
 			// Now decode the messages and pass them to the state table
 			switch int(result) {
@@ -748,32 +745,6 @@ func decode(data []byte, uuid string) []interface{} {
     lastUlMsgTime = time.Now()
     
 	return returnedMsgs
-}
-
-// TODO: Rob to understand this later
-func XmlDataStore(xmlData [8192]C.char, uuid string) {
-
-	//TODO: an attempt to store only xml
-	//and ignore the rest of the array
-	for i := 0; i < len(xmlData); i++ {
-		if xmlData[i] == 0 {
-			break
-		}
-	}
-
-	utmXml := utilities.UtmXml{}
-	utmXml.Id = bson.NewObjectId()
-	utmXml.Date = time.Now()
-	utmXml.Uuid = uuid
-	//utmXml.XmlData = xmlData
-
-	xml_Session, err := mgo.Dial("127.0.0.1:27017")
-	defer xml_Session.Close()
-	if err == nil {
-		xml_collection := xml_Session.DB("utm-db").C("xmLData")
-		xml_collection.Insert(&utmXml)
-	}
-
 }
 
 /* End Of File */

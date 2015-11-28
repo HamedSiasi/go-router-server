@@ -39,6 +39,24 @@ type ExpectedMsg struct {
 	ResponseId  ResponseTypeEnum
 }
 
+// A struct representing the state of a device
+// in a single direction (UL or DL)
+type DeviceTotalsState struct {
+    Timestamp    time.Time
+	DeviceUuid   string
+    Msgs         int
+    Bytes        int 
+    Totals       *TotalsState 
+}
+
+// A struct representing the state of all devices
+// in a single direction (UL or DL)
+type TotalsState struct {
+    Timestamp    time.Time
+    Msgs         int
+    Bytes        int    
+}
+
 // Conection details for a device
 type Connection struct {
 	DeviceUuid string  `bson:"DeviceUuid" json:"DeviceUuid"`
@@ -48,6 +66,8 @@ type Connection struct {
 	UlBytes    int
 	DlMsgs     int
 	DlBytes    int
+    UlTotals   *TotalsState 
+    DlTotals   *TotalsState	
 }
 
 //--------------------------------------------------------------------
@@ -69,67 +89,108 @@ var amqpMessageCount int
 // Count of the number of times we've (re)starte AMQP
 var amqpRetryCount int
 
+// Keep track of the decode totals for all devices here
+var totalsDecodeState TotalsState
+
 //--------------------------------------------------------------------
 // Functions
 //--------------------------------------------------------------------
 
 // Process datagrams from the AMQP queue
 func processDatagrams(q *Queue) {
+	deviceDecodeStateList := make(map[string]*DeviceTotalsState)    	
 
 	for {
 		amqpMessageCount++
 		select {
-		case msg, ok := <-q.Msgs:
-			if !ok {
-				return
-			}
-			globals.Dbg.PrintfTrace("%s [server] --> decoded msg:\n\n%+v\n\n", globals.LogTag, msg)
-
-			switch value := msg.(type) {
-			case *AmqpResponseMessage:
-				globals.Dbg.PrintfTrace("%s [server] --> is response.\n", globals.LogTag)
-				if value.Command == "UART_data" {
-					savedUlMsgs := totalUlMsgs
-					savedUlBytes := totalUlBytes
-					savedDlMsgs := totalDlMsgs
-					savedDlBytes := totalDlBytes
-					// UART data from the UTM-API which needs to be decoded
-					// Decode the messages
-					dlMsgs := decode(value.Data, value.DeviceUuid)
-
-					// Pass the messages to the data table for recording
-					// and pass them to processing to see if any responses
-					// are required
-					if dlMsgs != nil {
-						for _, dlMsg := range dlMsgs {
-							dataTableChannel <- dlMsg
-							processMsgs <- dlMsg
-						}
-					}
-
-					// Send the datatable a message with connection
-					// data for this device
-					dataTableChannel <- &Connection{
-						DeviceUuid: value.DeviceUuid,
-						DeviceName: value.DeviceName,
-						Timestamp:  time.Now(),
-						UlMsgs:     totalUlMsgs - savedUlMsgs,
-						UlBytes:    totalUlBytes - savedUlBytes,
-						DlMsgs:     totalDlMsgs - savedDlMsgs,
-						DlBytes:    totalDlBytes - savedDlBytes,
-					}
-				}
-
-			case *error:
-				// If an error has occurred, drop out of the loop
-				globals.Dbg.PrintfTrace("%s [server] --> AMQP error received (%s), dropping out...\n", globals.LogTag, (*value).Error())
-				return
-
-			default:
-				globals.Dbg.PrintfTrace("%s [server] --> message type: %+v.\n", globals.LogTag, msg)
-				log.Fatal(globals.LogTag, "invalid message type.")
-			}
-		}
+    		case msg, ok := <-q.Msgs:
+    			if !ok {
+    				return
+    			}
+    			globals.Dbg.PrintfTrace("%s [server] --> decoded msg:\n\n%+v\n\n", globals.LogTag, msg)
+    
+    			switch value := msg.(type) {
+        			case *AmqpResponseMessage:
+        				globals.Dbg.PrintfTrace("%s [server] --> is response.\n", globals.LogTag)
+        				if value.Command == "UART_data" {
+        					// UART data from the UTM-API which needs to be decoded
+        				    
+                       		// If the device is not known, add it
+        	            	decodeState := deviceDecodeStateList[value.DeviceUuid]
+                    		if decodeState == nil {
+                    		    decodeState = &DeviceTotalsState {
+                    		        Timestamp:  time.Now().UTC(),
+                    		        DeviceUuid: value.DeviceUuid,
+                    		        Msgs:       0,
+                    		        Bytes:      0,
+                    		        Totals:     &totalsDecodeState,
+                    		    }
+                    			deviceDecodeStateList[value.DeviceUuid] = decodeState;
+                    		}
+                    		
+        					// Decode the messages
+        					dlMsgs, byteCount := decode(value.Data, value.DeviceUuid)
+        
+        					// Pass the messages to the data table for recording
+        					// and pass them to processing to see if any responses
+        					// are required, totalising as we go
+        					if dlMsgs != nil {
+        					    decodeState.Timestamp = time.Now().UTC()
+        					    decodeState.Bytes += byteCount
+        					    totalsDecodeState.Timestamp = time.Now().UTC()
+        					    totalsDecodeState.Bytes += byteCount
+        						for _, dlMsg := range dlMsgs {
+        						    decodeState.Msgs++
+        						    totalsDecodeState.Msgs++
+        							dataTableChannel <- dlMsg
+        							processMsgsChannel <- dlMsg
+        						}
+        					}
+        
+        					// Ask the process loop for the encode status now
+        					get := &DeviceEncodeStateGet{
+        					    DeviceUuid: value.DeviceUuid,
+        					    }
+        					get.State = make(chan DeviceTotalsState)
+                        	processMsgsChannel <- get
+                        	encodeState := <- get.State
+                            globals.Dbg.PrintfTrace("%s [server] --> encodeState:\n\n%+v\n\n", globals.LogTag, encodeState)
+        
+        					// Send the datatable a message with connection
+        					// data for this device plus the totals
+        					ulTotals := TotalsState {
+        					    Timestamp:    time.Now().UTC(),
+                                Msgs:         totalsDecodeState.Msgs,
+                                Bytes:        totalsDecodeState.Bytes,
+        					}
+        					dlTotals := TotalsState {
+        					    Timestamp:    time.Now().UTC(),
+                                Msgs:         encodeState.Totals.Msgs,
+                                Bytes:        encodeState.Totals.Bytes,
+        					}
+        					dataTableChannel <- &Connection{
+        						DeviceUuid: value.DeviceUuid,
+        						DeviceName: value.DeviceName,
+        						Timestamp:  time.Now().UTC(),
+        						UlMsgs:     decodeState.Msgs,
+        						UlBytes:    decodeState.Bytes,
+        						DlMsgs:     encodeState.Msgs,
+        						DlBytes:    encodeState.Bytes,
+                                UlTotals:   &ulTotals, 
+                                DlTotals:   &dlTotals,	
+        					}
+        				}
+        
+        			case *error:
+        				// If an error has occurred, drop out of the loop
+        				globals.Dbg.PrintfTrace("%s [server] --> AMQP error received (%s), dropping out...\n", globals.LogTag, (*value).Error())
+        				return
+        
+        			default:
+        				globals.Dbg.PrintfTrace("%s [server] --> message type: %+v.\n", globals.LogTag, msg)
+        				log.Fatal(globals.LogTag, "invalid message type.")
+    			}
+    	}
 	}
 }
 

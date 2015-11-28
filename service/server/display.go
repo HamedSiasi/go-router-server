@@ -56,16 +56,6 @@ func displayFrontPageData () *FrontPageData {
     var data FrontPageData
     var deviceData FrontPageDeviceData
     
-    data.SummaryData.TotalUlMsgs = totalUlMsgs
-    data.SummaryData.TotalUlBytes = totalUlBytes
-    if totalUlBytes > 0 { 
-        data.SummaryData.LastUlMsgTime = &lastUlMsgTime
-    }    
-    data.SummaryData.TotalDlMsgs = totalDlMsgs
-    data.SummaryData.TotalDlBytes = totalDlBytes
-    if totalDlBytes > 0 { 
-        data.SummaryData.LastDlMsgTime = &lastDlMsgTime
-    }    
 	// Get the latest state for all devices
 	// This is very "go" syntax.  It means, create a channel called "get".  Pass the address
 	// of the channel into the dataTableChannel (where it is populated).  Then, pass the
@@ -75,6 +65,7 @@ func displayFrontPageData () *FrontPageData {
 	allDevicesState := <- get
 	
 	for _, deviceState := range allDevicesState {
+	    
 	    deviceData.Uuid             = deviceState.DeviceUuid
         deviceData.DeviceName       = deviceState.DeviceName
         if deviceState.LatestInterest != nil {
@@ -84,12 +75,26 @@ func displayFrontPageData () *FrontPageData {
             deviceData.Mode             = deviceState.LatestModeData.Mode
         }    
         if deviceState.LatestTrafficVolumeData != nil {
-            deviceData.TotalUlMsgs      = deviceState.LatestTrafficVolumeData.TotalUlMsgs
-            deviceData.TotalUlBytes     = deviceState.LatestTrafficVolumeData.TotalUlBytes
+            deviceData.TotalUlMsgs      = deviceState.LatestTrafficVolumeData.UlMsgs
+            deviceData.TotalUlBytes     = deviceState.LatestTrafficVolumeData.UlBytes
             deviceData.LastUlMsgTime    = &deviceState.LatestTrafficVolumeData.LastUlMsgTime
-            deviceData.TotalDlMsgs      = deviceState.LatestTrafficVolumeData.TotalDlMsgs
-            deviceData.TotalDlBytes     = deviceState.LatestTrafficVolumeData.TotalDlBytes
+            deviceData.TotalDlMsgs      = deviceState.LatestTrafficVolumeData.DlMsgs
+            deviceData.TotalDlBytes     = deviceState.LatestTrafficVolumeData.DlBytes
             deviceData.LastDlMsgTime    = &deviceState.LatestTrafficVolumeData.LastDlMsgTime            
+            if deviceState.LatestTrafficVolumeData.UlTotals != nil {
+                data.SummaryData.TotalUlMsgs = deviceState.LatestTrafficVolumeData.UlTotals.Msgs
+                data.SummaryData.TotalUlBytes = deviceState.LatestTrafficVolumeData.UlTotals.Bytes
+                if data.SummaryData.TotalUlMsgs > 0 { 
+                    data.SummaryData.LastUlMsgTime = &deviceState.LatestTrafficVolumeData.UlTotals.Timestamp
+                }    
+            }
+            if deviceState.LatestTrafficVolumeData.DlTotals != nil {
+                data.SummaryData.TotalDlMsgs = deviceState.LatestTrafficVolumeData.DlTotals.Msgs
+                data.SummaryData.TotalDlBytes = deviceState.LatestTrafficVolumeData.DlTotals.Bytes
+                if data.SummaryData.TotalDlMsgs > 0 { 
+                    data.SummaryData.LastDlMsgTime = &deviceState.LatestTrafficVolumeData.DlTotals.Timestamp
+                }    
+            }    
         }
         if deviceState.LatestSignalStrengthData != nil {
             deviceData.Rsrp             = deviceState.LatestSignalStrengthData.RsrpDbm            

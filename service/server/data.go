@@ -37,37 +37,69 @@ func (value *Interesting) DeepCopy() *Interesting {
 
 // Storage for traffic volume data
 type TrafficVolumeData struct {
-    TotalUlMsgs       int
-    TotalUlBytes      int
-    LastUlMsgTime     time.Time
-    TotalDlMsgs       int
-    TotalDlBytes      int
-    LastDlMsgTime     time.Time
+    UlMsgs        int
+    UlBytes       int
+    LastUlMsgTime time.Time
+    DlMsgs        int
+    DlBytes       int
+    LastDlMsgTime time.Time
+    UlTotals      *TotalsState 
+    DlTotals      *TotalsState	
 }
 func (value *TrafficVolumeData) DeepCopy() *TrafficVolumeData {
     if value == nil {
         return nil
     }
     result := &TrafficVolumeData {
-        TotalUlMsgs:     value.TotalUlMsgs,
-        TotalUlBytes:    value.TotalUlBytes,
-        LastUlMsgTime:   value.LastUlMsgTime,
-        TotalDlMsgs:     value.TotalDlMsgs,
-        TotalDlBytes:    value.TotalDlBytes,
-        LastDlMsgTime:   value.LastDlMsgTime,
+        UlMsgs:             value.UlMsgs,
+        UlBytes:            value.UlBytes,
+        LastUlMsgTime:      value.LastUlMsgTime,
+        DlMsgs:             value.DlMsgs,
+        DlBytes:            value.DlBytes,
+        LastDlMsgTime:      value.LastDlMsgTime,
     }
+    if value.UlTotals != nil {
+        result.UlTotals = &TotalsState {
+            Timestamp: value.UlTotals.Timestamp,
+            Msgs:      value.UlTotals.Msgs,
+            Bytes:     value.UlTotals.Bytes,       
+        }
+    }    
+    if value.DlTotals != nil {
+        result.DlTotals = &TotalsState {
+            Timestamp: value.DlTotals.Timestamp,
+            Msgs:      value.DlTotals.Msgs,
+            Bytes:     value.DlTotals.Bytes,       
+        }
+    }    
     return result
 }
 func updateTrafficVolumeData(trafficData *TrafficVolumeData, connection *Connection) *TrafficVolumeData {
-    trafficData.TotalUlMsgs   += connection.UlMsgs
-    trafficData.TotalUlBytes  += connection.UlBytes
-    trafficData.TotalDlMsgs   += connection.DlMsgs
-    trafficData.TotalDlBytes  += connection.DlBytes
+    trafficData.UlMsgs   = connection.UlMsgs
+    trafficData.UlBytes  = connection.UlBytes
     if connection.UlMsgs > 0 {
         trafficData.LastUlMsgTime = connection.Timestamp
     }
+    trafficData.DlMsgs   = connection.DlMsgs
+    trafficData.DlBytes  = connection.DlBytes
     if connection.DlMsgs > 0 {
         trafficData.LastDlMsgTime = connection.Timestamp
+    }
+    if connection.UlTotals != nil {
+        if trafficData.UlTotals == nil {
+            trafficData.UlTotals = &TotalsState{}
+        }
+        trafficData.UlTotals.Timestamp = connection.UlTotals.Timestamp
+        trafficData.UlTotals.Msgs      = connection.UlTotals.Msgs
+        trafficData.UlTotals.Bytes     = connection.UlTotals.Bytes
+    }
+    if connection.DlTotals != nil {
+        if trafficData.DlTotals == nil {
+            trafficData.DlTotals = &TotalsState{}
+        }
+        trafficData.DlTotals.Timestamp = connection.DlTotals.Timestamp
+        trafficData.DlTotals.Msgs      = connection.DlTotals.Msgs
+        trafficData.DlTotals.Bytes     = connection.DlTotals.Bytes
     }
     
     return trafficData

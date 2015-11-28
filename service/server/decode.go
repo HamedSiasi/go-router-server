@@ -317,8 +317,9 @@ var ulDecodeTypeDisplay map[int]string = map[int]string {
 // Functions
 //--------------------------------------------------------------------
 
-// The decode function
-func decode(data []byte, uuid string) []interface{} {
+// The decode function.  Returns an array of decoded
+// messages and a byte count
+func decode(data []byte, uuid string) ([]interface{}, int) {
 
 	var bytesRemaining C.uint32_t = 1
 	var returnedMsgs []interface{} = nil
@@ -360,9 +361,9 @@ func decode(data []byte, uuid string) []interface{} {
 			globals.Dbg.PrintfTrace("%s [decode] --> decode received uplink message: %+v.\n\n-----## %s ##----- \n\n", globals.LogTag, result, ulDecodeTypeDisplay[int(result)])
 			globals.Dbg.PrintfInfo("%s [decode] --> XML buffer pointer 0x%08x, used %d, left %d:.\n", globals.LogTag, *ppXmlBuffer, C.uint32_t(len(xmlDecodeBuffer)) - xmlBufferLen, xmlBufferLen)
 	
-    		//Store XmlData in MongoDB
+    		// Store XmlData in MongoDB
     		utilities.XmlDataStore(xmlDecodeBuffer, uuid)
-    		globals.Dbg.PrintfInfo("%s [decode] -->  the XML data is:\n\n%s\n\n", globals.LogTag, spew.Sdump(xmlDecodeBuffer))
+    		globals.Dbg.PrintfInfo("%s [decode] --> the XML data is:\n\n%s\n\n", globals.LogTag, spew.Sdump(xmlDecodeBuffer))
     		
 			// Now decode the messages and pass them to the state table
 			switch int(result) {
@@ -740,11 +741,7 @@ func decode(data []byte, uuid string) []interface{} {
 		}
 	}
 
-    totalUlMsgs += len(returnedMsgs)
-    totalUlBytes += int(used)
-    lastUlMsgTime = time.Now()
-    
-	return returnedMsgs
+	return returnedMsgs, int(used)
 }
 
 /* End Of File */

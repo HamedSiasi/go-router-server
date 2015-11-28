@@ -50,7 +50,7 @@ type LatestState struct {
 
 // Structure to allow the latest state for a particular
 // device to be retrieved over a channel
-type DeviceLatestStateChannel struct {
+type DeviceLatestStateGet struct {
 	DeviceUuid   string
 	State        chan LatestState
 }
@@ -61,12 +61,12 @@ type DeviceLatestStateChannel struct {
 
 // To update the latest values send a MessageContainer into this channel
 // containing the received message; a copy their contents will be stored
-// in a displayable form
+// in the datatable
 
-// To get the latest state for a given UUID, send a '*chan DeviceLatestStateChannel'
+// To get the latest state for a given UUID, send a '*DeviceLatestStateGet'
 // into this channel containing the device UUID and a pointer to a channel
 // down which to send the LatestState struct; a copy of all quantities will
-// be copied into the struct and then the channel will be closed.
+// be copied into the struct and then the LatestState channel will be closed.
 
 // To get the latest state of all devices, send a '*chan []DevicesLatestState'
 // into this channel and a copy of all quantities for all UUIDs will be
@@ -377,71 +377,72 @@ func operateDataTable() {
 					globals.Dbg.PrintfTrace("%s [datatable] --> storage completed.\n", globals.LogTag)
 	            	
 	            // Return the latest state for a given UUID 
-	            case *DeviceLatestStateChannel:
+	            case *DeviceLatestStateGet:
 	            	// Retrieve the device state
-   	            	state := deviceLatestStateList[value.DeviceUuid]
+   	            	latestState := deviceLatestStateList[value.DeviceUuid]
    	            	
-   	            	if state != nil {
+   	            	if latestState != nil {
 		                // Duplicate the memory pointed to into a new LatestState struct,
 		                // post it and close the channel
 		                globals.Dbg.PrintfTrace("%s [datatable] --> fetching latest state for UUID %s.\n", globals.LogTag, value.DeviceUuid)
-		                latest := LatestState{}
-		                latest.DeviceUuid = state.DeviceUuid
-		                latest.DeviceName = state.DeviceName
-		                latest.Connected = state.Connected
-		                latest.LastHeardFrom = state.LastHeardFrom
-		                latest.LatestInterest = state.LatestInterest.DeepCopy()
-                        state.LatestInterest.UnSet() // Reseting interestingness after answering a specific query
-	                    latest.LatestTrafficVolumeData = state.LatestTrafficVolumeData.DeepCopy()
-		                latest.LatestInitIndData = state.LatestInitIndData.DeepCopy()
-		                latest.LatestIntervalsData = state.LatestIntervalsData.DeepCopy()
-		                latest.LatestModeData = state.LatestModeData.DeepCopy()
-		                latest.LatestDateTimeData = state.LatestDateTimeData.DeepCopy()
-		                latest.LatestUtmStatusData = state.LatestUtmStatusData.DeepCopy()
-		                latest.LatestGnssData = state.LatestGnssData.DeepCopy()
-		                latest.LatestCellIdData = state.LatestCellIdData.DeepCopy()
-		                latest.LatestSignalStrengthData = state.LatestSignalStrengthData.DeepCopy()
-		                latest.LatestTemperatureData = state.LatestTemperatureData.DeepCopy()
-		                latest.LatestPowerStateData = state.LatestPowerStateData.DeepCopy()
-		                latest.LatestTrafficReportData = state.LatestTrafficReportData.DeepCopy()
-		                latest.LatestTrafficTestModeParametersData = state.LatestTrafficTestModeParametersData.DeepCopy()
-		                latest.LatestTrafficTestModeReportData = state.LatestTrafficTestModeReportData.DeepCopy()
-		                latest.LatestActivityReportData = state.LatestActivityReportData.DeepCopy()
-		                value.State <- latest
-		                close(value.State)
-		                globals.Dbg.PrintfTrace("%s [datatable] --> provided latest state and closed channel.\n", globals.LogTag)
+		                state := LatestState{}
+		                state.DeviceUuid = latestState.DeviceUuid
+		                state.DeviceName = latestState.DeviceName
+		                state.Connected = latestState.Connected
+		                state.LastHeardFrom = latestState.LastHeardFrom
+		                state.LatestInterest = latestState.LatestInterest.DeepCopy()
+                        latestState.LatestInterest.UnSet() // Reseting interestingness after answering a specific query
+	                    state.LatestTrafficVolumeData = latestState.LatestTrafficVolumeData.DeepCopy()
+		                state.LatestInitIndData = latestState.LatestInitIndData.DeepCopy()
+		                state.LatestIntervalsData = latestState.LatestIntervalsData.DeepCopy()
+		                state.LatestModeData = latestState.LatestModeData.DeepCopy()
+		                state.LatestDateTimeData = latestState.LatestDateTimeData.DeepCopy()
+		                state.LatestUtmStatusData = latestState.LatestUtmStatusData.DeepCopy()
+		                state.LatestGnssData = latestState.LatestGnssData.DeepCopy()
+		                state.LatestCellIdData = latestState.LatestCellIdData.DeepCopy()
+		                state.LatestSignalStrengthData = latestState.LatestSignalStrengthData.DeepCopy()
+		                state.LatestTemperatureData = latestState.LatestTemperatureData.DeepCopy()
+		                state.LatestPowerStateData = latestState.LatestPowerStateData.DeepCopy()
+		                state.LatestTrafficReportData = latestState.LatestTrafficReportData.DeepCopy()
+		                state.LatestTrafficTestModeParametersData = latestState.LatestTrafficTestModeParametersData.DeepCopy()
+		                state.LatestTrafficTestModeReportData = latestState.LatestTrafficTestModeReportData.DeepCopy()
+		                state.LatestActivityReportData = latestState.LatestActivityReportData.DeepCopy()
+		                value.State <- state
+		                globals.Dbg.PrintfTrace("%s [datatable] --> provided latest state.\n", globals.LogTag)
 		            } else {
 		                globals.Dbg.PrintfTrace("%s [datatable] --> asked for latest state for unknown UUID %s.\n", globals.LogTag, value.DeviceUuid)
 		            }
+	                close(value.State)
+		            
 	            // Return the latest state for all UUIDs 
 	            case *chan []LatestState:
 	            
    	            	var allStates []LatestState
-	                for _, state := range deviceLatestStateList {
+	                for _, latestState := range deviceLatestStateList {
 		                // Duplicate the memory pointed to into a new LatestState struct,
 		                // post it and close the channel
-		                latest := LatestState{}
-		                latest.DeviceUuid = state.DeviceUuid
-		                latest.DeviceName = state.DeviceName
-		                latest.Connected = state.Connected
-		                latest.LastHeardFrom = state.LastHeardFrom
-		                latest.LatestInterest = state.LatestInterest.DeepCopy()
-	                    latest.LatestTrafficVolumeData = state.LatestTrafficVolumeData.DeepCopy()
-		                latest.LatestInitIndData = state.LatestInitIndData.DeepCopy()
-		                latest.LatestIntervalsData = state.LatestIntervalsData.DeepCopy()
-		                latest.LatestModeData = state.LatestModeData.DeepCopy()
-		                latest.LatestDateTimeData = state.LatestDateTimeData.DeepCopy()
-		                latest.LatestUtmStatusData = state.LatestUtmStatusData.DeepCopy()
-		                latest.LatestGnssData = state.LatestGnssData.DeepCopy()
-		                latest.LatestCellIdData = state.LatestCellIdData.DeepCopy()
-		                latest.LatestSignalStrengthData = state.LatestSignalStrengthData.DeepCopy()
-		                latest.LatestTemperatureData = state.LatestTemperatureData.DeepCopy()
-		                latest.LatestPowerStateData = state.LatestPowerStateData.DeepCopy()
-		                latest.LatestTrafficReportData = state.LatestTrafficReportData.DeepCopy()
-		                latest.LatestTrafficTestModeParametersData = state.LatestTrafficTestModeParametersData.DeepCopy()
-		                latest.LatestTrafficTestModeReportData = state.LatestTrafficTestModeReportData.DeepCopy()
-		                latest.LatestActivityReportData = state.LatestActivityReportData.DeepCopy()
-		                allStates = append(allStates, latest)
+		                state := LatestState{}
+		                state.DeviceUuid = latestState.DeviceUuid
+		                state.DeviceName = latestState.DeviceName
+		                state.Connected = latestState.Connected
+		                state.LastHeardFrom = latestState.LastHeardFrom
+		                state.LatestInterest = latestState.LatestInterest.DeepCopy()
+	                    state.LatestTrafficVolumeData = latestState.LatestTrafficVolumeData.DeepCopy()
+		                state.LatestInitIndData = latestState.LatestInitIndData.DeepCopy()
+		                state.LatestIntervalsData = latestState.LatestIntervalsData.DeepCopy()
+		                state.LatestModeData = latestState.LatestModeData.DeepCopy()
+		                state.LatestDateTimeData = latestState.LatestDateTimeData.DeepCopy()
+		                state.LatestUtmStatusData = latestState.LatestUtmStatusData.DeepCopy()
+		                state.LatestGnssData = latestState.LatestGnssData.DeepCopy()
+		                state.LatestCellIdData = latestState.LatestCellIdData.DeepCopy()
+		                state.LatestSignalStrengthData = latestState.LatestSignalStrengthData.DeepCopy()
+		                state.LatestTemperatureData = latestState.LatestTemperatureData.DeepCopy()
+		                state.LatestPowerStateData = latestState.LatestPowerStateData.DeepCopy()
+		                state.LatestTrafficReportData = latestState.LatestTrafficReportData.DeepCopy()
+		                state.LatestTrafficTestModeParametersData = latestState.LatestTrafficTestModeParametersData.DeepCopy()
+		                state.LatestTrafficTestModeReportData = latestState.LatestTrafficTestModeReportData.DeepCopy()
+		                state.LatestActivityReportData = latestState.LatestActivityReportData.DeepCopy()
+		                allStates = append(allStates, state)
     		        }    
 	                *value <- allStates
 	                close(*value)

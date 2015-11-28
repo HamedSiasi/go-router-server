@@ -30,6 +30,7 @@ import (
 	"time"
 	"unsafe"
 	"github.com/robmeades/utm/service/globals"
+	"github.com/robmeades/utm/service/utilities"
 )
 
 //--------------------------------------------------------------------
@@ -60,24 +61,20 @@ const (
 // Variables
 //--------------------------------------------------------------------
 
-var xmlEncodeBuffer [8192]C.char
-
-var totalDlMsgs int
-var totalDlBytes int
-var lastDlMsgTime time.Time
-
 //--------------------------------------------------------------------
 // Functions
 //--------------------------------------------------------------------
 
 // Encode and enqueue a message, return an error if there is one
-func encodeAndEnqueue(msg interface{}, uuid string) error {
+// and the number of bytes encoded
+func encodeAndEnqueue(msg interface{}, uuid string) (error, int) {
     
     if msg != nil {        
 		// Create a buffer that is big enough to store all
 		// the encoded data and take a pointer to it's first element
 		var outputBuffer [MaxDatagramSizeRaw]byte
 		outputPointer := (*C.char)(unsafe.Pointer(&outputBuffer[0]))
+        var xmlEncodeBuffer = make([]byte, 8192, 8192)
 		var byteCount C.uint32_t = 0     
         responseId := RESPONSE_NONE
 		
@@ -211,10 +208,6 @@ func encodeAndEnqueue(msg interface{}, uuid string) error {
 		}
 		
 	    if byteCount > 0 {
-	        totalDlMsgs++
-	        totalDlBytes += int (byteCount)
-	        lastDlMsgTime = time.Now()
-	        
     		// Send the output buffer to the TSW server
     		payload := outputBuffer[:byteCount]
     		msg := AmqpMessage {
@@ -229,6 +222,10 @@ func encodeAndEnqueue(msg interface{}, uuid string) error {
     		globals.Dbg.PrintfTrace("%s [encode] --> %d byte message for AMQP downlink:\n\n%+v\n", globals.LogTag, byteCount, msg)
     		downlinkMessages <- msg    		
     		globals.Dbg.PrintfTrace("%s [encode] --> encoded %d bytes into AMQP message:\n\n%+v\n", globals.LogTag, byteCount, msg)
+
+    		// Store XmlData in MongoDB
+    		utilities.XmlDataStore(xmlEncodeBuffer, uuid)
+    		globals.Dbg.PrintfInfo("%s [decode] --> the XML data is:\n\n%s\n\n", globals.LogTag, spew.Sdump(xmlEncodeBuffer))    		
 			globals.Dbg.PrintfInfo("%s [encode] --> XML buffer pointer 0x%08x, used %d, left %d:.\n", globals.LogTag, *ppXmlBuffer, C.uint32_t(len(xmlEncodeBuffer)) - xmlBufferLen, xmlBufferLen)
     		
         	// If a response is expected, add it to the list for this device
@@ -251,13 +248,13 @@ func encodeAndEnqueue(msg interface{}, uuid string) error {
 				globals.Dbg.PrintfTrace("%s [encode] --> expected list for UUID %s is now size %d.\n", globals.LogTag, uuid, len(*list))
             }    
             		
-    	    return nil
+    	    return nil, int(byteCount)
         }    				   
 	    
-   	    return nil
+   	    return nil, int(byteCount)
     }
     
-	return errors.New("No downlink message channel available to enqueue the encoded message.\n")
+	return errors.New("No downlink message channel available to enqueue the encoded message.\n"), 0
 }
 
 /* End Of File */

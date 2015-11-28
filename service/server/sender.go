@@ -279,12 +279,17 @@ func (msg *ClientSendMsg) Send(response http.ResponseWriter, request *http.Reque
 
 // Send the messages
 func (m *Msg) Send(uuid string) error {
-    var err error
+    var err error = nil
+    var byteCount int = 0
+    var msgCount int = 0
     
     switch m.MsgType {
         case CLIENT_SEND_PING:
             globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send PingReq.\n", globals.LogTag)                    
             encodeAndEnqueue (&PingReqDlMsg{}, uuid)
+            if err == nil {
+                msgCount++
+            }
             
         case CLIENT_SEND_REBOOT:
             globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send RebootReq.\n", globals.LogTag)                    
@@ -300,7 +305,10 @@ func (m *Msg) Send(uuid string) error {
                 }
             }
             if err == nil {
-                encodeAndEnqueue (msg, uuid)
+                err, byteCount = encodeAndEnqueue (msg, uuid)
+                if err == nil {
+                    msgCount++
+                }
             }            
             
         case CLIENT_SEND_DATE_TIME_SET:
@@ -312,12 +320,18 @@ func (m *Msg) Send(uuid string) error {
             }
 
             if err == nil {
-               encodeAndEnqueue (msg, uuid)                
+               err, byteCount = encodeAndEnqueue (msg, uuid)                
+                if err == nil {
+                    msgCount++
+                }
             }
             
         case CLIENT_SEND_DATE_TIME_GET:
             globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send DateTimeGetReq.\n", globals.LogTag)                    
-            encodeAndEnqueue (&DateTimeGetReqDlMsg{}, uuid)
+            err, byteCount = encodeAndEnqueue (&DateTimeGetReqDlMsg{}, uuid)
+            if err == nil {
+                msgCount++
+            }
             
         case CLIENT_SEND_MODE_SET:
             globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send ModeSetReq.\n", globals.LogTag)                    
@@ -327,7 +341,10 @@ func (m *Msg) Send(uuid string) error {
                 msg := &ModeSetReqDlMsg {}
                 msg.Mode = ModeEnum(clientModeEnumString[modeString]) + MODE_NULL
                 if msg.Mode != MODE_NULL {
-                    encodeAndEnqueue (msg, uuid)
+                    err, byteCount = encodeAndEnqueue (msg, uuid)
+                    if err == nil {
+                        msgCount++
+                    }
                 } else {
                     globals.Dbg.PrintfTrace ("%s [dl_msgs] --> unknown mode \"%s\".\n", globals.LogTag, modeString)                    
                 }
@@ -335,7 +352,10 @@ func (m *Msg) Send(uuid string) error {
             
         case CLIENT_SEND_MODE_GET:
             globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send ModeGetReq.\n", globals.LogTag)                    
-            encodeAndEnqueue (&ModeGetReqDlMsg{}, uuid)
+            err, byteCount = encodeAndEnqueue (&ModeGetReqDlMsg{}, uuid)
+            if err == nil {
+                msgCount++
+            }
             
         case CLIENT_SEND_HEARTBEAT_SET:
             globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send HeartbeatSetReq [TODO].\n", globals.LogTag)
@@ -346,7 +366,10 @@ func (m *Msg) Send(uuid string) error {
                 err, msg.HeartbeatSnapToRtc = GetValueBool (m.MsgBody, heartbeatSnapToRtcTag)                
             }
             if err == nil {
-                encodeAndEnqueue (msg, uuid)
+                err, byteCount = encodeAndEnqueue (msg, uuid)
+                if err == nil {
+                    msgCount++
+                }
             }           
             
         case CLIENT_SEND_REPORTING_INTERVAL_SET:
@@ -354,16 +377,25 @@ func (m *Msg) Send(uuid string) error {
             msg := &ReportingIntervalSetReqDlMsg {}
             err, msg.ReportingInterval = GetValueUint32 (m.MsgBody, reportingIntervalTag)
             if err == nil {
-                encodeAndEnqueue (msg, uuid)
+                err, byteCount = encodeAndEnqueue (msg, uuid)
+                if err == nil {
+                    msgCount++
+                }
             }           
             
         case CLIENT_SEND_INTERVALS_GET:
             globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send IntervalsGetReq.\n", globals.LogTag)                    
-            encodeAndEnqueue (&IntervalsGetReqDlMsg{}, uuid)
+            err, byteCount = encodeAndEnqueue (&IntervalsGetReqDlMsg{}, uuid)
+            if err == nil {
+                msgCount++
+            }
             
         case CLIENT_SEND_MEASUREMENTS_GET:
             globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send MeasurementsGetReq.\n", globals.LogTag)                    
-            encodeAndEnqueue (&MeasurementsGetReqDlMsg{}, uuid)
+            err, byteCount = encodeAndEnqueue (&MeasurementsGetReqDlMsg{}, uuid)
+            if err == nil {
+                msgCount++
+            }
             
         // TODO
         //case CLIENT_SEND_MEASUREMENT_CONTROL_SET:
@@ -372,7 +404,10 @@ func (m *Msg) Send(uuid string) error {
         
         case CLIENT_SEND_TRAFFIC_REPORT_GET:
             globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send TrafficReportGetReq.\n", globals.LogTag)                    
-            encodeAndEnqueue (&TrafficReportGetReqDlMsg{}, uuid)
+            err, byteCount = encodeAndEnqueue (&TrafficReportGetReqDlMsg{}, uuid)
+            if err == nil {
+                msgCount++
+            }
             
         case CLIENT_SEND_TRAFFIC_TEST_MODE_PARAMETERS_SET:
             globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send TrafficTestModeParametersSetReq.\n", globals.LogTag)                    
@@ -392,25 +427,51 @@ func (m *Msg) Send(uuid string) error {
                 }
             }
             if err == nil {
-                encodeAndEnqueue (msg, uuid)
+                err, byteCount = encodeAndEnqueue (msg, uuid)
+                if err == nil {
+                    msgCount++
+                }
             }            
             
         case CLIENT_SEND_TRAFFIC_TEST_MODE_PARAMETERS_GET:
             globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send TrafficTestModeParametersGetReq.\n", globals.LogTag)                    
-            encodeAndEnqueue (&TrafficTestModeParametersGetReqDlMsg{}, uuid)
+            err, byteCount = encodeAndEnqueue (&TrafficTestModeParametersGetReqDlMsg{}, uuid)
+            if err == nil {
+                msgCount++
+            }
             
         case CLIENT_SEND_TRAFFIC_TEST_MODE_REPORT_GET:
             globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send TrafficTestModeReportGetReq.\n", globals.LogTag)                    
-            encodeAndEnqueue (&TrafficTestModeReportGetReqDlMsg{}, uuid)
+            err, byteCount = encodeAndEnqueue (&TrafficTestModeReportGetReqDlMsg{}, uuid)
+            if err == nil {
+                msgCount++
+            }
             
         case CLIENT_SEND_ACTIVITY_REPORT_GET:
             globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send ActivityReportGetReq.\n", globals.LogTag)                    
-            encodeAndEnqueue (&ActivityReportGetReqDlMsg{}, uuid)
+            err, byteCount = encodeAndEnqueue (&ActivityReportGetReqDlMsg{}, uuid)
+            if err == nil {
+                msgCount++
+            }
             
         default:
             globals.Dbg.PrintfTrace ("%s [dl_msgs] --> asked to send an unknown message type: %d.\n", globals.LogTag, m.MsgType)                    
             return errors.New("Unknown message type")
     }
+    
+    // Send an update to the processing loop so that we don't miss
+    // out on the totals
+    if msgCount > 0 {
+	    encodeStateAdd := &DeviceEncodeStateAdd {
+    	    DeviceUuid:      uuid, 
+    	    State: TotalsState {
+        	    Timestamp: time.Now().UTC(),
+        	    Msgs:      msgCount,
+        	    Bytes:     byteCount,
+    	    },
+	    }
+    	processMsgsChannel <- encodeStateAdd
+    }    
     
     return nil
 }

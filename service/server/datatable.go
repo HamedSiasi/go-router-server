@@ -30,7 +30,8 @@ type LatestState struct {
     DeviceName                           string                         `json:"Name, omitempty"`
     Connected                            bool                           `json:"Connected, omitempty"`
     LastHeardFrom                        time.Time                      `json:"LastHeardFrom, omitempty"`
-    LatestInterest                       *Interesting                   `json:"Interesting, omitempty"`
+    LatestExpectedMsgData                *ExpectedMsgData               `json:"LatestExpectedMsgList, omitempty"`
+    LatestInterest                       *Interesting                   `json:"LatestInterest, omitempty"`
     LatestTrafficVolumeData              *TrafficVolumeData             `json:"LatestTrafficVolumeData, omitempty"`
     LatestInitIndData                    *InitIndData                   `json:"LatestInitIndData, omitempty"`
     LatestIntervalsData                  *IntervalsData                 `json:"LatestIntervalsData, omitempty"`
@@ -166,7 +167,8 @@ func operateDataTable() {
     	                    state.LatestTrafficVolumeData = &TrafficVolumeData {}
     	                }	                
     	                state.LatestTrafficVolumeData = updateTrafficVolumeData (state.LatestTrafficVolumeData, value)
-				
+                        state.LatestExpectedMsgData =  makeExpectedMsgData(value.ExpectedMsgList, time.Now().UTC())   	                
+	
     					globals.Dbg.PrintfTrace("%s [datatable] --> connection state for device %s updated.\n", globals.LogTag, value.DeviceUuid)
                         // Store latest state in MongoDB
                 		err := utilities.InsertDB ("blah", state)
@@ -209,6 +211,7 @@ func operateDataTable() {
             	                    state.LatestInterest = &Interesting {}
             	                }    
     	                        state.LatestInterest.Set()
+    	                        state.LatestExpectedMsgData = nil
 			                    state.LatestTrafficVolumeData = nil
                                 state.LatestIntervalsData = nil
                                 state.LatestModeData = nil
@@ -393,6 +396,7 @@ func operateDataTable() {
 		                state.DeviceName = latestState.DeviceName
 		                state.Connected = latestState.Connected
 		                state.LastHeardFrom = latestState.LastHeardFrom
+   		                state.LatestExpectedMsgData = latestState.LatestExpectedMsgData.DeepCopy()
 		                state.LatestInterest = latestState.LatestInterest.DeepCopy()
                         latestState.LatestInterest.UnSet() // Reseting interestingness after answering a specific query
 	                    state.LatestTrafficVolumeData = latestState.LatestTrafficVolumeData.DeepCopy()
@@ -429,6 +433,7 @@ func operateDataTable() {
 		                state.DeviceName = latestState.DeviceName
 		                state.Connected = latestState.Connected
 		                state.LastHeardFrom = latestState.LastHeardFrom
+   		                state.LatestExpectedMsgData = latestState.LatestExpectedMsgData.DeepCopy()
 		                state.LatestInterest = latestState.LatestInterest.DeepCopy()
 	                    state.LatestTrafficVolumeData = latestState.LatestTrafficVolumeData.DeepCopy()
 		                state.LatestInitIndData = latestState.LatestInitIndData.DeepCopy()

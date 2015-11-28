@@ -59,12 +59,13 @@ type TotalsState struct {
 
 // Conection details for a device
 type Connection struct {
-	DeviceUuid  string  `bson:"DeviceUuid" json:"DeviceUuid"`
-	DeviceName  string
-	UlDevice    TotalsState
-	DlDevice    TotalsState
-    UlTotals    *TotalsState 
-    DlTotals    *TotalsState	
+	DeviceUuid      string  `bson:"DeviceUuid" json:"DeviceUuid"`
+	DeviceName      string
+	UlDevice        TotalsState
+	DlDevice        TotalsState
+	ExpectedMsgList *[]ExpectedMsg
+    UlTotals        *TotalsState 
+    DlTotals        *TotalsState	
 }
 
 //--------------------------------------------------------------------
@@ -154,7 +155,7 @@ func processDatagrams(q *Queue) {
                             globals.Dbg.PrintfTrace("%s [server] --> encodeState:\n\n%+v\n\n", globals.LogTag, encodeState)
         
         					// Send the datatable a message with connection
-        					// data for this device plus the totals
+        					// data for this device plus the totals for all
         					ulTotals := TotalsState {
         					    Timestamp:    totalsDecodeState.Timestamp,
                                 Msgs:         totalsDecodeState.Msgs,
@@ -165,6 +166,13 @@ func processDatagrams(q *Queue) {
                                 Msgs:         encodeState.Totals.Msgs,
                                 Bytes:        encodeState.Totals.Bytes,
         					}
+                		    expectedMsgListCopy := make([]ExpectedMsg, 0)
+        	            	expectedMsgList := deviceExpectedMsgList[value.DeviceUuid]
+                    		if expectedMsgList != nil {
+            					for _, expectedMsg := range *expectedMsgList {
+            					    expectedMsgListCopy = append(expectedMsgListCopy, expectedMsg)
+            					}
+            				}	
         					dataTableChannel <- &Connection {
         						DeviceUuid:         value.DeviceUuid,
         						DeviceName:         value.DeviceName,
@@ -178,6 +186,7 @@ func processDatagrams(q *Queue) {
             						Msgs:      encodeState.Msgs,
             						Bytes:     encodeState.Bytes,
         						},
+        						ExpectedMsgList:    &expectedMsgListCopy,
                                 UlTotals:   &ulTotals, 
                                 DlTotals:   &dlTotals,	
         					}

@@ -35,6 +35,42 @@ func (value *Interesting) DeepCopy() *Interesting {
     return result
 }
 
+// Storage for the expected message list
+type ExpectedMsgData struct {    
+    Timestamp      time.Time    
+    ExpectedMsgList  *[]ExpectedMsg
+}
+func (value *ExpectedMsgData) DeepCopy() *ExpectedMsgData {
+    if value == nil {
+        return nil
+    }
+    expectedMsgList := make ([]ExpectedMsg, 0)
+    result := &ExpectedMsgData {
+        Timestamp:         value.Timestamp,  
+        ExpectedMsgList:   &expectedMsgList,
+    }
+    if value.ExpectedMsgList != nil {
+        for _, expectedMsg := range *value.ExpectedMsgList {
+            expectedMsgList = append (expectedMsgList, expectedMsg)    
+        }
+    }
+        
+    return result
+}
+func makeExpectedMsgData(newData *[]ExpectedMsg, Time time.Time) *ExpectedMsgData {
+    expectedMsgList := make ([]ExpectedMsg, 0)
+    data := ExpectedMsgData {
+        Timestamp:  	   Time,
+        ExpectedMsgList:   &expectedMsgList,
+    }
+    if newData != nil {
+        for _, expectedMsg := range *newData {
+            expectedMsgList = append (expectedMsgList, expectedMsg)    
+        }
+    }
+    return &data
+}
+
 // Storage for traffic volume data
 type TrafficVolumeData struct {
     UlMsgs        int

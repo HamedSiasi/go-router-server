@@ -45,6 +45,7 @@ type FrontPageDeviceData struct {
     DiskSpaceLeft      string     `json:"DiskSpaceLeft, omitempty"`
     Reporting          string     `json:"Reporting, omitempty"`
     Heartbeat          string     `json:"Heartbeat, omitempty"`
+    NumExpectedMsgs    int        `json:"NumExpectedMsgs, omitempty"`
 }
 
 type FrontPageData struct {
@@ -106,6 +107,10 @@ func displayFrontPageData () *FrontPageData {
         if deviceState.LatestIntervalsData != nil {
             deviceData.Reporting        = getReportingString (deviceState.LatestIntervalsData)
             deviceData.Heartbeat        = getHeartbeatString (deviceState.LatestIntervalsData)
+        }
+        deviceData.NumExpectedMsgs = 0
+        if deviceState.LatestExpectedMsgData != nil && deviceState.LatestExpectedMsgData.ExpectedMsgList != nil {
+            deviceData.NumExpectedMsgs = len (*deviceState.LatestExpectedMsgData.ExpectedMsgList)
         }
         data.DeviceData = append (data.DeviceData, deviceData)
 	}

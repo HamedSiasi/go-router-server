@@ -85,7 +85,8 @@
 	margin-left: 300px;
  }
 
+/* Set this to 10px if you have bullet points to account for */
 
 .SmallPadding {
-	padding-left:  10px !important;
+	padding-left:  2px;
 }

@@ -20,6 +20,8 @@ import (
 	"github.com/robmeades/utm/service/models"
 	"github.com/robmeades/utm/service/utilities"
 	"net/http"
+	"fmt"
+	"time"
 )
 
 //--------------------------------------------------------------------
@@ -33,6 +35,14 @@ import (
 //--------------------------------------------------------------------
 // Functions
 //--------------------------------------------------------------------
+
+// Implement our own time formatter to stop it being half a mile
+// long and to micro-second accuracy
+func (t JsonTime) MarshalJSON() ([]byte, error) {
+    timeStamp := fmt.Sprintf("\"%s\"", time.Time(t).Format ("2006-01-02 15:04:05"))
+    
+    return []byte(timeStamp), nil
+}
 
 func LogoutHandler(request http.ResponseWriter, response *http.Request) {
 	session := sessions.GetSession(response)

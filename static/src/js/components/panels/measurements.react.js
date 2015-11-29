@@ -23,7 +23,6 @@ var Measurements = React.createClass({
                     <tbody style={{fontSize: 12}}>
                       <tr className="even gradeA">
                         <td style={{width: 15}}>
-                          <a tabIndex={-1} href="#/standardtwo"> <b className="fa fa-cogs" /></a><br />
                           <input type="checkbox" style={{width: 15}} /><br />
                           <img src="static/Images/green.png" alt="logo" style={{maxWidth: 12}} />
                         </td>

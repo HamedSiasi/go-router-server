@@ -17,29 +17,31 @@ import (
 )
 
 //--------------------------------------------------------------------
-// Types used in messages with associated copy functions
+// Types
 //--------------------------------------------------------------------
+
+type JsonTime time.Time
 
 type FrontPageSummaryData struct {
     TotalUlMsgs        int        `json:"TotalUlMsgs, omitempty"`
     TotalUlBytes       int        `json:"TotalUlBytes, omitempty"`
-    LastUlMsgTime      *time.Time `json:"LastUlMsgTime, omitempty"`    
+    LastUlMsgTime      *JsonTime  `json:"LastUlMsgTime, omitempty"`    
     TotalDlMsgs        int        `json:"TotalDlMsgs, omitempty"`
     TotalDlBytes       int        `json:"TotalDlBytes, omitempty"`
-    LastDlMsgTime      *time.Time `json:"LastDlMsgTime, omitempty"`    
+    LastDlMsgTime      *JsonTime  `json:"LastDlMsgTime, omitempty"`    
 }
 
 type FrontPageDeviceData struct {
     Uuid               string     `json:"Uuid, omitempty"`
     DeviceName         string     `json:"DeviceName, omitempty"`
-    Interesting        *time.Time `json:"Interesting, omitempty"`
+    Interesting        *JsonTime  `json:"Interesting, omitempty"`
     Mode               string     `json:"Mode, omitempty"`
     TotalUlMsgs        int        `json:"TotalUlMsgs, omitempty"`
     TotalUlBytes       int        `json:"TotalUlBytes, omitempty"`
-    LastUlMsgTime      *time.Time `json:"LastUlMsgTime, omitempty"`
+    LastUlMsgTime      *JsonTime  `json:"LastUlMsgTime, omitempty"`
     TotalDlMsgs        int        `json:"TotalDlMsgs, omitempty"`
     TotalDlBytes       int        `json:"TotalDlBytes, omitempty"`
-    LastDlMsgTime      *time.Time `json:"LastDlMsgTime, omitempty"`
+    LastDlMsgTime      *JsonTime  `json:"LastDlMsgTime, omitempty"`
     Rsrp               float32    `json:"Rsrp, omitempty"`
     BatteryLevel       string     `json:"BatteryLevel, omitempty"`
     DiskSpaceLeft      string     `json:"DiskSpaceLeft, omitempty"`
@@ -52,6 +54,10 @@ type FrontPageData struct {
     SummaryData FrontPageSummaryData
     DeviceData []FrontPageDeviceData
 }
+
+//--------------------------------------------------------------------
+// Functions
+//--------------------------------------------------------------------
 
 func displayFrontPageData () *FrontPageData {
     var data FrontPageData
@@ -70,7 +76,8 @@ func displayFrontPageData () *FrontPageData {
 	    deviceData.Uuid             = deviceState.DeviceUuid
         deviceData.DeviceName       = deviceState.DeviceName
         if deviceState.LatestInterest != nil {
-            deviceData.Interesting      = &deviceState.LatestInterest.Timestamp
+            jsonTimeStampInterest := JsonTime(deviceState.LatestInterest.Timestamp)
+            deviceData.Interesting = &jsonTimeStampInterest
         }
         if deviceState.LatestModeData != nil {
             deviceData.Mode             = deviceState.LatestModeData.Mode
@@ -78,22 +85,26 @@ func displayFrontPageData () *FrontPageData {
         if deviceState.LatestTrafficVolumeData != nil {
             deviceData.TotalUlMsgs      = deviceState.LatestTrafficVolumeData.UlMsgs
             deviceData.TotalUlBytes     = deviceState.LatestTrafficVolumeData.UlBytes
-            deviceData.LastUlMsgTime    = &deviceState.LatestTrafficVolumeData.LastUlMsgTime
+            jsonTimeStampDeviceUl := JsonTime(deviceState.LatestTrafficVolumeData.LastUlMsgTime)
+            deviceData.LastUlMsgTime = &jsonTimeStampDeviceUl
             deviceData.TotalDlMsgs      = deviceState.LatestTrafficVolumeData.DlMsgs
             deviceData.TotalDlBytes     = deviceState.LatestTrafficVolumeData.DlBytes
-            deviceData.LastDlMsgTime    = &deviceState.LatestTrafficVolumeData.LastDlMsgTime            
+            jsonTimeStampDeviceDl := JsonTime(deviceState.LatestTrafficVolumeData.LastDlMsgTime)
+            deviceData.LastDlMsgTime = &jsonTimeStampDeviceDl
             if deviceState.LatestTrafficVolumeData.UlTotals != nil {
                 data.SummaryData.TotalUlMsgs = deviceState.LatestTrafficVolumeData.UlTotals.Msgs
                 data.SummaryData.TotalUlBytes = deviceState.LatestTrafficVolumeData.UlTotals.Bytes
                 if data.SummaryData.TotalUlMsgs > 0 { 
-                    data.SummaryData.LastUlMsgTime = &deviceState.LatestTrafficVolumeData.UlTotals.Timestamp
+                    jsonTimeStampTotalsUl := JsonTime(deviceState.LatestTrafficVolumeData.UlTotals.Timestamp)
+                    data.SummaryData.LastUlMsgTime = &jsonTimeStampTotalsUl
                 }    
             }
             if deviceState.LatestTrafficVolumeData.DlTotals != nil {
                 data.SummaryData.TotalDlMsgs = deviceState.LatestTrafficVolumeData.DlTotals.Msgs
                 data.SummaryData.TotalDlBytes = deviceState.LatestTrafficVolumeData.DlTotals.Bytes
                 if data.SummaryData.TotalDlMsgs > 0 { 
-                    data.SummaryData.LastDlMsgTime = &deviceState.LatestTrafficVolumeData.DlTotals.Timestamp
+                    jsonTimeStampTotalsDl := JsonTime(deviceState.LatestTrafficVolumeData.DlTotals.Timestamp)
+                    data.SummaryData.LastDlMsgTime = &jsonTimeStampTotalsDl
                 }    
             }    
         }

@@ -19,36 +19,37 @@ var DisplayRow = React.createClass({
             rows.push(       
     
               <tr className="even gradeC" key={i}>
-                        <td style={{width: 15}}>
-                          <a tabIndex={-1} href="#/standardtwo"> <b className="fa fa-cogs" /></a><br />
-                          <input type="checkbox" style={{width: 15}} /><br />
+                        <td style={{textAlign: 'center', width: 15}}>
+                          <input type="checkbox" /><br />
                           <img src="static/dist/assets/images/green.png" alt="logo" style={{maxWidth: 12}} />
                         </td>
-                        <td>
+                        <td style={{width: 250}}>
                           <ul className="SmallPadding">
-                            <li><b>Uuid:</b> {uuid["Uuid"]}</li>
-                            <li><b>Mode:</b> {uuid["Mode"]}</li>
-                            <li><b>Name:</b> {uuid["UnitName"]}</li>
-                             <li><b>Reporting Interval:</b> {uuid["Reporting"]}</li>
-                              <li><b>Heart Beat:</b> {uuid["Heartbeat"]}</li>
+                            <b>Name:</b> {uuid["UnitName"]}<br />
+                            <b>UUID:</b> {uuid["Uuid"]}<br />
+                            <b>Mode:</b> {uuid["Mode"]}<br />
+                            <b>Reporting:</b> {uuid["Reporting"]}<br />
+                            <b>Heartbeat:</b> {uuid["Heartbeat"]}<br />
                           </ul>   
                         </td>
-                        <td>
+                        <td style={{width: 170}}>
                           <ul className="SmallPadding">
-                            <li><b>Total Msg:</b> {uuid["TotalUlMsgs"]}</li>
-                            <li><b>Total Bytes:</b> {uuid["TotalUlBytes"]}</li>
-                            <li><b>Last Msg RX:</b> {uuid["LastUlMsgTime"]}</li>
+                            <b>Msgs:</b> {uuid["TotalUlMsgs"]}<br />
+                            <b>Bytes:</b> {uuid["TotalUlBytes"]}<br />
+                            <b>Last Msg:</b> {uuid["LastUlMsgTime"]}<br />
                           </ul> 
                         </td>
-                        <td className="center">
-                          <li><b>Total Msg:</b> {uuid["TotalDlMsgs"]}</li>
-                          <li><b>Total Bytes:</b> {uuid["TotalDlBytes"]}</li>
-                          <li><b>Last Msg RX:</b> {uuid["LastDlMsgTime"]}</li>
+                        <td style={{width: 170}}>
+                          <b>Msgs:</b> {uuid["TotalDlMsgs"]}<br />
+                          <b>Bytes:</b> {uuid["TotalDlBytes"]}<br />
+                          <b>Last Msg:</b> {uuid["LastDlMsgTime"]}<br />
                         </td>
-                        <td className="center">{uuid["Rsrp"]}</td>
-                        <td className="center" style={{width: 105}}>
-                          <i className="fa fa-floppy-o" /> {uuid["DiskSpaceLeft"]}<br />
-                          <i className="fa fa-battery-full" /> {uuid["BatteryLevel"]}
+                        <td style={{width: 80}}>
+                        <i className="fa fa-signal" /> {uuid["Rsrp"]} dBm<br />
+                        <i className="fa fa-floppy-o" /> {uuid["DiskSpaceLeft"]}<br />
+                        <i className="fa fa-battery-full" /> {uuid["BatteryLevel"]}
+                        </td> 
+                        <td className="center" style={{width: 200}}>
                         </td> 
                       </tr>
 
@@ -68,14 +69,12 @@ var DisplayRow = React.createClass({
                                   <table className="table table-striped table-bordered table-hover" id="dataTables-example">
                                     <thead>
                                       <tr className="info">
-                                        <th> <input type="checkbox" style={{width: 15}} /> All</th>
-                                        <th>Name/Uuid</th>
+                                        <th style={{textAlign: 'center', width: 15}}><input type="checkbox" /></th>
+                                        <th>Device</th>
                                         <th>Uplink</th>
                                         <th>Downlink</th>
-                                        <th>RSRP </th>
-                                        <th>
-                                          Others
-                                        </th>
+                                        <th>Status</th>
+                                        <th>Results</th>
                                       </tr>
                                     </thead>
                                      <tbody style={{fontSize: 12}}>

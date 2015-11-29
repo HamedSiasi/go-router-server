@@ -22762,36 +22762,37 @@ var DisplayRow = React.createClass({displayName: "DisplayRow",
             rows.push(       
     
               React.createElement("tr", {className: "even gradeC", key: i}, 
-                        React.createElement("td", {style: {width: 15}}, 
-                          React.createElement("a", {tabIndex: -1, href: "#/standardtwo"}, " ", React.createElement("b", {className: "fa fa-cogs"})), React.createElement("br", null), 
-                          React.createElement("input", {type: "checkbox", style: {width: 15}}), React.createElement("br", null), 
+                        React.createElement("td", {style: {textAlign: 'center', width: 15}}, 
+                          React.createElement("input", {type: "checkbox"}), React.createElement("br", null), 
                           React.createElement("img", {src: "static/dist/assets/images/green.png", alt: "logo", style: {maxWidth: 12}})
                         ), 
-                        React.createElement("td", null, 
+                        React.createElement("td", {style: {width: 250}}, 
                           React.createElement("ul", {className: "SmallPadding"}, 
-                            React.createElement("li", null, React.createElement("b", null, "Uuid:"), " ", uuid["Uuid"]), 
-                            React.createElement("li", null, React.createElement("b", null, "Mode:"), " ", uuid["Mode"]), 
-                            React.createElement("li", null, React.createElement("b", null, "Name:"), " ", uuid["UnitName"]), 
-                             React.createElement("li", null, React.createElement("b", null, "Reporting Interval:"), " ", uuid["Reporting"]), 
-                              React.createElement("li", null, React.createElement("b", null, "Heart Beat:"), " ", uuid["Heartbeat"])
+                            React.createElement("b", null, "Name:"), " ", uuid["UnitName"], React.createElement("br", null), 
+                            React.createElement("b", null, "UUID:"), " ", uuid["Uuid"], React.createElement("br", null), 
+                            React.createElement("b", null, "Mode:"), " ", uuid["Mode"], React.createElement("br", null), 
+                            React.createElement("b", null, "Reporting:"), " ", uuid["Reporting"], React.createElement("br", null), 
+                            React.createElement("b", null, "Heartbeat:"), " ", uuid["Heartbeat"], React.createElement("br", null)
                           )
                         ), 
-                        React.createElement("td", null, 
+                        React.createElement("td", {style: {width: 170}}, 
                           React.createElement("ul", {className: "SmallPadding"}, 
-                            React.createElement("li", null, React.createElement("b", null, "Total Msg:"), " ", uuid["TotalUlMsgs"]), 
-                            React.createElement("li", null, React.createElement("b", null, "Total Bytes:"), " ", uuid["TotalUlBytes"]), 
-                            React.createElement("li", null, React.createElement("b", null, "Last Msg RX:"), " ", uuid["LastUlMsgTime"])
+                            React.createElement("b", null, "Msgs:"), " ", uuid["TotalUlMsgs"], React.createElement("br", null), 
+                            React.createElement("b", null, "Bytes:"), " ", uuid["TotalUlBytes"], React.createElement("br", null), 
+                            React.createElement("b", null, "Last Msg:"), " ", uuid["LastUlMsgTime"], React.createElement("br", null)
                           )
                         ), 
-                        React.createElement("td", {className: "center"}, 
-                          React.createElement("li", null, React.createElement("b", null, "Total Msg:"), " ", uuid["TotalDlMsgs"]), 
-                          React.createElement("li", null, React.createElement("b", null, "Total Bytes:"), " ", uuid["TotalDlBytes"]), 
-                          React.createElement("li", null, React.createElement("b", null, "Last Msg RX:"), " ", uuid["LastDlMsgTime"])
+                        React.createElement("td", {style: {width: 170}}, 
+                          React.createElement("b", null, "Msgs:"), " ", uuid["TotalDlMsgs"], React.createElement("br", null), 
+                          React.createElement("b", null, "Bytes:"), " ", uuid["TotalDlBytes"], React.createElement("br", null), 
+                          React.createElement("b", null, "Last Msg:"), " ", uuid["LastDlMsgTime"], React.createElement("br", null)
                         ), 
-                        React.createElement("td", {className: "center"}, uuid["Rsrp"]), 
-                        React.createElement("td", {className: "center", style: {width: 105}}, 
-                          React.createElement("i", {className: "fa fa-floppy-o"}), " ", uuid["DiskSpaceLeft"], React.createElement("br", null), 
-                          React.createElement("i", {className: "fa fa-battery-full"}), " ", uuid["BatteryLevel"]
+                        React.createElement("td", {style: {width: 80}}, 
+                        React.createElement("i", {className: "fa fa-signal"}), " ", uuid["Rsrp"], " dBm", React.createElement("br", null), 
+                        React.createElement("i", {className: "fa fa-floppy-o"}), " ", uuid["DiskSpaceLeft"], React.createElement("br", null), 
+                        React.createElement("i", {className: "fa fa-battery-full"}), " ", uuid["BatteryLevel"]
+                        ), 
+                        React.createElement("td", {className: "center", style: {width: 200}}
                         )
                       )
 
@@ -22811,14 +22812,12 @@ var DisplayRow = React.createClass({displayName: "DisplayRow",
                                   React.createElement("table", {className: "table table-striped table-bordered table-hover", id: "dataTables-example"}, 
                                     React.createElement("thead", null, 
                                       React.createElement("tr", {className: "info"}, 
-                                        React.createElement("th", null, " ", React.createElement("input", {type: "checkbox", style: {width: 15}}), " All"), 
-                                        React.createElement("th", null, "Name/Uuid"), 
+                                        React.createElement("th", {style: {textAlign: 'center', width: 15}}, React.createElement("input", {type: "checkbox"})), 
+                                        React.createElement("th", null, "Device"), 
                                         React.createElement("th", null, "Uplink"), 
                                         React.createElement("th", null, "Downlink"), 
-                                        React.createElement("th", null, "RSRP "), 
-                                        React.createElement("th", null, 
-                                          "Others"
-                                        )
+                                        React.createElement("th", null, "Status"), 
+                                        React.createElement("th", null, "Results")
                                       )
                                     ), 
                                      React.createElement("tbody", {style: {fontSize: 12}}, 
@@ -23388,7 +23387,6 @@ var Measurements = React.createClass({displayName: "Measurements",
                     React.createElement("tbody", {style: {fontSize: 12}}, 
                       React.createElement("tr", {className: "even gradeA"}, 
                         React.createElement("td", {style: {width: 15}}, 
-                          React.createElement("a", {tabIndex: -1, href: "#/standardtwo"}, " ", React.createElement("b", {className: "fa fa-cogs"})), React.createElement("br", null), 
                           React.createElement("input", {type: "checkbox", style: {width: 15}}), React.createElement("br", null), 
                           React.createElement("img", {src: "static/Images/green.png", alt: "logo", style: {maxWidth: 12}})
                         ), 

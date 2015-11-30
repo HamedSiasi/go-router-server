@@ -22493,21 +22493,19 @@ var Setting = require('./controls/setting.react');
 var Header = require('./Header/Header.react')
 
 var Template = React.createClass({displayName: "Template",
-
-	render:function(){
-		return (
-		React.createElement("div", null, 
-		  React.createElement(Header, null), 
-		    this.props.children
-		 )
-		);
-		
-	}
+    render:function(){
+	    return (
+            React.createElement("div", null, 
+                React.createElement(Header, null), 
+                    this.props.children
+		     )
+        );
+    }
 });
 
 module.exports = Template;
 
-},{"./Header/Header.react":189,"./controls/setting.react":196,"react":188}],191:[function(require,module,exports){
+},{"./Header/Header.react":189,"./controls/setting.react":204,"react":188}],191:[function(require,module,exports){
 var React = require('react');
 var Template = require('./app-template.js');
 var Router = require('react-router-component');
@@ -22521,38 +22519,111 @@ var Locations = Router.Locations;
 var Location  = Router.Location;
 
 var App = React.createClass({displayName: "App",
-  render:function(){
-    return (
-      React.createElement(Template, null, 
-        React.createElement(Locations, null, 
-        React.createElement(Location, {path: "/", handler: Index}), 
-          React.createElement(Location, {path: "#/display", handler: Display}), 
-          React.createElement(Location, {path: "#/mode", handler: Mode}), 
-          React.createElement(Location, {path: "#/login", handler: Login}), 
-          React.createElement(Location, {path: "#/register", handler: Register})
-        )
-      )
-    );
-  }
+    render:function(){
+        return (
+            React.createElement(Template, null, 
+                React.createElement(Locations, null, 
+                    React.createElement(Location, {path: "/", handler: Index}), 
+                    React.createElement(Location, {path: "#/display", handler: Display}), 
+                    React.createElement(Location, {path: "#/mode", handler: Mode}), 
+                    React.createElement(Location, {path: "#/login", handler: Login}), 
+                    React.createElement(Location, {path: "#/register", handler: Register})
+                )
+            )
+        );
+    }
 });
 
 module.exports = App;
-},{"./app-template.js":190,"./display/display.react":197,"./index":199,"./mode/mode.react":200,"./user/login.react":205,"./user/register.react":206,"react":188,"react-router-component":8}],192:[function(require,module,exports){
+
+},{"./app-template.js":190,"./display/display.react":214,"./index":216,"./mode/mode.react":217,"./user/login.react":219,"./user/register.react":220,"react":188,"react-router-component":8}],192:[function(require,module,exports){
 var React = require('react');
 
-var Apply = React.createClass({displayName: "Apply",
-  render:function(){
-    return (
-      React.createElement("button", {type: "button", className: "btn btn-info", style: {width: 100, height: 30, float: 'left', marginTop: 10}}, 
-      "Apply"
-      )
-    );
-  }
+var GetIntervals = React.createClass({displayName: "GetIntervals",
+    render:function(){
+        return (
+            React.createElement("button", {type: "button", className: "btn btn-info", style: {width: 100, height: 30, float: 'left', marginTop: 10}}, 
+                "Get Intervals"
+            )
+        );
+    }
 });
 
-module.exports = Apply;
+module.exports = GetIntervals;
 
 },{"react":188}],193:[function(require,module,exports){
+var React = require('react');
+
+var GetIntervals = React.createClass({displayName: "GetIntervals",
+    render:function(){
+        return (
+  	        React.createElement("div", {className: "btn-group"}, 
+  	            React.createElement("button", {type: "button", className: "btn btn-info", style: {width: 120, height: 30, marginTop: 10}}, 
+  	                "Get Intervals"
+  	            ), 
+  	            React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle", "data-toggle": "dropdown", style: {height: 30, marginTop: 10}}, 
+  	                React.createElement("span", {className: "caret"})
+  	            ), 
+      	        React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
+      	            React.createElement("li", null, React.createElement("a", {href: "#"}, "blah")), 
+      	            React.createElement("li", null, React.createElement("a", {href: "#"}, "blah1"))
+       	        )
+  	        )
+        );
+    }
+});
+
+module.exports = GetIntervals;
+
+},{"react":188}],194:[function(require,module,exports){
+var React = require('react');
+
+var GetPing = React.createClass({displayName: "GetPing",
+    render:function(){
+        return (
+      	    React.createElement("div", {className: "btn-group"}, 
+  	            React.createElement("button", {type: "button", className: "btn btn-info", style: {width: 90, height: 30, marginLeft: 10, marginTop: 10}}, 
+  	                "Get Ping"
+  	            ), 
+  	            React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle", "data-toggle": "dropdown", style: {height: 30, marginTop: 10}}, 
+  	                React.createElement("span", {className: "caret"})
+  	            ), 
+      	        React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
+      	            React.createElement("li", null, React.createElement("a", {href: "#"}, "blah")), 
+      	            React.createElement("li", null, React.createElement("a", {href: "#"}, "blah1"))
+       	        )
+  	        )
+        );
+    }
+});
+
+module.exports = GetPing;
+
+},{"react":188}],195:[function(require,module,exports){
+var React = require('react');
+
+var GetTime = React.createClass({displayName: "GetTime",
+    render:function(){
+        return (
+  	        React.createElement("div", {className: "btn-group"}, 
+  	            React.createElement("button", {type: "button", className: "btn btn-info", style: {width: 90, height: 30, marginLeft: 10, marginTop: 10}}, 
+  	                "Get Time"
+  	            ), 
+  	            React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle", "data-toggle": "dropdown", style: {height: 30, marginTop: 10}}, 
+  	                React.createElement("span", {className: "caret"})
+  	            ), 
+      	        React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
+      	            React.createElement("li", null, React.createElement("a", {href: "#"}, "blah")), 
+      	            React.createElement("li", null, React.createElement("a", {href: "#"}, "blah1"))
+       	        )
+  	        )
+        );
+    }
+});
+
+module.exports = GetTime;
+
+},{"react":188}],196:[function(require,module,exports){
 var React = require('react');
 
 var HeartBeat = React.createClass({displayName: "HeartBeat",
@@ -22570,7 +22641,7 @@ var HeartBeat = React.createClass({displayName: "HeartBeat",
 
 module.exports = HeartBeat;
 
-},{"react":188}],194:[function(require,module,exports){
+},{"react":188}],197:[function(require,module,exports){
 var React = require('react');
 
 var Reboot = React.createClass({displayName: "Reboot",
@@ -22583,7 +22654,7 @@ var Reboot = React.createClass({displayName: "Reboot",
 
 module.exports = Reboot;
 
-},{"react":188}],195:[function(require,module,exports){
+},{"react":188}],198:[function(require,module,exports){
 var React = require('react');
 
 var Reporting = React.createClass({displayName: "Reporting",
@@ -22601,7 +22672,117 @@ var Reporting = React.createClass({displayName: "Reporting",
 
 module.exports = Reporting;
 
-},{"react":188}],196:[function(require,module,exports){
+},{"react":188}],199:[function(require,module,exports){
+var React = require('react');
+
+var SetHeartBeat = React.createClass({displayName: "SetHeartBeat",
+	  render: function() {
+	    return (
+	        React.createElement("div", {className: "btn-group"}, 
+	            React.createElement("button", {type: "button", className: "btn btn-info"}, "Set Heartbeat (seconds)"), 
+	            React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle", "data-toggle": "dropdown"}, 
+	                React.createElement("span", {className: "caret"})
+	            ), 
+	            React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
+	                React.createElement("li", null, React.createElement("a", {href: "#"}, "blah")), 
+	                React.createElement("li", null, React.createElement("a", {href: "#"}, "blah1"))
+	            )
+	        )
+	    );
+	  }
+	});
+
+module.exports = SetHeartBeat;
+
+},{"react":188}],200:[function(require,module,exports){
+var React = require('react');
+
+var SetReporting = React.createClass({displayName: "SetReporting",
+    render:function(){
+        return (
+            React.createElement("div", {className: "btn-group"}, 
+                React.createElement("button", {type: "button", className: "btn btn-info"}, "Set Reporting (heartbeats)"), 
+                React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle", "data-toggle": "dropdown"}, 
+	                React.createElement("span", {className: "caret"})
+	            ), 
+	            React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
+	                React.createElement("li", null, React.createElement("a", {href: "#"}, "blah")), 
+	                React.createElement("li", null, React.createElement("a", {href: "#"}, "blah1"))
+	            )
+		    )
+        );
+    }
+});
+
+module.exports = SetReporting;
+
+},{"react":188}],201:[function(require,module,exports){
+var React = require('react');
+
+var SetTTParameters = React.createClass({displayName: "SetTTParameters",
+	  render: function() {
+	    return (
+	        React.createElement("div", {className: "btn-group"}, 
+	            React.createElement("button", {type: "button", className: "btn btn-info", style: {width: 165, height: 30, marginTop: 10}}, "Send Parameters"), 
+	            React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle", "data-toggle": "dropdown", style: {height: 30, marginTop: 10}}, 
+	                React.createElement("span", {className: "caret"})
+	            ), 
+	            React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
+	                React.createElement("li", null, React.createElement("a", {href: "#"}, "blah")), 
+	                React.createElement("li", null, React.createElement("a", {href: "#"}, "blah1"))
+	            )
+	        )
+	    );
+	  }
+	});
+
+module.exports = SetTTParameters;
+
+},{"react":188}],202:[function(require,module,exports){
+var React = require('react');
+
+var SetTTStart = React.createClass({displayName: "SetTTStart",
+	  render: function() {
+	    return (
+	        React.createElement("div", {className: "btn-group"}, 
+	            React.createElement("button", {type: "button", className: "btn btn-info", style: {width: 170, height: 30}}, "Start Test"), 
+	            React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle", "data-toggle": "dropdown", style: {height: 30}}, 
+	                React.createElement("span", {className: "caret"})
+	            ), 
+	            React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
+	                React.createElement("li", null, React.createElement("a", {href: "#"}, "blah")), 
+	                React.createElement("li", null, React.createElement("a", {href: "#"}, "blah1"))
+	            )
+	        )
+	    );
+	  }
+	});
+
+module.exports = SetTTStart;
+
+},{"react":188}],203:[function(require,module,exports){
+var React = require('react');
+
+var SetTTStop = React.createClass({displayName: "SetTTStop",
+	  render: function() {
+	    return (
+	        React.createElement("div", {className: "btn-group"}, 
+	            React.createElement("button", {type: "button", className: "btn btn-info", style: {width: 170, height: 30}}, "Stop Test"), 
+	            React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle", "data-toggle": "dropdown", style: {height: 30}}, 
+	                React.createElement("span", {className: "caret"})
+	            ), 
+	            React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
+	                React.createElement("li", null, React.createElement("a", {href: "#"}, "blah")), 
+	                React.createElement("li", null, React.createElement("a", {href: "#"}, "blah1"))
+	            )
+	        )
+	    );
+	  }
+	});
+
+module.exports = SetTTStop;
+
+},{"react":188}],204:[function(require,module,exports){
 var React = require('react');
 var Apply = require('./apply.react');
 var Reboot = require('./reboot.react');
@@ -22638,18 +22819,206 @@ React.createElement("div", null,
 
 module.exports = Setting;
 
-},{"./apply.react":192,"./heartbeat.react":193,"./reboot.react":194,"./reporting.react":195,"react":188}],197:[function(require,module,exports){
+},{"./apply.react":192,"./heartbeat.react":196,"./reboot.react":197,"./reporting.react":198,"react":188}],205:[function(require,module,exports){
+var React = require('react');
+var SetHeartbeat = require('./set_heartbeat.react');
+var ValueHeartbeat = require('./value_heartbeat.react');
+var SetReporting = require('./set_reporting.react');
+var ValueReporting = require('./value_reporting.react');
+var GetIntervals = require('./get_intervals.react');
+var GetTime = require('./get_time.react');
+var GetPing = require('./get_ping.react');
+
+var SettingStd = React.createClass({displayName: "SettingStd",
+    render: function() {
+        return (
+            React.createElement("div", null, 
+                React.createElement("table", null, 
+	                React.createElement("thead", null, 
+			            React.createElement("tr", null, 
+			                React.createElement("th", {colSpan: 3, style: {textAlign: 'center'}}, "Device Settings")
+			            )
+			        ), 
+                    React.createElement("tr", {style: {height: 50}}, 
+                        React.createElement("td", {style: {width: 170}}, " ", React.createElement(ValueHeartbeat, null)), 
+                        React.createElement("td", {style: {width: 300}}, " ", React.createElement(SetHeartbeat, null)), 
+                        React.createElement("td", null)
+                    ), 
+                    React.createElement("tr", null, 
+                        React.createElement("td", null, React.createElement(ValueReporting, null)), 
+                        React.createElement("td", null, React.createElement(SetReporting, null)), 
+                        React.createElement("td", null)
+                    ), 
+                    React.createElement("tr", null, 
+                        React.createElement("td", {colSpan: 3}, React.createElement(GetIntervals, null), " ", React.createElement(GetTime, null), " ", React.createElement(GetPing, null))
+                    )
+                )
+            )
+        );
+    }
+});
+
+module.exports = SettingStd;
+
+},{"./get_intervals.react":193,"./get_ping.react":194,"./get_time.react":195,"./set_heartbeat.react":199,"./set_reporting.react":200,"./value_heartbeat.react":207,"./value_reporting.react":208,"react":188}],206:[function(require,module,exports){
+var React = require('react');
+var ValueTTUlNumDatagrams = require('./value_tt_ul_num_datagrams.react');
+var ValueTTUlLenDatagram = require('./value_tt_ul_len_datagram.react');
+var ValueTTDlNumDatagrams = require('./value_tt_dl_num_datagrams.react');
+var ValueTTDlLenDatagram = require('./value_tt_dl_len_datagram.react');
+var ValueTTTimeout = require('./value_tt_timeout.react');
+var SetTTParameters = require('./set_tt_parameters.react');
+var SetTTStart = require('./set_tt_start.react');
+var SetTTStop = require('./set_tt_stop.react');
+
+var SettingTT = React.createClass({displayName: "SettingTT",
+    render: function() {
+        return (
+            React.createElement("div", null, 
+                React.createElement("table", null, 
+                    React.createElement("thead", null, 
+	                    React.createElement("tr", null, 
+		                    React.createElement("th", {colSpan: 5, style: {textAlign: 'center'}}, "Traffic Test Settings")
+		                )
+		            ), 
+                    React.createElement("tr", {style: {height: 50}}, 
+                        React.createElement("td", {style: {width: 110}}, "UL: Number:"), 
+                        React.createElement("td", {style: {width: 100}}, React.createElement(ValueTTUlNumDatagrams, null)), 
+                        React.createElement("td", {style: {width: 110}}, "Length:"), 
+                        React.createElement("td", {style: {width: 100}}, React.createElement(ValueTTUlLenDatagram, null)), 
+                        React.createElement("td", null, React.createElement(SetTTStart, null))
+                    ), 
+                    React.createElement("tr", null, 
+                        React.createElement("td", null, "DL: Number:"), 
+                        React.createElement("td", null, React.createElement(ValueTTDlNumDatagrams, null)), 
+                        React.createElement("td", null, "Length:"), 
+                        React.createElement("td", null, React.createElement(ValueTTDlLenDatagram, null)), 
+                        React.createElement("td", null, React.createElement(SetTTStop, null))
+                    ), 
+                    React.createElement("tr", null, 
+                        React.createElement("td", null, "Timeout (secs):"), 
+                        React.createElement("td", null, React.createElement(ValueTTTimeout, null)), 
+                        React.createElement("td", {colSpan: 2}, React.createElement(SetTTParameters, null))
+                    )
+                )
+            )
+        );
+    }
+});
+
+module.exports = SettingTT;
+
+},{"./set_tt_parameters.react":201,"./set_tt_start.react":202,"./set_tt_stop.react":203,"./value_tt_dl_len_datagram.react":209,"./value_tt_dl_num_datagrams.react":210,"./value_tt_timeout.react":211,"./value_tt_ul_len_datagram.react":212,"./value_tt_ul_num_datagrams.react":213,"react":188}],207:[function(require,module,exports){
+var React = require('react');
+
+var ValueHeartbeat = React.createClass({displayName: "ValueHeartbeat",
+    render:function(){
+        return (
+            React.createElement("div", null, 
+                React.createElement("input", {className: "form-control", type: "number", min: 1, max: 3599, defaultValue: 900, step: 1, style: {width: 145}})
+            )
+        );
+    }
+});
+
+module.exports = ValueHeartbeat;
+
+},{"react":188}],208:[function(require,module,exports){
+var React = require('react');
+
+var ValueReporting = React.createClass({displayName: "ValueReporting",
+    render:function(){
+        return (
+            React.createElement("div", null, 
+        	    React.createElement("input", {type: "number", className: "form-control bfh-number", min: 1, max: 10, defaultValue: 1, style: {width: 145}})
+            )
+        );
+    }
+});
+
+module.exports = ValueReporting;
+
+},{"react":188}],209:[function(require,module,exports){
+var React = require('react');
+
+var ValueTTDlLenDatagram = React.createClass({displayName: "ValueTTDlLenDatagram",
+    render:function(){
+        return (
+            React.createElement("div", null, 
+                React.createElement("input", {className: "form-control", type: "number", min: 1, max: 100, defaultValue: 100, step: 1, style: {width: 80}})
+            )
+        );
+    }
+});
+
+module.exports = ValueTTDlLenDatagram;
+
+},{"react":188}],210:[function(require,module,exports){
+var React = require('react');
+
+var ValueTTDlNumDatagrams = React.createClass({displayName: "ValueTTDlNumDatagrams",
+    render:function(){
+        return (
+            React.createElement("div", null, 
+                React.createElement("input", {className: "form-control", type: "number", min: 1, max: 10000, defaultValue: 100, step: 1, style: {width: 80}})
+            )
+        );
+    }
+});
+
+module.exports = ValueTTDlNumDatagrams;
+
+},{"react":188}],211:[function(require,module,exports){
+var React = require('react');
+
+var ValueTTTimeout = React.createClass({displayName: "ValueTTTimeout",
+    render:function(){
+        return (
+            React.createElement("input", {className: "form-control", type: "number", min: 1, max: 86400, defaultValue: 6000, step: 1, style: {width: 80, marginTop: 10}})
+        );
+    }
+});
+
+module.exports = ValueTTTimeout;
+
+},{"react":188}],212:[function(require,module,exports){
+var React = require('react');
+
+var ValueTTUlLenDatagram = React.createClass({displayName: "ValueTTUlLenDatagram",
+    render:function(){
+        return (
+            React.createElement("div", null, 
+                React.createElement("input", {className: "form-control", type: "number", min: 1, max: 100, defaultValue: 100, step: 1, style: {width: 80}})
+            )
+        );
+    }
+});
+
+module.exports = ValueTTUlLenDatagram;
+
+},{"react":188}],213:[function(require,module,exports){
+var React = require('react');
+
+var ValueTTUlNumDatagrams = React.createClass({displayName: "ValueTTUlNumDatagrams",
+    render:function(){
+        return (
+        	React.createElement("div", null, 
+	            React.createElement("input", {className: "form-control", type: "number", name: "UlNum", min: 1, max: 10000, defaultValue: 100, step: 1, style: {width: 80}})
+            )
+        );
+    }
+});
+
+module.exports = ValueTTUlNumDatagrams;
+
+},{"react":188}],214:[function(require,module,exports){
 /**
  * Copyright (c) 2014, U-blox.
  * All rights reserved.
  */
 var React = require('react');
 var AppStore = require('../../stores/app-store.js');
-var Configure = require('../panels/configure.react')
-var Summary = require('../panels/summary.react')
-var Hint = require('../panels/hint.react')
-var Measurements = require('../panels/measurements.react')
-var StoreWatchMixin = require('../../mixins/StoreWatchMixin');
+var Settings = require('../panels/settings.react')
 var DisplayRow = require('./displayRow.react')
 
 var Link = require('react-router-component').Link
@@ -22662,73 +23031,52 @@ var totalMsg = 0;
 var totalBytes = 0;
 
 var Display = React.createClass({displayName: "Display",
-
-   getInitialState: function(){   
-
-      var data = {data:[
-
-
+    getInitialState: function(){   
+        var data = {data:[
         ]}    
+        return data;
+    },
+    componentDidMount: function() {
+        pollState(function(data) {
+	        // fixup missing state properties to avoid muliple levels of missing attribute tests
+	        [
+	            "SummaryData",
+	            "DeviceData"
+	        ].map(function(property) {
+	            if (!data[property]) {
+	                data[property] = {};
+	            }
+	        });
+        this.setState({data: data});
+	    }.bind(this), 10000);
+    },
 
-      return data;
-  },
-  componentDidMount: function() {
-    pollState(function(data) {
-      // fixup missing state properties to avoid muliple levels of missing attribute tests
-      [
-       "SummaryData",
-       "DeviceData"
-      ].map(function(property) {
-        if (!data[property]) {
-          data[property] = {};
-        }
-      });
-
-      this.setState({data: data});
-    }.bind(this), 10000);
-
-  },
-
-  render:function(){
-    return (
-            React.createElement("div", null, React.createElement("br", null), 
-              React.createElement(Configure, null), 
-              React.createElement(Summary, {SummaryData:  this.state.data["SummaryData"]}), 
-              React.createElement(DisplayRow, {DeviceData:  this.state.data["DeviceData"]})
-    
-            )
-        );
-
-        }
+	render:function(){
+	    return (
+	        React.createElement("div", null, 
+	            React.createElement(Settings, null), 
+	            React.createElement(DisplayRow, {DeviceData:  this.state.data["DeviceData"]})
+	        )
+	    );
+    }
 });
 
-
-function formatTime(ts) {
-  if (ts != null) {
-    var i = ts.indexOf(".");
-    return ts.substr(0, i).replace("T", " ");
-  }
-
-}
-
 function pollState(updateState) {
-  function pollLoop() {
-    var x = new XMLHttpRequest();
-    x.onreadystatechange = function() {
-      if (x.readyState == 4) {
-        if (x.status == 200) {
-          var data = JSON.parse(x.responseText);
-         
-          updateState(data);
-        }
-        window.setTimeout(pollLoop, 1000);
-      }
-    };
-
-    x.open("GET", "frontPageData", true);
-    x.send();
-  }
-  pollLoop();
+    function pollLoop() {
+        var x = new XMLHttpRequest();
+        x.onreadystatechange = function() {
+            if (x.readyState == 4) {
+                if (x.status == 200) {
+                    var data = JSON.parse(x.responseText);
+                   updateState(data);
+                }
+            window.setTimeout(pollLoop, 1000);
+            }
+        };
+        x.open("GET", "frontPageData", true);
+        x.send();
+    }
+    pollLoop();
 }
 
 Object.size = function(obj) {
@@ -22740,7 +23088,8 @@ Object.size = function(obj) {
 };
 
 module.exports = Display;
-},{"../../mixins/StoreWatchMixin":210,"../../stores/app-store.js":211,"../panels/configure.react":201,"../panels/hint.react":202,"../panels/measurements.react":203,"../panels/summary.react":204,"./displayRow.react":198,"react":188,"react-router-component":8}],198:[function(require,module,exports){
+
+},{"../../stores/app-store.js":224,"../panels/settings.react":218,"./displayRow.react":215,"react":188,"react-router-component":8}],215:[function(require,module,exports){
 /**
  * Copyright (c) 2014, U-blox.
  * All rights reserved.
@@ -22749,275 +23098,110 @@ var React = require('react');
 var Link = require('react-router-component').Link;
 
 var DisplayRow = React.createClass({displayName: "DisplayRow",
-
     render: function() {
-
         var rows = [];
-
-          if(this.props["DeviceData"] !== undefined){   
-
+        if (this.props["DeviceData"] !== undefined){        	
             this.props["DeviceData"].forEach(function(uuid, i) {
-
-             
-            rows.push(       
-    
-              React.createElement("tr", {className: "even gradeC", key: i}, 
-                        React.createElement("td", {style: {textAlign: 'center', width: 15}}, 
-                          React.createElement("input", {type: "checkbox"}), React.createElement("br", null), 
-                          React.createElement("img", {src: "static/dist/assets/images/green.png", alt: "logo", style: {maxWidth: 12}})
-                        ), 
-                        React.createElement("td", {style: {width: 250}}, 
-                          React.createElement("ul", {className: "SmallPadding"}, 
-                            React.createElement("b", null, "Name:"), " ", uuid["UnitName"], React.createElement("br", null), 
-                            React.createElement("b", null, "UUID:"), " ", uuid["Uuid"], React.createElement("br", null), 
-                            React.createElement("b", null, "Mode:"), " ", uuid["Mode"], React.createElement("br", null), 
-                            React.createElement("b", null, "Reporting:"), " ", uuid["Reporting"], React.createElement("br", null), 
-                            React.createElement("b", null, "Heartbeat:"), " ", uuid["Heartbeat"], React.createElement("br", null)
-                          )
-                        ), 
-                        React.createElement("td", {style: {width: 170}}, 
-                          React.createElement("ul", {className: "SmallPadding"}, 
-                            React.createElement("b", null, "Msgs:"), " ", uuid["TotalUlMsgs"], React.createElement("br", null), 
-                            React.createElement("b", null, "Bytes:"), " ", uuid["TotalUlBytes"], React.createElement("br", null), 
-                            React.createElement("b", null, "Last Msg:"), " ", uuid["LastUlMsgTime"], React.createElement("br", null)
-                          )
-                        ), 
-                        React.createElement("td", {style: {width: 170}}, 
-                          React.createElement("b", null, "Msgs:"), " ", uuid["TotalDlMsgs"], React.createElement("br", null), 
-                          React.createElement("b", null, "Bytes:"), " ", uuid["TotalDlBytes"], React.createElement("br", null), 
-                          React.createElement("b", null, "Last Msg:"), " ", uuid["LastDlMsgTime"], React.createElement("br", null)
-                        ), 
-                        React.createElement("td", {style: {width: 80}}, 
-                        React.createElement("i", {className: "fa fa-signal"}), " ", uuid["Rsrp"], " dBm", React.createElement("br", null), 
-                        React.createElement("i", {className: "fa fa-floppy-o"}), " ", uuid["DiskSpaceLeft"], React.createElement("br", null), 
-                        React.createElement("i", {className: "fa fa-battery-full"}), " ", uuid["BatteryLevel"]
-                        ), 
-                        React.createElement("td", {className: "center", style: {width: 200}}
-                        )
-                      )
-
-                      );
-
-                
-         
-   
-       });
-}
-                return (
-                        React.createElement("div", {className: "row"}, 
-                          React.createElement("div", {className: "panel panel-default"}, 
-                            React.createElement("div", {className: "_panel-heading", style: {width:'100%'}}, 
-                              React.createElement("div", {className: "panel-body"}, 
-                                React.createElement("div", {className: "dataTable_wrapper"}, 
-                                  React.createElement("table", {className: "table table-striped table-bordered table-hover", id: "dataTables-example"}, 
-                                    React.createElement("thead", null, 
-                                      React.createElement("tr", {className: "info"}, 
-                                        React.createElement("th", {style: {textAlign: 'center', width: 15}}, React.createElement("input", {type: "checkbox"})), 
-                                        React.createElement("th", null, "Device"), 
-                                        React.createElement("th", null, "Uplink"), 
-                                        React.createElement("th", null, "Downlink"), 
-                                        React.createElement("th", null, "Status"), 
-                                        React.createElement("th", null, "Results")
-                                      )
-                                    ), 
-                                     React.createElement("tbody", {style: {fontSize: 12}}, 
-                                            rows
-                                    )
-                                  )
-                                )
-                              )
-                            )
-                          )
-                        )
-                );
-
-
+	            rows.push(       
+	                React.createElement("tr", {className: "even gradeC", key: i}, 
+	                    React.createElement("td", {style: {textAlign: 'center', width: 15}}, 
+	                        React.createElement("input", {type: "checkbox"}), React.createElement("br", null), 
+	                        React.createElement("img", {src: "static/dist/assets/images/green.png", alt: "logo", style: {maxWidth: 12}})
+	                    ), 
+	                    React.createElement("td", {style: {width: 250}}, 
+	                        React.createElement("ul", {className: "SmallPadding"}, 
+	                            React.createElement("b", null, "Name:"), " ", uuid["UnitName"], React.createElement("br", null), 
+	                            React.createElement("b", null, "UUID:"), " ", uuid["Uuid"], React.createElement("br", null), 
+	                            React.createElement("b", null, "Mode:"), " ", uuid["Mode"], React.createElement("br", null), 
+	                            React.createElement("b", null, "Reporting:"), " ", uuid["Reporting"], React.createElement("br", null), 
+	                            React.createElement("b", null, "Heartbeat:"), " ", uuid["Heartbeat"]
+	                        )
+	                    ), 
+	                    React.createElement("td", {style: {width: 170}}, 
+	                        React.createElement("ul", {className: "SmallPadding"}, 
+	                            React.createElement("b", null, "Msgs:"), " ", uuid["TotalUlMsgs"], React.createElement("br", null), 
+	                            React.createElement("b", null, "Bytes:"), " ", uuid["TotalUlBytes"], React.createElement("br", null), 
+	                            React.createElement("b", null, "Last Msg:"), " ", uuid["LastUlMsgTime"]
+	                        )
+	                    ), 
+	                    React.createElement("td", {style: {width: 170}}, 
+	                        React.createElement("b", null, "Msgs:"), " ", uuid["TotalDlMsgs"], React.createElement("br", null), 
+	                        React.createElement("b", null, "Bytes:"), " ", uuid["TotalDlBytes"], React.createElement("br", null), 
+	                        React.createElement("b", null, "Last Msg:"), " ", uuid["LastDlMsgTime"]
+	                    ), 
+	                    React.createElement("td", {style: {width: 80}}, 
+	                        React.createElement("i", {className: "fa fa-signal"}), " ", uuid["Rsrp"], " dBm", React.createElement("br", null), 
+	                        React.createElement("i", {className: "fa fa-floppy-o"}), " ", uuid["DiskSpaceLeft"], React.createElement("br", null), 
+	                        React.createElement("i", {className: "fa fa-battery-full"}), " ", uuid["BatteryLevel"]
+	                    ), 
+	                    React.createElement("td", {className: "center", style: {width: 200}}
+	                    )
+	                )
+	            );
+            });
+        }
+        return (
+        		
+            React.createElement("div", {className: "row"}, 
+                React.createElement("div", {className: "panel panel-default"}, 
+                    React.createElement("div", {className: "_panel-heading", style: {width:'100%'}}, 
+                        React.createElement("div", {className: "panel-body"}, 
+                            React.createElement("div", {className: "dataTable_wrapper"}, 
+	                            React.createElement("table", {className: "table table-striped table-bordered table-hover", id: "dataTables-example"}, 
+	                                React.createElement("thead", null, 
+	                                    React.createElement("tr", {className: "info"}, 
+	                                        React.createElement("th", {style: {textAlign: 'center', width: 15}}, React.createElement("input", {type: "checkbox"})), 
+	                                        React.createElement("th", null, "Device"), 
+	                                        React.createElement("th", null, "Uplink"), 
+	                                        React.createElement("th", null, "Downlink"), 
+	                                        React.createElement("th", null, "Status"), 
+	                                        React.createElement("th", null, "Test Results")
+	                                    )
+	                                ), 
+	                                React.createElement("tbody", {style: {fontSize: 12}}, 
+	                                    rows
+	                                )
+	                            )
+	                        )
+	                    )
+	                )
+	            )
+	        )
+        );
     }
 });
 
 module.exports = DisplayRow;
 
-},{"react":188,"react-router-component":8}],199:[function(require,module,exports){
+},{"react":188,"react-router-component":8}],216:[function(require,module,exports){
 var React = require('react');
 
 
 var Index = React.createClass({displayName: "Index",
-
-	render:function(){
-		return (
-			  React.createElement("div", {className: "row"}, React.createElement("br", null), 
-                          React.createElement("div", {className: "panel panel-default"}, 
-                            React.createElement("div", {className: "_panel-heading", style: {width:'80%'}}, 
-                              React.createElement("div", {className: "panel-body"}, 
-                                React.createElement("div", {className: "dataTable_wrapper"}, 
-		React.createElement("div", null, 
-		        React.createElement("div", null, 
-        React.createElement("h2", null, 
-          React.createElement("a", {name: "_Toc425263541"}, "1.1 Introduction")
-        ), 
-        React.createElement("p", null, 
-          "The software is shipped with a default configuration, which may be re-enabled via the remote interface or USB port. It has a number of basic test modes." + ' ' +
-          "Remote adjustment of the features and configurations can only be done in Standard TRX mode, and may have immediate impact on current behaviour. Most" + ' ' +
-          "changes will persist across a power cycle. The USB port, or for remote access, Standard TRX mode, is also used to configure and manage entry into either" + ' ' +
-          "Receive-Only or Transmit-Only modes, though these modes do not persist across a power cycle."
-        ), 
-        React.createElement("p", null, 
-          "Changes to the configuration are recorded in the host FLASH storage and therefore survive power cycling."
-        ), 
-        React.createElement("h3", null, 
-          React.createElement("a", {name: "_Toc425263542"}, "1.1.1 Basic Modes of Operation:")
-        ), 
-        React.createElement("p", null, 
-          "1. Self-Test"
-        ), 
-        React.createElement("p", null, 
-          "2. Standard TRX"
-        ), 
-        React.createElement("p", null, 
-          "3. Receive only"
-        ), 
-        React.createElement("p", null, 
-          "4. Transmit only"
-        ), 
-        React.createElement("h4", null, 
-          "1.1.1.1 Self-Test"
-        ), 
-        React.createElement("p", null, 
-          "At boot up the host application will perform a number of tests to verify UTM operation. These include:"
-        ), 
-        React.createElement("p", null, 
-          "1. Battery Voltage above required threshold"
-        ), 
-        React.createElement("p", null, 
-          "2. Module ‘OK’ through AT command dialogue"
-        ), 
-        React.createElement("p", null, 
-          "3. SD Card present"
-        ), 
-        React.createElement("p", null, 
-          "Any failures at this stage will result in an error light and halt further operation, except for access via USB which may be used to extend tests via direct" + ' ' +
-          "interaction."
-        ), 
-        React.createElement("p", null, 
-          "On successful completion of this stage the UTM will always transition to Standard TRX mode."
-        ), 
-        React.createElement("h4", null, 
-          "1.1.1.2 Standard TRX"
-        ), 
-        React.createElement("p", null, 
-          "This is the default mode after boot up and successful self-test."
-        ), 
-        React.createElement("p", null, 
-          "In this mode, the software operates with 2 basic internal timers:"
-        ), 
-        React.createElement("p", null, 
-          "1. Heartbeat timer to wake up the UTM and perform one or more measurements"
-        ), 
-        React.createElement("p", null, 
-          "2. Reporting interval timer to trigger a transmission of measurement(s) as user data"
-        ), 
-        React.createElement("p", null, 
-          "For each measurement (see section 2.4.2) it is possible to configure the following:"
-        ), 
-        React.createElement("p", null, 
-          "1. Each measurement is defined as occurring every K heartbeats"
-        ), 
-        React.createElement("p", null, 
-          "2. Enable the measurement for transmission as user data"
-        ), 
-        React.createElement("p", null, 
-          "Optionally, the criteria for transmission of the measurement may be set as:"
-        ), 
-        React.createElement("p", null, 
-          "1. Only report the measurement if the data hysteresis is greater than D from the last"
-        ), 
-        React.createElement("p", null, 
-          "2. Only report data if above a threshold A, or below a threshold B"
-        ), 
-        React.createElement("p", null, 
-          "3. As (2) but on a “one-shot” basis"
-        ), 
-        React.createElement("p", null, 
-          "4. Set a maximum reporting interval of MxN heartbeats irrespective of the criteria above"
-        ), 
-        React.createElement("p", null, 
-          "The reporting interval is defined as occurring every N heartbeats (default is 1)."
-        ), 
-        React.createElement("p", null, 
-          "In addition to the 2 internal timer mechanisms for UTM triggered operations, the eNodeB is responsible for configuring the the UE DRX Idle Timeout (the" + ' ' +
-          "time the UE stays awake after an uplink transmission in order to receive downlink messages) and the UE DRX Sleep Duration (the periodicity of UE wake-up" + ' ' +
-          "for downlink reception if there is nothing to transmit on the uplink). The UE DRX Sleep Duration is defined as 2^P x Q, where Q is ~5 seconds at MCS4, and" + ' ' +
-          "~320ms at MCS2, where P is in the range 0 to 15 up to a maximum period of ~2days at MCS4."
-        ), 
-        React.createElement("p", null, 
-          "It is possible to configure the UTM to request continuous uplink grants that will be filled with a numerically incrementing data stream. A timer may be set" + ' ' +
-          "to terminate this function, or by remote access."
-        ), 
-        React.createElement("h4", null, 
-          "1.1.1.3 Receive Only"
-        ), 
-        React.createElement("p", null, 
-          "This mode can be pre-configured and entered via the Standard TRX mode. In this mode the module will enable its receiver and either"
-        ), 
-        React.createElement("p", null, 
-          "1. perform a full band scan, after which it will return to Standard TRX mode, or"
-        ), 
-        React.createElement("p", null, 
-          "2. perform a partial scan based on provided channel numbers"
-        ), 
-        React.createElement("p", null, 
-          "3. perform a continuous RSSI measurement at the pre-configured frequency. In the latter case the duration of the RSSI measurement can be pre-configured to" + ' ' +
-          "force a return to Standard TRX mode, or remain permanently in this mode until power down."
-        ), 
-        React.createElement("p", null, 
-          "Measurements will be logged to the SD Card if enabled, but none will be transmitted as user data whilst in this mode. The UTM will not be in communication" + ' ' +
-          "with the eNodeB during this time. In the case of full band scan, the UTM can optionally transmit the full RSSI results as user data when returning to" + ' ' +
-          "Standard TRX mode."
-        ), 
-        React.createElement("p", null, 
-          "Note that a full band scan can take a significant length of time (>1hr) and in RX Mode power consumption will be high and battery life will be much" + ' ' +
-          "shorter than Standard TRX operation. The UTM will terminate this mode when the battery voltage is measured at the minimum threshold, and after reporting" + ' ' +
-          "the battery low condition in Standard TRX mode it will halt by asserting a battery low condition on the status LED."
-        ), 
-        React.createElement("h4", null, 
-          "1.1.1.4 Transmit Only"
-        ), 
-        React.createElement("p", null, 
-          "This mode can be pre-configured and entered via the Standard TRX mode. In this mode the module will enable its transmitter and either"
-        ), 
-        React.createElement("p", null, 
-          "1. Transmit for a pre-configured time period, after which it will return to Standard TRX mode, or"
-        ), 
-        React.createElement("p", null, 
-          "2. Transmit permanently in this mode until power down"
-        ), 
-        React.createElement("p", null, 
-          "The transmission is continuous and may be used to measure radiation profiles. This mode should only be used in the lab to avoid spurious transmissions on" + ' ' +
-          "licensed spectrum in the field. Note that in Standard TRX mode it is possible for the UTM to be configured to ask for continuous uplink grants."
-        ), 
-        React.createElement("p", null, 
-          "Measurements will be logged to the SD Card if enabled, but only pre-configured RF Burst content will be transmitted and the UTM will not be in" + ' ' +
-          "communication with the eNodeB during this time."
-        ), 
-        React.createElement("p", null, 
-          "Note that power consumption will be significant during this time and battery life will be much shorter than Standard TRX operation. The UTM will terminate" + ' ' +
-          "this mode when the battery voltage is measured at the minimum threshold, and after reporting the battery low condition in Standard TRX mode it will halt by" + ' ' +
-          "asserting a battery low condition on the status LED."
-        )
-      )
-		 )
-		             )
-                              )
+    render:function(){
+        return (
+            React.createElement("div", {className: "row"}, React.createElement("br", null), 
+                React.createElement("div", {className: "panel panel-default"}, 
+                    React.createElement("div", {className: "_panel-heading", style: {width:'100%'}}, 
+                        React.createElement("div", {className: "panel-body"}, 
+                             React.createElement("div", {className: "dataTable_wrapper"}, 
+		                         React.createElement("div", null, 
+		                             React.createElement("div", null, 
+								         "This page intentionally left blank."
+								    )
+                                )
                             )
-                          )
                         )
+                    )
+                )
+            )
 		);
-		
 	}
 });
 
 module.exports = Index;
-},{"react":188}],200:[function(require,module,exports){
+
+},{"react":188}],217:[function(require,module,exports){
 /**
  * Copyright (c) 2014, U-blox.
  * All rights reserved.
@@ -23319,199 +23503,37 @@ var Mode = React.createClass({displayName: "Mode",
 
 module.exports = Mode;
 
-},{"../controls/setting.react":196,"react":188}],201:[function(require,module,exports){
+},{"../controls/setting.react":204,"react":188}],218:[function(require,module,exports){
 var React = require('react');
-var Link = require('react-router-component').Link;
+var SettingStd = require('../controls/setting_std.react');
+var SettingTT = require('../controls/setting_tt.react');
 
-var Configure = React.createClass({displayName: "Configure",
-  render:function(){
-    return (
-   
-    	React.createElement("div", {className: "col-lg-4"}, 
-            React.createElement("div", {style: {height: 60, width: 200, marginTop: 100}}, 
-              React.createElement("div", {className: "panel-body"}, 
-                React.createElement("p", null, 
-                  React.createElement(Link, {href: "/mode"}, 
-                    React.createElement("b", {className: "fa fa-cogs  fa-2x"})
-                  ), 
-                  React.createElement("b", {style: {float: 'right'}}, "Configure Ticked")
+var Settings = React.createClass({displayName: "Settings",
+    render:function(){
+        return (
+            React.createElement("div", {className: "row"}, 
+		        React.createElement("div", {className: "col-lg-5"}, 
+		            React.createElement("div", {className: "panel panel-info", style: {height: 180, marginTop: 10}}, 
+			            React.createElement("div", {className: "panel-body"}, 
+                            React.createElement(SettingStd, null)
+			            )
+		            )
+	            ), 
+		        React.createElement("div", {className: "col-lg-7"}, 
+		            React.createElement("div", {className: "panel panel-info", style: {height: 180, marginTop: 10}}, 
+			            React.createElement("div", {className: "panel-body"}, 
+                            React.createElement(SettingTT, null)
+			            )
+		            )
                 )
-              )
-            )
-          )
-     
-    );
-  }
+	        )
+	    )
+    }
 });
 
-module.exports = Configure;
-},{"react":188,"react-router-component":8}],202:[function(require,module,exports){
-var React = require('react');
+module.exports = Settings;
 
-var Hint = React.createClass({displayName: "Hint",
-  render:function(){
-    return (
-    		React.createElement("div", {className: "col-lg-4"}
-
-          )
-     
-    );
-  }
-});
-
-module.exports = Hint;
-
-},{"react":188}],203:[function(require,module,exports){
-var React = require('react');
-
-var Measurements = React.createClass({displayName: "Measurements",
-  render:function(){
-    return (
-    	 React.createElement("div", {className: "panel panel-default"}, 
-            React.createElement("div", {className: "panel-heading"}, 
-    		   React.createElement("div", {className: "panel-body"}, 
-                React.createElement("div", {className: "dataTable_wrapper"}, 
-                  React.createElement("table", {className: "table table-striped table-bordered table-hover", id: "dataTables-example"}, 
-                    React.createElement("thead", null, 
-                      React.createElement("tr", {className: "info"}, 
-                        React.createElement("th", null, " ", React.createElement("input", {type: "checkbox", style: {width: 15}}), " All"), 
-                        React.createElement("th", null, "Name/Uuid"), 
-                       React.createElement("th", null, "Upstream"), 
-                        React.createElement("th", null, "Downsteam"), 
-                        React.createElement("th", null, "RSRP "), 
-                        React.createElement("th", null, 
-                          "Battery - ", React.createElement("i", {className: "fa fa-floppy-o"})
-                        )
-                      )
-                    ), 
-                    React.createElement("tbody", {style: {fontSize: 12}}, 
-                      React.createElement("tr", {className: "even gradeA"}, 
-                        React.createElement("td", {style: {width: 15}}, 
-                          React.createElement("input", {type: "checkbox", style: {width: 15}}), React.createElement("br", null), 
-                          React.createElement("img", {src: "static/Images/green.png", alt: "logo", style: {maxWidth: 12}})
-                        ), 
-                        React.createElement("td", null, 
-                          React.createElement("ul", null, 
-                            React.createElement("li", null, React.createElement("b", null, "Uuid:"), " "/*this.state["LatestDisplayRow"]["Uuid"]*/), 
-                            React.createElement("li", null, React.createElement("b", null, "Mode:"), " "/*this.state["LatestDisplayRow"]["Mode"]*/), 
-                            React.createElement("li", null, React.createElement("b", null, "Name:"), " "/*this.state["LatestDisplayRow"]["UnitName"]*/)
-                          )
-                        ), 
-                        React.createElement("td", null, 
-                          React.createElement("ul", null, 
-                            React.createElement("li", null, React.createElement("b", null, "Total Msg:"), " "/*this.state["LatestDisplayRow"]["TotalMsgs"]*/), 
-                            React.createElement("li", null, React.createElement("b", null, "Total Bytes:"), " "/*this.state["LatestDataVolume"]["UplinkBytes"]*/), 
-                            React.createElement("li", null, React.createElement("b", null, "Last Msg RX:"), " "/*this.state["LatestDisplayRow"]["UlastMsgReceived"]*/)
-                          )
-                        ), 
-                        React.createElement("td", {className: "center"}, 
-                          React.createElement("ul", null, 
-                            React.createElement("li", null, React.createElement("b", null, "Total Msg:"), " "/*this.state["LatestDisplayRow"]["DTotalMsgs"] ? "" : "--"*/), 
-                            React.createElement("li", null, React.createElement("b", null, "Total Bytes:"), " "/*this.state["LatestDisplayRow"]["DTotalBytes"] ? "" : "--"*/), 
-                            React.createElement("li", null, React.createElement("b", null, "Last Msg RX:"), " "/*this.state["LatestDisplayRow"]["DlastMsgReceived"] ? "" : "--"*/)
-                          )
-                        ), 
-                        React.createElement("td", {className: "center"}/*this.state["LatestDisplayRow"]["BatteryLevel"] ? "" : "0"*/), 
-                        React.createElement("td", {className: "center"}, 
-                          /*this.state["LatestDisplayRow"]["BatteryLevel"] ? "" : "0"*/" -"
-                          /*this.state["LatestDisplayRow"]["DiskSpaceLeft"] ? "" : " 0"*/
-                        )
-                      ), 
-                    React.createElement("tr", {className: "even gradeC"}, 
-                        React.createElement("td", {style: {width: 15}}, 
-                          React.createElement("a", {tabIndex: -1, href: "#/standardtwo"}, " ", React.createElement("b", {className: "fa fa-cogs"})), React.createElement("br", null), 
-                          React.createElement("input", {type: "checkbox", style: {width: 15}}), React.createElement("br", null), 
-                          React.createElement("img", {src: "ehlo.jpg", alt: "logo", style: {maxWidth: 12}})
-                        ), 
-                        React.createElement("td", {style: {width: 205}}, 
-                          React.createElement("ul", null, 
-                            React.createElement("li", null, React.createElement("b", null, "Uuid:"), " "/*this.state["LatestDisplayRow"]["Uuid"]*/), 
-                            React.createElement("li", null, React.createElement("b", null, "Mode:"), " "/*this.state["LatestDisplayRow"]["Mode"]*/), 
-                            React.createElement("li", null, React.createElement("b", null, "Name:"), " "/*this.state["LatestDisplayRow"]["UnitName"]*/)
-                          )
-                        ), 
-                        React.createElement("td", {style: {width: 75}}, 
-                          React.createElement("ul", null, 
-                            React.createElement("li", null, React.createElement("b", null, "Total Msg:"), " "/*this.state["LatestDisplayRow"]["TotalMsgs"]*/), 
-                            React.createElement("li", null, React.createElement("b", null, "Total Bytes:"), " "/*this.state["LatestDataVolume"]["UplinkBytes"]*/), 
-                            React.createElement("li", null, React.createElement("b", null, "Last Msg RX:"), " "/*this.state["LatestDisplayRow"]["UlastMsgReceived"]*/)
-                          )
-                        ), 
-                        React.createElement("td", {className: "center", style: {width: 75}}, 
-                          React.createElement("ul", null, 
-                            React.createElement("li", null, React.createElement("b", null, "Total Msg:"), " "/*this.state["LatestDisplayRow"]["DTotalMsgs"] ? "" : "--"*/), 
-                            React.createElement("li", null, React.createElement("b", null, "Total Bytes:"), " "/*this.state["LatestDisplayRow"]["DTotalBytes"] ? "" : "--"*/), 
-                            React.createElement("li", null, React.createElement("b", null, "Last Msg RX:"), " "/*this.state["LatestDisplayRow"]["DlastMsgReceived"] ? "" : "--"*/)
-                          )
-                        ), 
-                        React.createElement("td", {className: "center", style: {width: 25}}/*this.state["LatestDisplayRow"]["BatteryLevel"] ? "" : "0"*/), 
-                        React.createElement("td", {className: "center", style: {width: 25}}, 
-                          /*this.state["LatestDisplayRow"]["BatteryLevel"] ? "" : "0"*/ " -"
-                          /*this.state["LatestDisplayRow"]["DiskSpaceLeft"] ? "" : " 0"*/ 
-                        )
-                      )
-                    )
-                  )
-                )
-              )
-            )
-      )
-     
-    );
-  }
-});
-
-module.exports = Measurements;
-
-},{"react":188}],204:[function(require,module,exports){
-var React = require('react');
-
-var Summary = React.createClass({displayName: "Summary",
-      render:function(){
-              var rows = [];
-
-                  if(this.props["SummaryData"] !== undefined){                  
-
-                                      rows.push(  
-                                    React.createElement("div", null, React.createElement("br", null), 
-                                    React.createElement("div", {className: "col-lg-4"}
-                                    ), 
-                                    React.createElement("div", {className: "col-lg-4"}, 
-                                      React.createElement("div", {className: "panel panel-info", style: {height: 110, width: 350, marginTop: 20}}, 
-                                        React.createElement("div", {className: "panel-body"}, 
-                                          React.createElement("p", {style: {fontStyle: 'italic'}}, 
-
-                                           React.createElement("b", null, "Total Uplink Msgs:"), " ", React.createElement("span", {className: "resetColor"}, "  ", this.props["SummaryData"]['TotalUlMsgs'] ), React.createElement("br", null), 
-                                            React.createElement("b", null, "Total Downlink Msgs:"), " ", React.createElement("span", {className: "resetColor"}, "  ", this.props["SummaryData"]["TotalDlMsgs"] ), React.createElement("br", null), 
-                                            React.createElement("b", null, "Total Bytes:"), " ", this.props["SummaryData"]["TotalDlBytes"], React.createElement("br", null), 
-                                            React.createElement("b", null, "Last Msg:"), "    ", this.props["SummaryData"]["LastDlMsgTime"], React.createElement("br", null)
-                                          )
-                                        )
-                                      )
-                                      )
-                                      )  
-
-                                   );   
-
-                     
-               }
-               
-
-
-
-
-          return (
-
-              React.createElement("div", null, 
-                rows[0]
-             )
-          );
-      }
-});
-
-module.exports = Summary;
-
-},{"react":188}],205:[function(require,module,exports){
+},{"../controls/setting_std.react":205,"../controls/setting_tt.react":206,"react":188}],219:[function(require,module,exports){
 var React = require('react');
 var Link = require('react-router-component').Link;
 
@@ -23545,7 +23567,7 @@ var Login = React.createClass({displayName: "Login",
 
 module.exports = Login;
 
-},{"react":188,"react-router-component":8}],206:[function(require,module,exports){
+},{"react":188,"react-router-component":8}],220:[function(require,module,exports){
 var React = require('react');
 var Link = require('react-router-component').Link;
 
@@ -23622,7 +23644,7 @@ var Register = React.createClass({displayName: "Register",
 
 module.exports = Register;
 
-},{"react":188,"react-router-component":8}],207:[function(require,module,exports){
+},{"react":188,"react-router-component":8}],221:[function(require,module,exports){
 module.exports = {
   SET_COMMISSIONING: 'SET_COMMISSIONING',
   SET_TRAFFIC_TEST: 'SET_TRAFFIC_TEST',
@@ -23632,7 +23654,7 @@ module.exports = {
   REBOOT: 'REBOOT',
   ADD_USER: 'ADD_USER'
 };
-},{}],208:[function(require,module,exports){
+},{}],222:[function(require,module,exports){
 var Dispatcher = require('flux').Dispatcher;
 var assign = require('react/lib/Object.assign');
 
@@ -23647,34 +23669,12 @@ var AppDispatcher = assign(new Dispatcher(), {
 });
 
 module.exports = AppDispatcher;
-},{"flux":3,"react/lib/Object.assign":56}],209:[function(require,module,exports){
+},{"flux":3,"react/lib/Object.assign":56}],223:[function(require,module,exports){
 var App = require('./components/app');
 var React = require('react');
 
 React.render(React.createElement(App, null), document.getElementById('main'));
-},{"./components/app":191,"react":188}],210:[function(require,module,exports){
-var React = require('react');
-var AppStore = require('../stores/app-store');
-
-var StoreWatchMixin = function(cb){
-  return {
-    getInitialState:function(){
-      return cb(this)
-    },
-    componentWillMount:function(){
-      AppStore.addChangeListener(this._onChange)
-    },
-    componentWillUnmount:function(){
-      AppStore.removeChangeListener(this._onChange)
-    },
-    _onChange: function(){
-      this.setState(cb(this))
-    }
-  }
-}
-
-module.exports = StoreWatchMixin;
-},{"../stores/app-store":211,"react":188}],211:[function(require,module,exports){
+},{"./components/app":191,"react":188}],224:[function(require,module,exports){
 var AppDispatcher = require('../dispatchers/app-dispatcher');
 var AppConstants = require('../constants/app-constants');
 var assign = require('react/lib/Object.assign');
@@ -23769,4 +23769,4 @@ function addUser(company, firstName, lastName, email, password) {
 })
 
 module.exports = AppStore;
-},{"../constants/app-constants":207,"../dispatchers/app-dispatcher":208,"events":1,"react/lib/Object.assign":56}]},{},[209]);
+},{"../constants/app-constants":221,"../dispatchers/app-dispatcher":222,"events":1,"react/lib/Object.assign":56}]},{},[223]);

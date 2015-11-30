@@ -11,20 +11,19 @@ var Locations = Router.Locations;
 var Location  = Router.Location;
 
 var App = React.createClass({
-  render:function(){
-    return (
-      <Template>
-        <Locations>
-        <Location path="/" handler={Index} />
-          <Location path="#/display" handler={Display} />
-          <Location path="#/mode" handler={Mode} />
-          <Location path="#/login" handler={Login} />
-          <Location path="#/register" handler={Register} />
-        </Locations>
-      </Template>
-    );
-  }
+    render:function(){
+        return (
+            <Template>
+                <Locations>
+                    <Location path="/" handler={Index} />
+                    <Location path="#/display" handler={Display} />
+                    <Location path="#/mode" handler={Mode} />
+                    <Location path="#/login" handler={Login} />
+                    <Location path="#/register" handler={Register} />
+                </Locations>
+            </Template>
+        );
+    }
 });
 
 module.exports = App;
-

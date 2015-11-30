@@ -23292,7 +23292,7 @@ module.exports = ValueTTUlNumDatagrams;
 var React = require('react');
 var AppStore = require('../../stores/app-store.js');
 var Settings = require('../panels/settings.react')
-var DisplayRow = require('./displayRow.react')
+var DisplayRow = require('./display_row.react')
 
 var Link = require('react-router-component').Link
 
@@ -23357,7 +23357,7 @@ Object.size = function(obj) {
 
 module.exports = Display;
 
-},{"../../stores/app-store.js":219,"../panels/settings.react":212,"./displayRow.react":210,"react":188,"react-router-component":8}],210:[function(require,module,exports){
+},{"../../stores/app-store.js":219,"../panels/settings.react":212,"./display_row.react":210,"react":188,"react-router-component":8}],210:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK

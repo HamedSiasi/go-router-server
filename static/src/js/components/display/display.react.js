@@ -20,7 +20,7 @@
 var React = require('react');
 var AppStore = require('../../stores/app-store.js');
 var Settings = require('../panels/settings.react')
-var DisplayRow = require('./displayRow.react')
+var DisplayRow = require('./display_row.react')
 
 var Link = require('react-router-component').Link
 

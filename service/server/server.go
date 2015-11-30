@@ -281,10 +281,9 @@ func Run() {
 	store := cookiestore.New([]byte("secretkey789"))
 	router := routes.LoadRoutes()
 
-	router.Handle("/frontPageData", utilities.Handler(getFrontPageData))
-	router.HandleFunc("/register", registerHandler)
-	router.HandleFunc("/login", loginHandler)
-	router.HandleFunc("/mode", ShowModeHandler)
+	router.Handle("/frontPageData", utilities.Handler(GetFrontPageData))
+	router.HandleFunc("/register", RegisterHandler)
+	router.HandleFunc("/login", LoginHandler)
 	router.HandleFunc("/display", ShowDisplayHandler)
 	router.HandleFunc("/logout", LogoutHandler)
 

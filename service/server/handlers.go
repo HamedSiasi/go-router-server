@@ -72,19 +72,7 @@ func ShowDisplayHandler(request http.ResponseWriter, response *http.Request) {
 	}
 }
 
-func ShowModeHandler(request http.ResponseWriter, response *http.Request) {
-	session := sessions.GetSession(response)
-	user_id := session.Get("user_id")
-	globals.Dbg.PrintfTrace("Calling ShowMode User ID session \n%s\n", spew.Sdump(user_id))
-	if user_id == nil {
-		request.WriteHeader(403)
-		http.Redirect(request, response, "/", 403)
-	} else {
-		http.Redirect(request, response, "/mode", 202)
-	}
-}
-
-func loginHandler(response http.ResponseWriter, request *http.Request) {
+func LoginHandler(response http.ResponseWriter, request *http.Request) {
 
 	email := request.FormValue("email")
 	password := request.FormValue("password")
@@ -109,7 +97,7 @@ func loginHandler(response http.ResponseWriter, request *http.Request) {
     }        	
 }
 
-func registerHandler(response http.ResponseWriter, request *http.Request) {
+func RegisterHandler(response http.ResponseWriter, request *http.Request) {
 
 	company := request.FormValue("company_name")
 	firstName := request.FormValue("user_firstName")
@@ -130,7 +118,7 @@ func registerHandler(response http.ResponseWriter, request *http.Request) {
 }
 
 /// Get the summary data for the front page
-func getFrontPageData(response http.ResponseWriter, request *http.Request) *globals.Error {
+func GetFrontPageData(response http.ResponseWriter, request *http.Request) *globals.Error {
 	err := utilities.ValidateGetRequest(request)
 	if err == nil {
 		displayData := displayFrontPageData()

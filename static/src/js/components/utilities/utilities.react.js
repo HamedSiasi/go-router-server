@@ -19,14 +19,27 @@
 
 var React = require('react');
 
-var ValueReporting = React.createClass({
-    render:function(){
+var MakeLiUuidList = React.createClass({
+    render: function() {
+        var list = [];
+        if ((this.props.Items != null) && (this.props.Items.length > 0)) {        	
+            this.props.Items.forEach(function(item, i) {
+            	list.push(
+                    <li>&nbsp;{item}&nbsp;</li>
+                );
+        });
+        } else {
+        	list.push(
+	            <li>&nbsp;Empty&nbsp;</li>
+	        );
+        }
+
         return (
-            <div>
-        	    <input type="number" className="form-control bfh-number" min={1} max={10} defaultValue={1} style={{width: 145}} />
+            <div >
+                {list}
             </div>
         );
     }
 });
 
-module.exports = ValueReporting;
+module.exports = MakeLiUuidList;

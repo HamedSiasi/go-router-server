@@ -22405,91 +22405,106 @@ module.exports = warning;
 module.exports = require('./lib/React');
 
 },{"./lib/React":58}],189:[function(require,module,exports){
+/**
+ * Copyright (C) u-blox Melbourn Ltd
+ * u-blox Melbourn Ltd, Melbourn, UK
+ * 
+ * All rights reserved.
+ *
+ * This source file is the sole property of u-blox Melbourn Ltd.
+ * Reproduction or utilization of this source in whole or part is
+ * forbidden without the written consent of u-blox Melbourn Ltd.
+ * 
+ * This file is written in JSX, not HTML.  If you want to put any
+ * content in here that should be generated as HTML, stuff it
+ * through:
+ * 
+ * https://facebook.github.io/react/html-jsx.html
+ * 
+ * ...to get your syntax correct.
+ */
+
 var React = require('react');
 var Link = require('react-router-component').Link;
 
 var Header = React.createClass({displayName: "Header",
-  render: function() {
-    return (
-
-      React.createElement("nav", {className: "navbar navbar-default navbar-static-top", role: "navigation", style: {marginBottom: 0}}, 
-        React.createElement("div", {className: "navbar-header"}, 
-          React.createElement(Link, {href: "/Display"}, 
-            React.createElement("img", {src: "static/dist/assets/images/logo.png", alt: "u-blox", style: {maxWidth: 130, padding: 5}})
-          )
-        ), 
-        /* /.navbar-header */
-        React.createElement("ul", {className: "nav navbar-top-links navbar-right"}, 
-          React.createElement("li", {className: "dropdown"}, 
-            React.createElement("a", {className: "dropdown-toggle", "data-toggle": "dropdown"}, 
-              React.createElement("i", {className: "fa fa-user fa-fw"}), " User ", React.createElement("i", {className: "fa fa-caret-down"})
-            ), 
-            React.createElement("ul", {className: "dropdown-menu dropdown-user"}, 
-              React.createElement("li", null, React.createElement(Link, {href: "#/register"}, React.createElement("i", {className: "fa fa-user fa-fw"}), " Add User")
-              ), 
-              React.createElement("li", null, React.createElement("a", {href: "#"}, React.createElement("i", {className: "fa fa-user fa-fw"}), " User Profile")
-              ), 
-              React.createElement("li", {className: "divider"}), 
-              React.createElement("li", null, React.createElement(Link, {href: "#/logout"}, React.createElement("i", {className: "fa fa-sign-out fa-fw"}), " Logout")
-              ), 
-              React.createElement("li", null, React.createElement(Link, {href: "#/login"}, React.createElement("i", {className: "fa fa-sign-in fa-fw"}), " Login")
-              )
+    render: function() {
+        return (
+            React.createElement("nav", {className: "navbar navbar-default navbar-static-top", role: "navigation", style: {marginBottom: 0}}, 
+                React.createElement("div", {className: "navbar-header"}, 
+                    React.createElement(Link, {href: "/Display"}, 
+                        React.createElement("img", {src: "static/dist/assets/images/logo.png", alt: "u-blox", style: {maxWidth: 130, padding: 5}})
+                    )
+                ), 
+            /* /.navbar-header */
+                React.createElement("ul", {className: "nav navbar-top-links navbar-right"}, 
+                    /* /.dropdown User */
+                    React.createElement("li", {className: "dropdown User"}, 
+                        React.createElement("a", {className: "dropdown-toggle", "data-toggle": "dropdown"}, 
+                            React.createElement("i", {className: "fa fa-user fa-fw"}), " User ", React.createElement("i", {className: "fa fa-caret-down"})
+                        ), 
+                        React.createElement("ul", {className: "dropdown-menu dropdown-user"}, 
+                            React.createElement("li", null, React.createElement(Link, {href: "#/login"}, React.createElement("i", {className: "fa fa-sign-in fa-fw"}), " Login")), 
+                            React.createElement("li", null, React.createElement(Link, {href: "#/logout"}, React.createElement("i", {className: "fa fa-sign-out fa-fw"}), " Logout")), 
+                            React.createElement("li", {className: "divider"}), 
+                            React.createElement("li", null, React.createElement(Link, {href: "#/register"}, React.createElement("i", {className: "fa fa-user fa-fw"}), " Add User")), 
+                            React.createElement("li", null, React.createElement("a", {href: "#"}, React.createElement("i", {className: "fa fa-user fa-fw"}), " User Profile"))
+                        )
+                    ), 
+                    /* /.dropdown Data */
+                    React.createElement("li", {className: "dropdown Data"}, 
+                        React.createElement("a", {className: "dropdown-toggle", "data-toggle": "dropdown"}, 
+                            React.createElement("i", {className: "fa fa-bar-chart-o"}), " Data ", React.createElement("i", {className: "fa fa-caret-down"})
+                        ), 
+                        React.createElement("ul", {className: "dropdown-menu dropdown-user"}, 
+                            React.createElement("li", null, React.createElement(Link, {href: "#/display"}, React.createElement("i", {className: "fa fa-tachometer"}), " Dash Board")), 
+                            React.createElement("li", null, React.createElement("a", {href: "#"}, React.createElement("i", {className: "fa fa-database"}), " ", React.createElement("del", null, "Report")))
+                        )
+                    ), 
+                    /* /.dropdown Downloads */
+                    React.createElement("li", {className: "dropdown Downloads"}, 
+                        React.createElement("a", {className: "dropdown-toggle", "data-toggle": "dropdown"}, 
+                            React.createElement("i", {className: "fa fa-download"}), " Downloads ", React.createElement("i", {className: "fa fa-caret-down"})
+                        ), 
+                        React.createElement("ul", {className: "dropdown-menu dropdown-user"}, 
+                            React.createElement("li", null, React.createElement("a", {href: "#/utm_downloadable_files/utils.zip", download: "utm_downloadable_files/utils.zip"}, 
+                                    React.createElement("i", {className: "fa fa-download"}), 
+                                        " ", React.createElement("del", null, "Download Utilities")
+                                )
+                            ), 
+                            React.createElement("li", null, React.createElement("a", {href: "#/utm_downloadable_files/UTM-N1_User_Manual.pdf", download: "utm_downloadable_files/UTM-N1_User_Manual.pdf"}, React.createElement("i", {className: "fa fa-book"}), " ", React.createElement("del", null, "Download User Manual")))
+                        )
+                    )
+                )
+                /* /.navbar-top-links */
             )
-            /* /.dropdown-user */
-          ), 
-          /* /.dropdown */
-          React.createElement("li", {className: "dropdown"}, 
-            React.createElement("a", {className: "dropdown-toggle", "data-toggle": "dropdown"}, 
-              React.createElement("i", {className: "fa fa-cloud-download"}), " Setting  ", React.createElement("i", {className: "fa fa-caret-down"})
-            ), 
-            React.createElement("ul", {className: "dropdown-menu dropdown-user"}, 
-              React.createElement("li", null, React.createElement(Link, {href: "#/mode"}, React.createElement("i", {className: "fa fa-exchange"}), " Mode")), 
-              React.createElement("li", null, React.createElement(Link, {href: "#/display"}, React.createElement("i", {className: "fa fa-tachometer"}), " Dash Board")), 
-              React.createElement("li", null, React.createElement("a", {href: "#"}, React.createElement("i", {className: "fa fa-file-archive-o"}), " Upload Files")), 
-              React.createElement("li", null, React.createElement("a", {href: "#"}, React.createElement("i", {className: "fa fa-file-excel-o"}), " Download Files"))
-            )
-            /* /.dropdown-user */
-          ), 
-          /* /.dropdown */
-          React.createElement("li", {className: "dropdown"}, 
-            React.createElement("a", {className: "dropdown-toggle", "data-toggle": "dropdown"}, 
-              React.createElement("i", {className: "fa fa-bar-chart"}), " Reports  ", React.createElement("i", {className: "fa fa-caret-down"})
-            ), 
-            React.createElement("ul", {className: "dropdown-menu dropdown-user"}, 
-              React.createElement("li", null, React.createElement("a", {href: "#"}, React.createElement("i", {className: "fa fa-area-chart"}), " Frame Loss")
-              ), React.createElement("li", null, React.createElement("a", {href: "#"}, React.createElement("i", {className: "fa fa-bar-chart"}), " Energy")
-              )
-            )
-            /* /.dropdown-user */
-          ), 
-          React.createElement("li", {className: "dropdown"}, 
-            React.createElement("a", {className: "dropdown-toggle", "data-toggle": "dropdown"}, 
-              React.createElement("i", {className: "fa fa-graduation-cap"}), " Help  ", React.createElement("i", {className: "fa fa-caret-down"})
-            ), 
-            React.createElement("ul", {className: "dropdown-menu dropdown-user"}, 
-              React.createElement("li", null, React.createElement("a", {href: "#"}, React.createElement("i", {className: "fa fa-book"}
-                  ), " User Manual")
-              ), React.createElement("li", null, React.createElement("a", {href: "#"}, 
-                  React.createElement("i", {className: "fa fa-question-circle"}), " FAQ")
-              )
-            )
-            /* /.dropdown-user */
-          )
-          /* /.dropdown-user */
-          /* /.dropdown */
-          /* /.dropdown */
-        )
-        /* /.navbar-top-links */
-      )
-    );
-  }
+        );
+    }
 });
 
 module.exports = Header;
 
 },{"react":188,"react-router-component":8}],190:[function(require,module,exports){
+/**
+ * Copyright (C) u-blox Melbourn Ltd
+ * u-blox Melbourn Ltd, Melbourn, UK
+ * 
+ * All rights reserved.
+ *
+ * This source file is the sole property of u-blox Melbourn Ltd.
+ * Reproduction or utilization of this source in whole or part is
+ * forbidden without the written consent of u-blox Melbourn Ltd.
+ * 
+ * This file is written in JSX, not HTML.  If you want to put any
+ * content in here that should be generated as HTML, stuff it
+ * through:
+ * 
+ * https://facebook.github.io/react/html-jsx.html
+ * 
+ * ...to get your syntax correct.
+ */
+
 var React = require('react');
-var Setting = require('./controls/setting.react');
 var Header = require('./Header/Header.react')
 
 var Template = React.createClass({displayName: "Template",
@@ -22505,12 +22520,30 @@ var Template = React.createClass({displayName: "Template",
 
 module.exports = Template;
 
-},{"./Header/Header.react":189,"./controls/setting.react":204,"react":188}],191:[function(require,module,exports){
+},{"./Header/Header.react":189,"react":188}],191:[function(require,module,exports){
+/**
+ * Copyright (C) u-blox Melbourn Ltd
+ * u-blox Melbourn Ltd, Melbourn, UK
+ * 
+ * All rights reserved.
+ *
+ * This source file is the sole property of u-blox Melbourn Ltd.
+ * Reproduction or utilization of this source in whole or part is
+ * forbidden without the written consent of u-blox Melbourn Ltd.
+ * 
+ * This file is written in JSX, not HTML.  If you want to put any
+ * content in here that should be generated as HTML, stuff it
+ * through:
+ * 
+ * https://facebook.github.io/react/html-jsx.html
+ * 
+ * ...to get your syntax correct.
+ */
+
 var React = require('react');
 var Template = require('./app-template.js');
 var Router = require('react-router-component');
 var Display = require('./display/display.react');
-var Mode = require('./mode/mode.react');
 var Login = require('./user/login.react');
 var Register = require('./user/register.react');
 var Index = require('./index');
@@ -22525,7 +22558,6 @@ var App = React.createClass({displayName: "App",
                 React.createElement(Locations, null, 
                     React.createElement(Location, {path: "/", handler: Index}), 
                     React.createElement(Location, {path: "#/display", handler: Display}), 
-                    React.createElement(Location, {path: "#/mode", handler: Mode}), 
                     React.createElement(Location, {path: "#/login", handler: Login}), 
                     React.createElement(Location, {path: "#/register", handler: Register})
                 )
@@ -22536,23 +22568,28 @@ var App = React.createClass({displayName: "App",
 
 module.exports = App;
 
-},{"./app-template.js":190,"./display/display.react":214,"./index":216,"./mode/mode.react":217,"./user/login.react":219,"./user/register.react":220,"react":188,"react-router-component":8}],192:[function(require,module,exports){
+},{"./app-template.js":190,"./display/display.react":209,"./index":211,"./user/login.react":213,"./user/register.react":214,"react":188,"react-router-component":8}],192:[function(require,module,exports){
+/**
+ * Copyright (C) u-blox Melbourn Ltd
+ * u-blox Melbourn Ltd, Melbourn, UK
+ * 
+ * All rights reserved.
+ *
+ * This source file is the sole property of u-blox Melbourn Ltd.
+ * Reproduction or utilization of this source in whole or part is
+ * forbidden without the written consent of u-blox Melbourn Ltd.
+ * 
+ * This file is written in JSX, not HTML.  If you want to put any
+ * content in here that should be generated as HTML, stuff it
+ * through:
+ * 
+ * https://facebook.github.io/react/html-jsx.html
+ * 
+ * ...to get your syntax correct.
+ */
+
 var React = require('react');
-
-var GetIntervals = React.createClass({displayName: "GetIntervals",
-    render:function(){
-        return (
-            React.createElement("button", {type: "button", className: "btn btn-info", style: {width: 100, height: 30, float: 'left', marginTop: 10}}, 
-                "Get Intervals"
-            )
-        );
-    }
-});
-
-module.exports = GetIntervals;
-
-},{"react":188}],193:[function(require,module,exports){
-var React = require('react');
+var MakeLiNameList = require('../utilities/utilities.react')
 
 var GetIntervals = React.createClass({displayName: "GetIntervals",
     render:function(){
@@ -22565,8 +22602,7 @@ var GetIntervals = React.createClass({displayName: "GetIntervals",
   	                React.createElement("span", {className: "caret"})
   	            ), 
       	        React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
-      	            React.createElement("li", null, React.createElement("a", {href: "#"}, "blah")), 
-      	            React.createElement("li", null, React.createElement("a", {href: "#"}, "blah1"))
+                    React.createElement(MakeLiNameList, {Items: this.props.Names})
        	        )
   	        )
         );
@@ -22575,8 +22611,28 @@ var GetIntervals = React.createClass({displayName: "GetIntervals",
 
 module.exports = GetIntervals;
 
-},{"react":188}],194:[function(require,module,exports){
+},{"../utilities/utilities.react":215,"react":188}],193:[function(require,module,exports){
+/**
+ * Copyright (C) u-blox Melbourn Ltd
+ * u-blox Melbourn Ltd, Melbourn, UK
+ * 
+ * All rights reserved.
+ *
+ * This source file is the sole property of u-blox Melbourn Ltd.
+ * Reproduction or utilization of this source in whole or part is
+ * forbidden without the written consent of u-blox Melbourn Ltd.
+ * 
+ * This file is written in JSX, not HTML.  If you want to put any
+ * content in here that should be generated as HTML, stuff it
+ * through:
+ * 
+ * https://facebook.github.io/react/html-jsx.html
+ * 
+ * ...to get your syntax correct.
+ */
+
 var React = require('react');
+var MakeLiNameList = require('../utilities/utilities.react')
 
 var GetPing = React.createClass({displayName: "GetPing",
     render:function(){
@@ -22589,8 +22645,7 @@ var GetPing = React.createClass({displayName: "GetPing",
   	                React.createElement("span", {className: "caret"})
   	            ), 
       	        React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
-      	            React.createElement("li", null, React.createElement("a", {href: "#"}, "blah")), 
-      	            React.createElement("li", null, React.createElement("a", {href: "#"}, "blah1"))
+                    React.createElement(MakeLiNameList, {Items: this.props.Names})
        	        )
   	        )
         );
@@ -22599,8 +22654,28 @@ var GetPing = React.createClass({displayName: "GetPing",
 
 module.exports = GetPing;
 
-},{"react":188}],195:[function(require,module,exports){
+},{"../utilities/utilities.react":215,"react":188}],194:[function(require,module,exports){
+/**
+ * Copyright (C) u-blox Melbourn Ltd
+ * u-blox Melbourn Ltd, Melbourn, UK
+ * 
+ * All rights reserved.
+ *
+ * This source file is the sole property of u-blox Melbourn Ltd.
+ * Reproduction or utilization of this source in whole or part is
+ * forbidden without the written consent of u-blox Melbourn Ltd.
+ * 
+ * This file is written in JSX, not HTML.  If you want to put any
+ * content in here that should be generated as HTML, stuff it
+ * through:
+ * 
+ * https://facebook.github.io/react/html-jsx.html
+ * 
+ * ...to get your syntax correct.
+ */
+
 var React = require('react');
+var MakeLiNameList = require('../utilities/utilities.react')
 
 var GetTime = React.createClass({displayName: "GetTime",
     render:function(){
@@ -22613,8 +22688,7 @@ var GetTime = React.createClass({displayName: "GetTime",
   	                React.createElement("span", {className: "caret"})
   	            ), 
       	        React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
-      	            React.createElement("li", null, React.createElement("a", {href: "#"}, "blah")), 
-      	            React.createElement("li", null, React.createElement("a", {href: "#"}, "blah1"))
+                    React.createElement(MakeLiNameList, {Items: this.props.Names})
        	        )
   	        )
         );
@@ -22623,69 +22697,39 @@ var GetTime = React.createClass({displayName: "GetTime",
 
 module.exports = GetTime;
 
-},{"react":188}],196:[function(require,module,exports){
+},{"../utilities/utilities.react":215,"react":188}],195:[function(require,module,exports){
+/**
+ * Copyright (C) u-blox Melbourn Ltd
+ * u-blox Melbourn Ltd, Melbourn, UK
+ * 
+ * All rights reserved.
+ *
+ * This source file is the sole property of u-blox Melbourn Ltd.
+ * Reproduction or utilization of this source in whole or part is
+ * forbidden without the written consent of u-blox Melbourn Ltd.
+ * 
+ * This file is written in JSX, not HTML.  If you want to put any
+ * content in here that should be generated as HTML, stuff it
+ * through:
+ * 
+ * https://facebook.github.io/react/html-jsx.html
+ * 
+ * ...to get your syntax correct.
+ */
+
 var React = require('react');
-
-var HeartBeat = React.createClass({displayName: "HeartBeat",
-  render:function(){
-    return (
-         React.createElement("select", {className: "form-control", style: {width: 180, height: 30, marginTop: 10, display: 'inline'}}, 
-              React.createElement("option", null, "Heart Beat"), 
-              React.createElement("option", null, "Fast (2min)"), 
-              React.createElement("option", null, "Medium (5min)t"), 
-              React.createElement("option", null, "Slow(30)")
-           )
-    );
-  }
-});
-
-module.exports = HeartBeat;
-
-},{"react":188}],197:[function(require,module,exports){
-var React = require('react');
-
-var Reboot = React.createClass({displayName: "Reboot",
-  render:function(){
-    return (
-     	React.createElement("input", {type: "checkbox", defaultValue: true})
-    );
-  }
-});
-
-module.exports = Reboot;
-
-},{"react":188}],198:[function(require,module,exports){
-var React = require('react');
-
-var Reporting = React.createClass({displayName: "Reporting",
-  render:function(){
-    return (
-    	    React.createElement("select", {className: "form-control", style: {width: 180, height: 30, marginTop: 10, display: 'inline'}}, 
-              React.createElement("option", null, "Reporting Interval"), 
-              React.createElement("option", null, "Fast (2min)"), 
-              React.createElement("option", null, "Medium (5min)t"), 
-              React.createElement("option", null, "Slow(30)")
-            )     
-    );
-  }
-});
-
-module.exports = Reporting;
-
-},{"react":188}],199:[function(require,module,exports){
-var React = require('react');
+var MakeLiNameList = require('../utilities/utilities.react')
 
 var SetHeartBeat = React.createClass({displayName: "SetHeartBeat",
-	  render: function() {
-	    return (
+    render: function() {
+        return (
 	        React.createElement("div", {className: "btn-group"}, 
 	            React.createElement("button", {type: "button", className: "btn btn-info"}, "Set Heartbeat (seconds)"), 
 	            React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle", "data-toggle": "dropdown"}, 
 	                React.createElement("span", {className: "caret"})
 	            ), 
 	            React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
-	                React.createElement("li", null, React.createElement("a", {href: "#"}, "blah")), 
-	                React.createElement("li", null, React.createElement("a", {href: "#"}, "blah1"))
+	                React.createElement(MakeLiNameList, {Items: this.props.Names})
 	            )
 	        )
 	    );
@@ -22694,8 +22738,28 @@ var SetHeartBeat = React.createClass({displayName: "SetHeartBeat",
 
 module.exports = SetHeartBeat;
 
-},{"react":188}],200:[function(require,module,exports){
+},{"../utilities/utilities.react":215,"react":188}],196:[function(require,module,exports){
+/**
+ * Copyright (C) u-blox Melbourn Ltd
+ * u-blox Melbourn Ltd, Melbourn, UK
+ * 
+ * All rights reserved.
+ *
+ * This source file is the sole property of u-blox Melbourn Ltd.
+ * Reproduction or utilization of this source in whole or part is
+ * forbidden without the written consent of u-blox Melbourn Ltd.
+ * 
+ * This file is written in JSX, not HTML.  If you want to put any
+ * content in here that should be generated as HTML, stuff it
+ * through:
+ * 
+ * https://facebook.github.io/react/html-jsx.html
+ * 
+ * ...to get your syntax correct.
+ */
+
 var React = require('react');
+var MakeLiNameList = require('../utilities/utilities.react')
 
 var SetReporting = React.createClass({displayName: "SetReporting",
     render:function(){
@@ -22706,8 +22770,7 @@ var SetReporting = React.createClass({displayName: "SetReporting",
 	                React.createElement("span", {className: "caret"})
 	            ), 
 	            React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
-	                React.createElement("li", null, React.createElement("a", {href: "#"}, "blah")), 
-	                React.createElement("li", null, React.createElement("a", {href: "#"}, "blah1"))
+                    React.createElement(MakeLiNameList, {Items: this.props.Names})
 	            )
 		    )
         );
@@ -22716,8 +22779,28 @@ var SetReporting = React.createClass({displayName: "SetReporting",
 
 module.exports = SetReporting;
 
-},{"react":188}],201:[function(require,module,exports){
+},{"../utilities/utilities.react":215,"react":188}],197:[function(require,module,exports){
+/**
+ * Copyright (C) u-blox Melbourn Ltd
+ * u-blox Melbourn Ltd, Melbourn, UK
+ * 
+ * All rights reserved.
+ *
+ * This source file is the sole property of u-blox Melbourn Ltd.
+ * Reproduction or utilization of this source in whole or part is
+ * forbidden without the written consent of u-blox Melbourn Ltd.
+ * 
+ * This file is written in JSX, not HTML.  If you want to put any
+ * content in here that should be generated as HTML, stuff it
+ * through:
+ * 
+ * https://facebook.github.io/react/html-jsx.html
+ * 
+ * ...to get your syntax correct.
+ */
+
 var React = require('react');
+var MakeLiNameList = require('../utilities/utilities.react')
 
 var SetTTParameters = React.createClass({displayName: "SetTTParameters",
 	  render: function() {
@@ -22728,8 +22811,7 @@ var SetTTParameters = React.createClass({displayName: "SetTTParameters",
 	                React.createElement("span", {className: "caret"})
 	            ), 
 	            React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
-	                React.createElement("li", null, React.createElement("a", {href: "#"}, "blah")), 
-	                React.createElement("li", null, React.createElement("a", {href: "#"}, "blah1"))
+                    React.createElement(MakeLiNameList, {Items: this.props.Names})
 	            )
 	        )
 	    );
@@ -22738,8 +22820,28 @@ var SetTTParameters = React.createClass({displayName: "SetTTParameters",
 
 module.exports = SetTTParameters;
 
-},{"react":188}],202:[function(require,module,exports){
+},{"../utilities/utilities.react":215,"react":188}],198:[function(require,module,exports){
+/**
+ * Copyright (C) u-blox Melbourn Ltd
+ * u-blox Melbourn Ltd, Melbourn, UK
+ * 
+ * All rights reserved.
+ *
+ * This source file is the sole property of u-blox Melbourn Ltd.
+ * Reproduction or utilization of this source in whole or part is
+ * forbidden without the written consent of u-blox Melbourn Ltd.
+ * 
+ * This file is written in JSX, not HTML.  If you want to put any
+ * content in here that should be generated as HTML, stuff it
+ * through:
+ * 
+ * https://facebook.github.io/react/html-jsx.html
+ * 
+ * ...to get your syntax correct.
+ */
+
 var React = require('react');
+var MakeLiNameList = require('../utilities/utilities.react')
 
 var SetTTStart = React.createClass({displayName: "SetTTStart",
 	  render: function() {
@@ -22750,8 +22852,7 @@ var SetTTStart = React.createClass({displayName: "SetTTStart",
 	                React.createElement("span", {className: "caret"})
 	            ), 
 	            React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
-	                React.createElement("li", null, React.createElement("a", {href: "#"}, "blah")), 
-	                React.createElement("li", null, React.createElement("a", {href: "#"}, "blah1"))
+                    React.createElement(MakeLiNameList, {Items: this.props.Names})
 	            )
 	        )
 	    );
@@ -22760,8 +22861,28 @@ var SetTTStart = React.createClass({displayName: "SetTTStart",
 
 module.exports = SetTTStart;
 
-},{"react":188}],203:[function(require,module,exports){
+},{"../utilities/utilities.react":215,"react":188}],199:[function(require,module,exports){
+/**
+ * Copyright (C) u-blox Melbourn Ltd
+ * u-blox Melbourn Ltd, Melbourn, UK
+ * 
+ * All rights reserved.
+ *
+ * This source file is the sole property of u-blox Melbourn Ltd.
+ * Reproduction or utilization of this source in whole or part is
+ * forbidden without the written consent of u-blox Melbourn Ltd.
+ * 
+ * This file is written in JSX, not HTML.  If you want to put any
+ * content in here that should be generated as HTML, stuff it
+ * through:
+ * 
+ * https://facebook.github.io/react/html-jsx.html
+ * 
+ * ...to get your syntax correct.
+ */
+
 var React = require('react');
+var MakeLiNameList = require('../utilities/utilities.react')
 
 var SetTTStop = React.createClass({displayName: "SetTTStop",
 	  render: function() {
@@ -22772,8 +22893,7 @@ var SetTTStop = React.createClass({displayName: "SetTTStop",
 	                React.createElement("span", {className: "caret"})
 	            ), 
 	            React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
-	                React.createElement("li", null, React.createElement("a", {href: "#"}, "blah")), 
-	                React.createElement("li", null, React.createElement("a", {href: "#"}, "blah1"))
+                    React.createElement(MakeLiNameList, {Items: this.props.Names})
 	            )
 	        )
 	    );
@@ -22782,44 +22902,26 @@ var SetTTStop = React.createClass({displayName: "SetTTStop",
 
 module.exports = SetTTStop;
 
-},{"react":188}],204:[function(require,module,exports){
-var React = require('react');
-var Apply = require('./apply.react');
-var Reboot = require('./reboot.react');
-var Reporting = require('./reporting.react');
-var HeartBeat = require('./heartbeat.react');
+},{"../utilities/utilities.react":215,"react":188}],200:[function(require,module,exports){
+/**
+ * Copyright (C) u-blox Melbourn Ltd
+ * u-blox Melbourn Ltd, Melbourn, UK
+ * 
+ * All rights reserved.
+ *
+ * This source file is the sole property of u-blox Melbourn Ltd.
+ * Reproduction or utilization of this source in whole or part is
+ * forbidden without the written consent of u-blox Melbourn Ltd.
+ * 
+ * This file is written in JSX, not HTML.  If you want to put any
+ * content in here that should be generated as HTML, stuff it
+ * through:
+ * 
+ * https://facebook.github.io/react/html-jsx.html
+ * 
+ * ...to get your syntax correct.
+ */
 
-var Setting = React.createClass({displayName: "Setting",
-  render: function() {
-    return (
-React.createElement("div", null, 
-   React.createElement("table", null, 
-      React.createElement("tr", null, 
-        React.createElement("td", null, " ", React.createElement(Reboot, null), "Reboot"), 
-        React.createElement("td", null)
-      ), 
-      React.createElement("tr", null, 
-        React.createElement("td", null, "  ", React.createElement(Reporting, null)), 
-        React.createElement("td", null)
-      ), 
-      React.createElement("tr", null, 
-        React.createElement("td", null, "  ", React.createElement(HeartBeat, null)), 
-        React.createElement("td", null)
-      ), 
-      React.createElement("tr", null, 
-        React.createElement("td", null, React.createElement(Apply, null), " "), 
-        React.createElement("td", null)
-      )
-  )
-)
-
-    );
-  }
-});
-
-module.exports = Setting;
-
-},{"./apply.react":192,"./heartbeat.react":196,"./reboot.react":197,"./reporting.react":198,"react":188}],205:[function(require,module,exports){
 var React = require('react');
 var SetHeartbeat = require('./set_heartbeat.react');
 var ValueHeartbeat = require('./value_heartbeat.react');
@@ -22836,21 +22938,25 @@ var SettingStd = React.createClass({displayName: "SettingStd",
                 React.createElement("table", null, 
 	                React.createElement("thead", null, 
 			            React.createElement("tr", null, 
-			                React.createElement("th", {colSpan: 3, style: {textAlign: 'center'}}, "Device Settings")
+			                React.createElement("th", {colSpan: 3, style: {textAlign: 'center'}}, "General Settings")
 			            )
 			        ), 
                     React.createElement("tr", {style: {height: 50}}, 
                         React.createElement("td", {style: {width: 170}}, " ", React.createElement(ValueHeartbeat, null)), 
-                        React.createElement("td", {style: {width: 300}}, " ", React.createElement(SetHeartbeat, null)), 
+                        React.createElement("td", {style: {width: 300}}, " ", React.createElement(SetHeartbeat, {Names: this.props.Names})), 
                         React.createElement("td", null)
                     ), 
                     React.createElement("tr", null, 
                         React.createElement("td", null, React.createElement(ValueReporting, null)), 
-                        React.createElement("td", null, React.createElement(SetReporting, null)), 
+                        React.createElement("td", null, React.createElement(SetReporting, {Names: this.props.Names})), 
                         React.createElement("td", null)
                     ), 
                     React.createElement("tr", null, 
-                        React.createElement("td", {colSpan: 3}, React.createElement(GetIntervals, null), " ", React.createElement(GetTime, null), " ", React.createElement(GetPing, null))
+                        React.createElement("td", {colSpan: 3}, 
+                            React.createElement(GetIntervals, {Names: this.props.Names}), 
+                            React.createElement(GetTime, {Names: this.props.Names}), 
+                            React.createElement(GetPing, {Names: this.props.Names})
+                        )
                     )
                 )
             )
@@ -22860,7 +22966,26 @@ var SettingStd = React.createClass({displayName: "SettingStd",
 
 module.exports = SettingStd;
 
-},{"./get_intervals.react":193,"./get_ping.react":194,"./get_time.react":195,"./set_heartbeat.react":199,"./set_reporting.react":200,"./value_heartbeat.react":207,"./value_reporting.react":208,"react":188}],206:[function(require,module,exports){
+},{"./get_intervals.react":192,"./get_ping.react":193,"./get_time.react":194,"./set_heartbeat.react":195,"./set_reporting.react":196,"./value_heartbeat.react":202,"./value_reporting.react":203,"react":188}],201:[function(require,module,exports){
+/**
+ * Copyright (C) u-blox Melbourn Ltd
+ * u-blox Melbourn Ltd, Melbourn, UK
+ * 
+ * All rights reserved.
+ *
+ * This source file is the sole property of u-blox Melbourn Ltd.
+ * Reproduction or utilization of this source in whole or part is
+ * forbidden without the written consent of u-blox Melbourn Ltd.
+ * 
+ * This file is written in JSX, not HTML.  If you want to put any
+ * content in here that should be generated as HTML, stuff it
+ * through:
+ * 
+ * https://facebook.github.io/react/html-jsx.html
+ * 
+ * ...to get your syntax correct.
+ */
+
 var React = require('react');
 var ValueTTUlNumDatagrams = require('./value_tt_ul_num_datagrams.react');
 var ValueTTUlLenDatagram = require('./value_tt_ul_len_datagram.react');
@@ -22878,7 +23003,7 @@ var SettingTT = React.createClass({displayName: "SettingTT",
                 React.createElement("table", null, 
                     React.createElement("thead", null, 
 	                    React.createElement("tr", null, 
-		                    React.createElement("th", {colSpan: 5, style: {textAlign: 'center'}}, "Traffic Test Settings")
+		                    React.createElement("th", {colSpan: 5, style: {textAlign: 'center'}}, "Traffic Test Mode Settings")
 		                )
 		            ), 
                     React.createElement("tr", {style: {height: 50}}, 
@@ -22886,19 +23011,19 @@ var SettingTT = React.createClass({displayName: "SettingTT",
                         React.createElement("td", {style: {width: 100}}, React.createElement(ValueTTUlNumDatagrams, null)), 
                         React.createElement("td", {style: {width: 110}}, "Length:"), 
                         React.createElement("td", {style: {width: 100}}, React.createElement(ValueTTUlLenDatagram, null)), 
-                        React.createElement("td", null, React.createElement(SetTTStart, null))
+                        React.createElement("td", null, React.createElement(SetTTStart, {Names: this.props.Names}))
                     ), 
                     React.createElement("tr", null, 
                         React.createElement("td", null, "DL: Number:"), 
                         React.createElement("td", null, React.createElement(ValueTTDlNumDatagrams, null)), 
                         React.createElement("td", null, "Length:"), 
                         React.createElement("td", null, React.createElement(ValueTTDlLenDatagram, null)), 
-                        React.createElement("td", null, React.createElement(SetTTStop, null))
+                        React.createElement("td", null, React.createElement(SetTTStop, {Names: this.props.Names}))
                     ), 
                     React.createElement("tr", null, 
                         React.createElement("td", null, "Timeout (secs):"), 
                         React.createElement("td", null, React.createElement(ValueTTTimeout, null)), 
-                        React.createElement("td", {colSpan: 2}, React.createElement(SetTTParameters, null))
+                        React.createElement("td", {colSpan: 2}, React.createElement(SetTTParameters, {Names: this.props.Names}))
                     )
                 )
             )
@@ -22908,7 +23033,26 @@ var SettingTT = React.createClass({displayName: "SettingTT",
 
 module.exports = SettingTT;
 
-},{"./set_tt_parameters.react":201,"./set_tt_start.react":202,"./set_tt_stop.react":203,"./value_tt_dl_len_datagram.react":209,"./value_tt_dl_num_datagrams.react":210,"./value_tt_timeout.react":211,"./value_tt_ul_len_datagram.react":212,"./value_tt_ul_num_datagrams.react":213,"react":188}],207:[function(require,module,exports){
+},{"./set_tt_parameters.react":197,"./set_tt_start.react":198,"./set_tt_stop.react":199,"./value_tt_dl_len_datagram.react":204,"./value_tt_dl_num_datagrams.react":205,"./value_tt_timeout.react":206,"./value_tt_ul_len_datagram.react":207,"./value_tt_ul_num_datagrams.react":208,"react":188}],202:[function(require,module,exports){
+/**
+ * Copyright (C) u-blox Melbourn Ltd
+ * u-blox Melbourn Ltd, Melbourn, UK
+ * 
+ * All rights reserved.
+ *
+ * This source file is the sole property of u-blox Melbourn Ltd.
+ * Reproduction or utilization of this source in whole or part is
+ * forbidden without the written consent of u-blox Melbourn Ltd.
+ * 
+ * This file is written in JSX, not HTML.  If you want to put any
+ * content in here that should be generated as HTML, stuff it
+ * through:
+ * 
+ * https://facebook.github.io/react/html-jsx.html
+ * 
+ * ...to get your syntax correct.
+ */
+
 var React = require('react');
 
 var ValueHeartbeat = React.createClass({displayName: "ValueHeartbeat",
@@ -22923,7 +23067,26 @@ var ValueHeartbeat = React.createClass({displayName: "ValueHeartbeat",
 
 module.exports = ValueHeartbeat;
 
-},{"react":188}],208:[function(require,module,exports){
+},{"react":188}],203:[function(require,module,exports){
+/**
+ * Copyright (C) u-blox Melbourn Ltd
+ * u-blox Melbourn Ltd, Melbourn, UK
+ * 
+ * All rights reserved.
+ *
+ * This source file is the sole property of u-blox Melbourn Ltd.
+ * Reproduction or utilization of this source in whole or part is
+ * forbidden without the written consent of u-blox Melbourn Ltd.
+ * 
+ * This file is written in JSX, not HTML.  If you want to put any
+ * content in here that should be generated as HTML, stuff it
+ * through:
+ * 
+ * https://facebook.github.io/react/html-jsx.html
+ * 
+ * ...to get your syntax correct.
+ */
+
 var React = require('react');
 
 var ValueReporting = React.createClass({displayName: "ValueReporting",
@@ -22938,7 +23101,26 @@ var ValueReporting = React.createClass({displayName: "ValueReporting",
 
 module.exports = ValueReporting;
 
-},{"react":188}],209:[function(require,module,exports){
+},{"react":188}],204:[function(require,module,exports){
+/**
+ * Copyright (C) u-blox Melbourn Ltd
+ * u-blox Melbourn Ltd, Melbourn, UK
+ * 
+ * All rights reserved.
+ *
+ * This source file is the sole property of u-blox Melbourn Ltd.
+ * Reproduction or utilization of this source in whole or part is
+ * forbidden without the written consent of u-blox Melbourn Ltd.
+ * 
+ * This file is written in JSX, not HTML.  If you want to put any
+ * content in here that should be generated as HTML, stuff it
+ * through:
+ * 
+ * https://facebook.github.io/react/html-jsx.html
+ * 
+ * ...to get your syntax correct.
+ */
+
 var React = require('react');
 
 var ValueTTDlLenDatagram = React.createClass({displayName: "ValueTTDlLenDatagram",
@@ -22953,7 +23135,26 @@ var ValueTTDlLenDatagram = React.createClass({displayName: "ValueTTDlLenDatagram
 
 module.exports = ValueTTDlLenDatagram;
 
-},{"react":188}],210:[function(require,module,exports){
+},{"react":188}],205:[function(require,module,exports){
+/**
+ * Copyright (C) u-blox Melbourn Ltd
+ * u-blox Melbourn Ltd, Melbourn, UK
+ * 
+ * All rights reserved.
+ *
+ * This source file is the sole property of u-blox Melbourn Ltd.
+ * Reproduction or utilization of this source in whole or part is
+ * forbidden without the written consent of u-blox Melbourn Ltd.
+ * 
+ * This file is written in JSX, not HTML.  If you want to put any
+ * content in here that should be generated as HTML, stuff it
+ * through:
+ * 
+ * https://facebook.github.io/react/html-jsx.html
+ * 
+ * ...to get your syntax correct.
+ */
+
 var React = require('react');
 
 var ValueTTDlNumDatagrams = React.createClass({displayName: "ValueTTDlNumDatagrams",
@@ -22968,7 +23169,26 @@ var ValueTTDlNumDatagrams = React.createClass({displayName: "ValueTTDlNumDatagra
 
 module.exports = ValueTTDlNumDatagrams;
 
-},{"react":188}],211:[function(require,module,exports){
+},{"react":188}],206:[function(require,module,exports){
+/**
+ * Copyright (C) u-blox Melbourn Ltd
+ * u-blox Melbourn Ltd, Melbourn, UK
+ * 
+ * All rights reserved.
+ *
+ * This source file is the sole property of u-blox Melbourn Ltd.
+ * Reproduction or utilization of this source in whole or part is
+ * forbidden without the written consent of u-blox Melbourn Ltd.
+ * 
+ * This file is written in JSX, not HTML.  If you want to put any
+ * content in here that should be generated as HTML, stuff it
+ * through:
+ * 
+ * https://facebook.github.io/react/html-jsx.html
+ * 
+ * ...to get your syntax correct.
+ */
+
 var React = require('react');
 
 var ValueTTTimeout = React.createClass({displayName: "ValueTTTimeout",
@@ -22981,7 +23201,26 @@ var ValueTTTimeout = React.createClass({displayName: "ValueTTTimeout",
 
 module.exports = ValueTTTimeout;
 
-},{"react":188}],212:[function(require,module,exports){
+},{"react":188}],207:[function(require,module,exports){
+/**
+ * Copyright (C) u-blox Melbourn Ltd
+ * u-blox Melbourn Ltd, Melbourn, UK
+ * 
+ * All rights reserved.
+ *
+ * This source file is the sole property of u-blox Melbourn Ltd.
+ * Reproduction or utilization of this source in whole or part is
+ * forbidden without the written consent of u-blox Melbourn Ltd.
+ * 
+ * This file is written in JSX, not HTML.  If you want to put any
+ * content in here that should be generated as HTML, stuff it
+ * through:
+ * 
+ * https://facebook.github.io/react/html-jsx.html
+ * 
+ * ...to get your syntax correct.
+ */
+
 var React = require('react');
 
 var ValueTTUlLenDatagram = React.createClass({displayName: "ValueTTUlLenDatagram",
@@ -22996,7 +23235,26 @@ var ValueTTUlLenDatagram = React.createClass({displayName: "ValueTTUlLenDatagram
 
 module.exports = ValueTTUlLenDatagram;
 
-},{"react":188}],213:[function(require,module,exports){
+},{"react":188}],208:[function(require,module,exports){
+/**
+ * Copyright (C) u-blox Melbourn Ltd
+ * u-blox Melbourn Ltd, Melbourn, UK
+ * 
+ * All rights reserved.
+ *
+ * This source file is the sole property of u-blox Melbourn Ltd.
+ * Reproduction or utilization of this source in whole or part is
+ * forbidden without the written consent of u-blox Melbourn Ltd.
+ * 
+ * This file is written in JSX, not HTML.  If you want to put any
+ * content in here that should be generated as HTML, stuff it
+ * through:
+ * 
+ * https://facebook.github.io/react/html-jsx.html
+ * 
+ * ...to get your syntax correct.
+ */
+
 var React = require('react');
 
 var ValueTTUlNumDatagrams = React.createClass({displayName: "ValueTTUlNumDatagrams",
@@ -23011,24 +23269,32 @@ var ValueTTUlNumDatagrams = React.createClass({displayName: "ValueTTUlNumDatagra
 
 module.exports = ValueTTUlNumDatagrams;
 
-},{"react":188}],214:[function(require,module,exports){
+},{"react":188}],209:[function(require,module,exports){
 /**
- * Copyright (c) 2014, U-blox.
+ * Copyright (C) u-blox Melbourn Ltd
+ * u-blox Melbourn Ltd, Melbourn, UK
+ * 
  * All rights reserved.
+ *
+ * This source file is the sole property of u-blox Melbourn Ltd.
+ * Reproduction or utilization of this source in whole or part is
+ * forbidden without the written consent of u-blox Melbourn Ltd.
+ * 
+ * This file is written in JSX, not HTML.  If you want to put any
+ * content in here that should be generated as HTML, stuff it
+ * through:
+ * 
+ * https://facebook.github.io/react/html-jsx.html
+ * 
+ * ...to get your syntax correct.
  */
+
 var React = require('react');
 var AppStore = require('../../stores/app-store.js');
 var Settings = require('../panels/settings.react')
 var DisplayRow = require('./displayRow.react')
 
 var Link = require('react-router-component').Link
-
-var arrData = [];
-
-var currentUuidsObject = new Object();
-var UuidsMap = new Map();
-var totalMsg = 0;
-var totalBytes = 0;
 
 var Display = React.createClass({displayName: "Display",
     getInitialState: function(){   
@@ -23047,15 +23313,15 @@ var Display = React.createClass({displayName: "Display",
 	                data[property] = {};
 	            }
 	        });
-        this.setState({data: data});
+            this.setState({data: data});
 	    }.bind(this), 10000);
     },
 
 	render:function(){
 	    return (
 	        React.createElement("div", null, 
-	            React.createElement(Settings, null), 
-	            React.createElement(DisplayRow, {DeviceData:  this.state.data["DeviceData"]})
+	            React.createElement(Settings, {DeviceData: this.state.data["DeviceData"]}), 
+	            React.createElement(DisplayRow, {DeviceData: this.state.data["DeviceData"]})
 	        )
 	    );
     }
@@ -23068,9 +23334,9 @@ function pollState(updateState) {
             if (x.readyState == 4) {
                 if (x.status == 200) {
                     var data = JSON.parse(x.responseText);
-                   updateState(data);
+                    updateState(data);
                 }
-            window.setTimeout(pollLoop, 1000);
+                window.setTimeout(pollLoop, 1000);
             }
         };
         x.open("GET", "frontPageData", true);
@@ -23082,25 +23348,42 @@ function pollState(updateState) {
 Object.size = function(obj) {
     var size = 0, key;
     for (key in obj) {
-        if (obj.hasOwnProperty(key)) size++;
+        if (obj.hasOwnProperty(key)) {
+        	size++;
+        }
     }
     return size;
 };
 
 module.exports = Display;
 
-},{"../../stores/app-store.js":224,"../panels/settings.react":218,"./displayRow.react":215,"react":188,"react-router-component":8}],215:[function(require,module,exports){
+},{"../../stores/app-store.js":219,"../panels/settings.react":212,"./displayRow.react":210,"react":188,"react-router-component":8}],210:[function(require,module,exports){
 /**
- * Copyright (c) 2014, U-blox.
+ * Copyright (C) u-blox Melbourn Ltd
+ * u-blox Melbourn Ltd, Melbourn, UK
+ * 
  * All rights reserved.
+ *
+ * This source file is the sole property of u-blox Melbourn Ltd.
+ * Reproduction or utilization of this source in whole or part is
+ * forbidden without the written consent of u-blox Melbourn Ltd.
+ * 
+ * This file is written in JSX, not HTML.  If you want to put any
+ * content in here that should be generated as HTML, stuff it
+ * through:
+ * 
+ * https://facebook.github.io/react/html-jsx.html
+ * 
+ * ...to get your syntax correct.
  */
+
 var React = require('react');
 var Link = require('react-router-component').Link;
 
 var DisplayRow = React.createClass({displayName: "DisplayRow",
     render: function() {
         var rows = [];
-        if (this.props["DeviceData"] !== undefined){        	
+        if (this.props["DeviceData"] && (this.props["DeviceData"].length > 0)) {
             this.props["DeviceData"].forEach(function(uuid, i) {
 	            rows.push(       
 	                React.createElement("tr", {className: "even gradeC", key: i}, 
@@ -23109,20 +23392,16 @@ var DisplayRow = React.createClass({displayName: "DisplayRow",
 	                        React.createElement("img", {src: "static/dist/assets/images/green.png", alt: "logo", style: {maxWidth: 12}})
 	                    ), 
 	                    React.createElement("td", {style: {width: 250}}, 
-	                        React.createElement("ul", {className: "SmallPadding"}, 
-	                            React.createElement("b", null, "Name:"), " ", uuid["UnitName"], React.createElement("br", null), 
-	                            React.createElement("b", null, "UUID:"), " ", uuid["Uuid"], React.createElement("br", null), 
-	                            React.createElement("b", null, "Mode:"), " ", uuid["Mode"], React.createElement("br", null), 
-	                            React.createElement("b", null, "Reporting:"), " ", uuid["Reporting"], React.createElement("br", null), 
-	                            React.createElement("b", null, "Heartbeat:"), " ", uuid["Heartbeat"]
-	                        )
+                            React.createElement("b", null, "Name:"), " ", uuid["DeviceName"], React.createElement("br", null), 
+                            React.createElement("b", null, "UUID:"), " ", uuid["Uuid"], React.createElement("br", null), 
+                            React.createElement("b", null, "Mode:"), " ", uuid["Mode"], React.createElement("br", null), 
+                            React.createElement("b", null, "Reporting:"), " ", uuid["Reporting"], React.createElement("br", null), 
+                            React.createElement("b", null, "Heartbeat:"), " ", uuid["Heartbeat"]
 	                    ), 
 	                    React.createElement("td", {style: {width: 170}}, 
-	                        React.createElement("ul", {className: "SmallPadding"}, 
-	                            React.createElement("b", null, "Msgs:"), " ", uuid["TotalUlMsgs"], React.createElement("br", null), 
-	                            React.createElement("b", null, "Bytes:"), " ", uuid["TotalUlBytes"], React.createElement("br", null), 
-	                            React.createElement("b", null, "Last Msg:"), " ", uuid["LastUlMsgTime"]
-	                        )
+                            React.createElement("b", null, "Msgs:"), " ", uuid["TotalUlMsgs"], React.createElement("br", null), 
+                            React.createElement("b", null, "Bytes:"), " ", uuid["TotalUlBytes"], React.createElement("br", null), 
+                            React.createElement("b", null, "Last Msg:"), " ", uuid["LastUlMsgTime"]
 	                    ), 
 	                    React.createElement("td", {style: {width: 170}}, 
 	                        React.createElement("b", null, "Msgs:"), " ", uuid["TotalDlMsgs"], React.createElement("br", null), 
@@ -23140,8 +23419,8 @@ var DisplayRow = React.createClass({displayName: "DisplayRow",
 	            );
             });
         }
-        return (
-        		
+        
+        return (		
             React.createElement("div", {className: "row"}, 
                 React.createElement("div", {className: "panel panel-default"}, 
                     React.createElement("div", {className: "_panel-heading", style: {width:'100%'}}, 
@@ -23173,7 +23452,26 @@ var DisplayRow = React.createClass({displayName: "DisplayRow",
 
 module.exports = DisplayRow;
 
-},{"react":188,"react-router-component":8}],216:[function(require,module,exports){
+},{"react":188,"react-router-component":8}],211:[function(require,module,exports){
+/**
+ * Copyright (C) u-blox Melbourn Ltd
+ * u-blox Melbourn Ltd, Melbourn, UK
+ * 
+ * All rights reserved.
+ *
+ * This source file is the sole property of u-blox Melbourn Ltd.
+ * Reproduction or utilization of this source in whole or part is
+ * forbidden without the written consent of u-blox Melbourn Ltd.
+ * 
+ * This file is written in JSX, not HTML.  If you want to put any
+ * content in here that should be generated as HTML, stuff it
+ * through:
+ * 
+ * https://facebook.github.io/react/html-jsx.html
+ * 
+ * ...to get your syntax correct.
+ */
+
 var React = require('react');
 
 
@@ -23201,328 +23499,52 @@ var Index = React.createClass({displayName: "Index",
 
 module.exports = Index;
 
-},{"react":188}],217:[function(require,module,exports){
+},{"react":188}],212:[function(require,module,exports){
 /**
- * Copyright (c) 2014, U-blox.
+ * Copyright (C) u-blox Melbourn Ltd
+ * u-blox Melbourn Ltd, Melbourn, UK
+ * 
  * All rights reserved.
+ *
+ * This source file is the sole property of u-blox Melbourn Ltd.
+ * Reproduction or utilization of this source in whole or part is
+ * forbidden without the written consent of u-blox Melbourn Ltd.
+ * 
+ * This file is written in JSX, not HTML.  If you want to put any
+ * content in here that should be generated as HTML, stuff it
+ * through:
+ * 
+ * https://facebook.github.io/react/html-jsx.html
+ * 
+ * ...to get your syntax correct.
  */
-var React = require('react');
-var Setting = require('../controls/setting.react');
 
-var Mode = React.createClass({displayName: "Mode",
-
-  /**
-   * @return {object}
-   */
-  render: function() {
-   
-       return (
-
-      React.createElement("div", {className: "row"}, React.createElement("br", null), 
-        React.createElement("div", {className: "col-lg-8", style: {width:'400px', height: '180px'}}, 
-          React.createElement("div", {className: "panel panel-info"}, 
-            React.createElement("div", {className: "panel-body", style: {width:'400px', height: '180px'}}, 
-             React.createElement("div", {style: {float:'left'}}, 
-                React.createElement("select", {id: "example-multiple-selected", multiple: "multiple", style: {width:'110px', height: '150px'}}, 
-                  React.createElement("option", {value: 1}, "UE-P"), 
-                  React.createElement("option", {value: 2, selected: "selected"}, "UE-TW"), 
-                   React.createElement("option", {value: 3}, "UE-WW"), 
-                  React.createElement("option", {value: 4}, "UE-T"), 
-                  React.createElement("option", {value: 5}, "UE-R"), 
-                  React.createElement("option", {value: 6}, "UE-E")
-                )
-              ), 
-
-              React.createElement("div", {style: {float:'right', marginRight:'30px'}}, 
-                React.createElement(Setting, null)
-              ), 
-              React.createElement("p", null)
-            )
-          )
-        ), 
-        React.createElement("div", {className: "col-lg-4"}
-
-
-        ), 
-        React.createElement("div", {className: "row"}, 
-        React.createElement("div", {className: "collg-4"}
-        ), 
-          React.createElement("div", {className: "col-lg-12", style: {marginTop:'10px'}}, 
-         
-            React.createElement("div", {className: "panel panel-info"}, 
-              React.createElement("div", {className: "panel-heading"}, 
-                "Operating Modes"
-              ), 
-              /* /.panel-heading */
-              React.createElement("div", {className: "panel-body"}, 
-                /* Nav tabs */
-                React.createElement("ul", {className: "nav nav-tabs"}, 
-                  React.createElement("li", {className: "active"}, React.createElement("a", {href: "#standard", "data-toggle": "tab"}, "Standard")
-                  ), 
-                  React.createElement("li", null, React.createElement("a", {href: "#commissioning", "data-toggle": "tab"}, "Commissioning")
-                  ), 
-                  React.createElement("li", null, React.createElement("a", {href: "#traffictest", "data-toggle": "tab"}, "Traffic Test")
-                  ), 
-                  React.createElement("li", null, React.createElement("a", {href: "#standalonebasic", "data-toggle": "tab"}, "Standalone TRX Basic")
-                  )
-                ), 
-                /* Tab panes */
-                React.createElement("div", {className: "tab-content"}, 
-                  React.createElement("div", {className: "tab-pane fade in active", id: "standard"}, 
-                    React.createElement("h4", {style: {marginLeft: 20}}, "Basic Mode"), 
-                    React.createElement("p", null
-                    ), React.createElement("div", {className: "col-lg-12"}, 
-                      React.createElement("div", {className: "panel panel-info", style: {height: 250}}, 
-                        React.createElement("i", {className: "fa fa-spinner fa-spin", style: {float: 'right', padding: 10, color: 'red'}}), 
-                        React.createElement("div", {className: "panel-body"}, React.createElement("p", null
-                          ), React.createElement("div", {className: "col-lg-8"}, 
-                            React.createElement("div", {className: "col-1-3"}, 
-                              React.createElement("div", {className: "cell red"}, "Status: Disconnected"
-                              )
-                            )
-                          ), 
-                          React.createElement("div", {className: "col-lg-8"}, 
-                            React.createElement("div", {className: "col-1-3"}, 
-                              React.createElement("div", {className: "cell grey"}, "WAKE UP CODE: -"
-                              )
-                            ), 
-                            React.createElement("div", {className: "col-1-3"}, 
-                              React.createElement("div", {className: "cell grey"}, "REVISION LEVEL: -"
-                              )
-                            ), 
-                            React.createElement("div", {className: "col-1-3 push-1-3"}
-                            ), 
-                            React.createElement("div", {className: "col-1-3"}, 
-                              React.createElement("div", {className: "cell grey"}, "LAST SEEN: - 04/10/2015"
-                              )
-                            ), 
-                            React.createElement("div", {className: "col-1-3"}, 
-                              React.createElement("div", {className: "cell grey"}, "REPORTING INTERVAL:" 
-                              )
-                            ), 
-                            React.createElement("div", {className: "col-1-3 push-1-3"}
-                            ), 
-                            React.createElement("div", {className: "col-1-3"}, 
-                              React.createElement("div", {className: "cell grey"}, "HEART BEAT: -"
-                              )
-                            ), 
-                            React.createElement("div", {className: "col-1-3"}, 
-                              React.createElement("div", {className: "cell grey"}, "DATE TIME:" 
-                              )
-                            )
-                          ), 
-                          React.createElement("p", null)
-                        )
-                      )
-                    ), 
-                    React.createElement("p", null)
-                  ), 
-                  React.createElement("div", {className: "tab-pane fade", id: "commissioning"}, 
-                    React.createElement("h4", {style: {marginLeft: 20}}, "Commissioning Mode"), 
-                    React.createElement("p", null
-                    ), React.createElement("div", {className: "col-lg-12"}, 
-                      React.createElement("div", {className: "panel panel-info", style: {height: 250}}, 
-                        React.createElement("i", {className: "fa fa-spinner fa-spin", style: {float: 'right', padding: 10, color: 'red'}}), 
-                        React.createElement("div", {className: "panel-body"}, React.createElement("p", null
-                          ), React.createElement("div", {className: "col-lg-8"}, 
-                            React.createElement("div", {className: "col-1-3"}, 
-                              React.createElement("div", {className: "cell red"}, "Status: Disconnected"
-                              )
-                            )
-                          ), 
-                          React.createElement("div", {className: "col-lg-8"}, 
-                            React.createElement("div", {className: "col-1-3"}, 
-                              React.createElement("div", {className: "cell grey"}, "RSSI: -"
-                              )
-                            ), 
-                            React.createElement("div", {className: "col-1-3"}, 
-                              React.createElement("div", {className: "cell grey"}, "RSRP: -"
-                              )
-                            ), 
-                            React.createElement("div", {className: "col-1-3 push-1-3"}
-                            ), 
-                            React.createElement("div", {className: "col-1-3"}, 
-                              React.createElement("div", {className: "cell grey"}, "CELL ID: -" 
-                              )
-                            ), 
-                            React.createElement("div", {className: "col-1-3"}, 
-                              React.createElement("div", {className: "cell grey"}, "SNR:" 
-                              )
-                            )
-                          ), 
-                          React.createElement("p", null)
-                        )
-                      )
-                    ), 
-                    React.createElement("p", null)
-                  ), 
-                  React.createElement("div", {className: "tab-pane fade", id: "traffictest"}, 
-                    React.createElement("h4", {style: {marginLeft: 20}}, "Traffic Test Mode"), 
-                    React.createElement("p", null
-                    ), React.createElement("div", {className: "col-lg-4"}, 
-                      React.createElement("div", {className: "panel panel-info", style: {height: 300}}, 
-                        React.createElement("div", {className: "panel-body"}, React.createElement("p", null, 
-                            React.createElement("input", {className: "form-control", placeholder: " No Of UL Datagrams", style: {width: 180, height: 30, margin: 5}}), 
-                            React.createElement("input", {className: "form-control", placeholder: " Size Of UL Datagrams", style: {width: 180, height: 30, margin: 5}}), 
-                            React.createElement("input", {className: "form-control", placeholder: " No Of DL Datagrams", style: {width: 180, height: 30, margin: 5}}), 
-                            React.createElement("input", {className: "form-control", placeholder: " Size Of DL Datagrams", style: {width: 180, height: 30, margin: 5}}), React.createElement("br", null), 
-                            React.createElement("button", {type: "button", className: "btn btn-info", style: {width: 100, height: 30, marginTop: 10}}, "Set up Test"), 
-                            React.createElement("button", {type: "button", className: "btn btn-default", style: {width: 100, height: 30, marginTop: 10}}, "Start Test")
-                          )
-                        )
-                      )
-                    ), 
-                    React.createElement("div", {className: "panel panel-info", style: {height: 300}}, 
-                      React.createElement("i", {className: "fa fa-spinner fa-spin", style: {float: 'right', padding: 10, color: 'red'}}), 
-                      React.createElement("div", {className: "panel-body"}, React.createElement("p", null
-                        ), React.createElement("div", {className: "col-lg-8", style: {float: 'right'}}, 
-                          React.createElement("div", {className: "col-1-3"}, 
-                            React.createElement("div", {className: "cell red"}, "Status: Disconnected"
-                            )
-                          )
-                        ), 
-                        React.createElement("div", {className: "col-lg-8", style: {float: 'right'}}, 
-                          React.createElement("div", {className: "col-1-3"}, 
-                            React.createElement("div", {className: "cell grey"}, "No of UL Datagrams: -"
-                            )
-                          ), 
-                          React.createElement("div", {className: "col-1-3"}, 
-                            React.createElement("div", {className: "cell grey"}, "No of UL Bytes: -"
-                            )
-                          ), 
-                          React.createElement("div", {className: "col-1-3 push-1-3"}
-                          ), 
-                          React.createElement("div", {className: "col-1-3"}, 
-                            React.createElement("div", {className: "cell grey"}, "No of DL Datagrams: -" 
-                            )
-                          ), 
-                          React.createElement("div", {className: "col-1-3"}, 
-                            React.createElement("div", {className: "cell grey"}, "No of DL Bytes:" 
-                            )
-                          ), 
-                          React.createElement("div", {className: "col-1-3 push-1-3"}
-                          ), 
-                          React.createElement("div", {className: "col-1-3"}, 
-                            React.createElement("div", {className: "cell grey"}, "No of DL Datagrams Missed: -"
-                            )
-                          )
-                        ), 
-                        React.createElement("p", null)
-                      ), 
-                      React.createElement("div", {className: "tab-pane fade", id: "standalonebasic"}, 
-                        React.createElement("h4", {style: {marginLeft: 20}}, "Basic Mode"), 
-                        React.createElement("p", null
-                        ), React.createElement("div", {className: "col-lg-12"}, 
-                          React.createElement("div", {className: "panel panel-info", style: {height: 250}}, 
-                            React.createElement("i", {className: "fa fa-spinner fa-spin", style: {float: 'right', padding: 10, color: 'red'}}), 
-                            React.createElement("div", {className: "panel-body"}, React.createElement("p", null
-                              ), React.createElement("div", {className: "col-lg-8"}, 
-                                React.createElement("div", {className: "col-1-3"}, 
-                                  React.createElement("div", {className: "cell red"}, "Status: Disconnected"
-                                  )
-                                )
-                              ), 
-                              React.createElement("div", {className: "col-lg-8"}, 
-                                React.createElement("div", {className: "col-1-3"}, 
-                                  React.createElement("div", {className: "cell grey"}, "No of UL Datagrams: -"
-                                  )
-                                ), 
-                                React.createElement("div", {className: "col-1-3"}, 
-                                  React.createElement("div", {className: "cell grey"}, "No of UL Bytes: -"
-                                  )
-                                ), 
-                                React.createElement("div", {className: "col-1-3 push-1-3"}
-                                ), 
-                                React.createElement("div", {className: "col-1-3"}, 
-                                  React.createElement("div", {className: "cell grey"}, "No of DL Datagrams: -" 
-                                  )
-                                ), 
-                                React.createElement("div", {className: "col-1-3"}, 
-                                  React.createElement("div", {className: "cell grey"}, "No of DL Bytes:" 
-                                  )
-                                )
-                              ), 
-                              React.createElement("p", null)
-                            )
-                          )
-                        ), 
-                        React.createElement("p", null), 
-                        React.createElement("h4", {style: {marginLeft: 20}}, "Advanced Mode"), 
-                        React.createElement("p", null
-                        ), React.createElement("div", {className: "col-lg-12"}, 
-                          React.createElement("div", {className: "panel panel-info", style: {height: 250}}, 
-                            React.createElement("div", {className: "panel-body"}, React.createElement("p", null
-                              ), React.createElement("div", {className: "col-lg-8"}, 
-                                React.createElement("div", {className: "col-1-3"}, 
-                                  React.createElement("div", {className: "cell red"}, "Status: Disconnected"
-                                  )
-                                )
-                              ), 
-                              React.createElement("div", {className: "col-lg-8"}, 
-                                React.createElement("div", {className: "col-1-3"}, 
-                                  React.createElement("div", {className: "cell grey"}, "No of UL Datagrams: -"
-                                  )
-                                ), 
-                                React.createElement("div", {className: "col-1-3"}, 
-                                  React.createElement("div", {className: "cell grey"}, "No of UL Bytes: -"
-                                  )
-                                ), 
-                                React.createElement("div", {className: "col-1-3 push-1-3"}
-                                ), 
-                                React.createElement("div", {className: "col-1-3"}, 
-                                  React.createElement("div", {className: "cell grey"}, "No of DL Datagrams: -" 
-                                  )
-                                ), 
-                                React.createElement("div", {className: "col-1-3"}, 
-                                  React.createElement("div", {className: "cell grey"}, "No of DL Bytes:" 
-                                  )
-                                )
-                              ), 
-                              React.createElement("p", null)
-                            )
-                          )
-                        ), 
-                        React.createElement("p", null)
-                      )
-                    )
-                  )
-                )
-              )
-              /* /.panel-body */
-            )
-            /* /.panel */
-            )
-        )
-
-      )
-    );
-
-
-  }
-});
-
-module.exports = Mode;
-
-},{"../controls/setting.react":204,"react":188}],218:[function(require,module,exports){
 var React = require('react');
 var SettingStd = require('../controls/setting_std.react');
 var SettingTT = require('../controls/setting_tt.react');
 
 var Settings = React.createClass({displayName: "Settings",
-    render:function(){
-        return (
+    render: function() {
+            var Names = [];
+            if (this.props["DeviceData"] && (this.props["DeviceData"].length > 0)) {        	
+                this.props["DeviceData"].forEach(function(name, i) {
+                	Names.push(name["DeviceName"]);
+                });
+            }
+            
+            return (
             React.createElement("div", {className: "row"}, 
 		        React.createElement("div", {className: "col-lg-5"}, 
 		            React.createElement("div", {className: "panel panel-info", style: {height: 180, marginTop: 10}}, 
 			            React.createElement("div", {className: "panel-body"}, 
-                            React.createElement(SettingStd, null)
+                            React.createElement(SettingStd, {Names: Names})
 			            )
 		            )
 	            ), 
 		        React.createElement("div", {className: "col-lg-7"}, 
 		            React.createElement("div", {className: "panel panel-info", style: {height: 180, marginTop: 10}}, 
 			            React.createElement("div", {className: "panel-body"}, 
-                            React.createElement(SettingTT, null)
+                            React.createElement(SettingTT, {Names: Names})
 			            )
 		            )
                 )
@@ -23533,7 +23555,7 @@ var Settings = React.createClass({displayName: "Settings",
 
 module.exports = Settings;
 
-},{"../controls/setting_std.react":205,"../controls/setting_tt.react":206,"react":188}],219:[function(require,module,exports){
+},{"../controls/setting_std.react":200,"../controls/setting_tt.react":201,"react":188}],213:[function(require,module,exports){
 var React = require('react');
 var Link = require('react-router-component').Link;
 
@@ -23567,7 +23589,7 @@ var Login = React.createClass({displayName: "Login",
 
 module.exports = Login;
 
-},{"react":188,"react-router-component":8}],220:[function(require,module,exports){
+},{"react":188,"react-router-component":8}],214:[function(require,module,exports){
 var React = require('react');
 var Link = require('react-router-component').Link;
 
@@ -23644,7 +23666,54 @@ var Register = React.createClass({displayName: "Register",
 
 module.exports = Register;
 
-},{"react":188,"react-router-component":8}],221:[function(require,module,exports){
+},{"react":188,"react-router-component":8}],215:[function(require,module,exports){
+/**
+ * Copyright (C) u-blox Melbourn Ltd
+ * u-blox Melbourn Ltd, Melbourn, UK
+ * 
+ * All rights reserved.
+ *
+ * This source file is the sole property of u-blox Melbourn Ltd.
+ * Reproduction or utilization of this source in whole or part is
+ * forbidden without the written consent of u-blox Melbourn Ltd.
+ * 
+ * This file is written in JSX, not HTML.  If you want to put any
+ * content in here that should be generated as HTML, stuff it
+ * through:
+ * 
+ * https://facebook.github.io/react/html-jsx.html
+ * 
+ * ...to get your syntax correct.
+ */
+
+var React = require('react');
+
+var MakeLiUuidList = React.createClass({displayName: "MakeLiUuidList",
+    render: function() {
+        var list = [];
+        if ((this.props.Items != null) && (this.props.Items.length > 0)) {        	
+            this.props.Items.forEach(function(item, i) {
+            	list.push(
+                    React.createElement("li", null, " ", item, " ")
+                );
+        });
+        } else {
+        	list.push(
+	            React.createElement("li", null, " Empty ")
+	        );
+        }
+
+        return (
+            React.createElement("div", null, 
+                list
+            )
+        );
+    }
+});
+
+module.exports = MakeLiUuidList;
+
+},{"react":188}],216:[function(require,module,exports){
 module.exports = {
   SET_COMMISSIONING: 'SET_COMMISSIONING',
   SET_TRAFFIC_TEST: 'SET_TRAFFIC_TEST',
@@ -23654,7 +23723,7 @@ module.exports = {
   REBOOT: 'REBOOT',
   ADD_USER: 'ADD_USER'
 };
-},{}],222:[function(require,module,exports){
+},{}],217:[function(require,module,exports){
 var Dispatcher = require('flux').Dispatcher;
 var assign = require('react/lib/Object.assign');
 
@@ -23669,12 +23738,23 @@ var AppDispatcher = assign(new Dispatcher(), {
 });
 
 module.exports = AppDispatcher;
-},{"flux":3,"react/lib/Object.assign":56}],223:[function(require,module,exports){
+},{"flux":3,"react/lib/Object.assign":56}],218:[function(require,module,exports){
+/**
+ * Copyright (C) u-blox Melbourn Ltd
+ * u-blox Melbourn Ltd, Melbourn, UK
+ * 
+ * All rights reserved.
+ *
+ * This source file is the sole property of u-blox Melbourn Ltd.
+ * Reproduction or utilization of this source in whole or part is
+ * forbidden without the written consent of u-blox Melbourn Ltd.
+ */
+
 var App = require('./components/app');
 var React = require('react');
 
 React.render(React.createElement(App, null), document.getElementById('main'));
-},{"./components/app":191,"react":188}],224:[function(require,module,exports){
+},{"./components/app":191,"react":188}],219:[function(require,module,exports){
 var AppDispatcher = require('../dispatchers/app-dispatcher');
 var AppConstants = require('../constants/app-constants');
 var assign = require('react/lib/Object.assign');
@@ -23769,4 +23849,4 @@ function addUser(company, firstName, lastName, email, password) {
 })
 
 module.exports = AppStore;
-},{"../constants/app-constants":221,"../dispatchers/app-dispatcher":222,"events":1,"react/lib/Object.assign":56}]},{},[223]);
+},{"../constants/app-constants":216,"../dispatchers/app-dispatcher":217,"events":1,"react/lib/Object.assign":56}]},{},[218]);

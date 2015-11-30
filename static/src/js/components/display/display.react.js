@@ -1,20 +1,28 @@
 /**
- * Copyright (c) 2014, U-blox.
+ * Copyright (C) u-blox Melbourn Ltd
+ * u-blox Melbourn Ltd, Melbourn, UK
+ * 
  * All rights reserved.
+ *
+ * This source file is the sole property of u-blox Melbourn Ltd.
+ * Reproduction or utilization of this source in whole or part is
+ * forbidden without the written consent of u-blox Melbourn Ltd.
+ * 
+ * This file is written in JSX, not HTML.  If you want to put any
+ * content in here that should be generated as HTML, stuff it
+ * through:
+ * 
+ * https://facebook.github.io/react/html-jsx.html
+ * 
+ * ...to get your syntax correct.
  */
+
 var React = require('react');
 var AppStore = require('../../stores/app-store.js');
 var Settings = require('../panels/settings.react')
 var DisplayRow = require('./displayRow.react')
 
 var Link = require('react-router-component').Link
-
-var arrData = [];
-
-var currentUuidsObject = new Object();
-var UuidsMap = new Map();
-var totalMsg = 0;
-var totalBytes = 0;
 
 var Display = React.createClass({
     getInitialState: function(){   
@@ -33,15 +41,15 @@ var Display = React.createClass({
 	                data[property] = {};
 	            }
 	        });
-        this.setState({data: data});
+            this.setState({data: data});
 	    }.bind(this), 10000);
     },
 
 	render:function(){
 	    return (
 	        <div>
-	            <Settings />  
-	            <DisplayRow DeviceData = { this.state.data["DeviceData"]} />  
+	            <Settings DeviceData = {this.state.data["DeviceData"]} />  
+	            <DisplayRow DeviceData = {this.state.data["DeviceData"]} />  
 	        </div>
 	    );
     }
@@ -54,9 +62,9 @@ function pollState(updateState) {
             if (x.readyState == 4) {
                 if (x.status == 200) {
                     var data = JSON.parse(x.responseText);
-                   updateState(data);
+                    updateState(data);
                 }
-            window.setTimeout(pollLoop, 1000);
+                window.setTimeout(pollLoop, 1000);
             }
         };
         x.open("GET", "frontPageData", true);
@@ -68,7 +76,9 @@ function pollState(updateState) {
 Object.size = function(obj) {
     var size = 0, key;
     for (key in obj) {
-        if (obj.hasOwnProperty(key)) size++;
+        if (obj.hasOwnProperty(key)) {
+        	size++;
+        }
     }
     return size;
 };

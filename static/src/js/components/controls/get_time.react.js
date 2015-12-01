@@ -23,17 +23,17 @@ var MakeLiNameList = require('../utilities/utilities.react')
 var GetTime = React.createClass({
     render:function(){
         return (
-  	        <div className="btn-group">
-  	            <button type="button" className="btn btn-info" style={{width: 90, height: 30, marginLeft: 10, marginTop: 10}} >
-  	                Get Time
-  	            </button>
-  	            <button type="button" className="btn btn-info dropdown-toggle" data-toggle="dropdown" style={{height: 30, marginTop: 10}} >
-  	                <span className="caret" />
-  	            </button>
-      	        <ul className="dropdown-menu" role="menu">
+              <div className="btn-group">
+                  <button type="button" className="btn btn-info" style={{width: 90, height: 30, marginLeft: 15, marginTop: 10}} >
+                      Get Time
+                  </button>
+                  <button type="button" className="btn btn-info dropdown-toggle" data-toggle="dropdown" style={{height: 30, marginTop: 10}} >
+                      <span className="caret" />
+                  </button>
+                  <ul className="dropdown-menu" role="menu">
                     <MakeLiNameList Items={this.props.Names} />
-       	        </ul>
-  	        </div>
+                   </ul>
+              </div>
         );
     }
 });

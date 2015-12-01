@@ -60,7 +60,7 @@ func (value *ExpectedMsgData) DeepCopy() *ExpectedMsgData {
 func makeExpectedMsgData(newData *[]ExpectedMsg, Time time.Time) *ExpectedMsgData {
     expectedMsgList := make ([]ExpectedMsg, 0)
     data := ExpectedMsgData {
-        Timestamp:  	   Time,
+        Timestamp:         Time,
         ExpectedMsgList:   &expectedMsgList,
     }
     if newData != nil {
@@ -80,7 +80,7 @@ type TrafficVolumeData struct {
     DlBytes       int
     LastDlMsgTime time.Time
     UlTotals      *TotalsState 
-    DlTotals      *TotalsState	
+    DlTotals      *TotalsState    
 }
 func (value *TrafficVolumeData) DeepCopy() *TrafficVolumeData {
     if value == nil {
@@ -168,13 +168,13 @@ func (value *InitIndData) DeepCopy() *InitIndData {
 }
 func makeInitIndData(newData *InitIndUlMsg, Time time.Time) *InitIndData {
     data := InitIndData {
-        Timestamp:  	   Time,
-        WakeUpCode:    	   WakeUpCodeLookUp[newData.WakeUpCode],
-	    RevisionLevel:     newData.RevisionLevel,
-	    SdCardNotRequired: newData.SdCardNotRequired,
-	    DisableModemDebug: newData.DisableModemDebug,
-	    DisableButton:     newData.DisableButton,
-	    DisableServerPing: newData.DisableServerPing,
+        Timestamp:         Time,
+        WakeUpCode:           WakeUpCodeLookUp[newData.WakeUpCode],
+        RevisionLevel:     newData.RevisionLevel,
+        SdCardNotRequired: newData.SdCardNotRequired,
+        DisableModemDebug: newData.DisableModemDebug,
+        DisableButton:     newData.DisableButton,
+        DisableServerPing: newData.DisableServerPing,
     }
     return &data
 }
@@ -338,8 +338,8 @@ func (value *UtmStatusData) DeepCopy() *UtmStatusData {
 }
 func makeUtmStatusData(newData *PollIndUlMsg, Time time.Time) *UtmStatusData {
     data := UtmStatusData {
-        Timestamp:  	   Time,
-        EnergyLeft:    	   EnergyLeftLookUp[newData.EnergyLeft],
+        Timestamp:         Time,
+        EnergyLeft:           EnergyLeftLookUp[newData.EnergyLeft],
         DiskSpaceLeft:     DiskSpaceLeftLookUp[newData.DiskSpaceLeft],
     }
     return &data

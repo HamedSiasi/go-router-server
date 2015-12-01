@@ -33,10 +33,10 @@ var SettingTT = React.createClass({
             <div >
                 <table >
                     <thead>
-	                    <tr >
-		                    <th colSpan={5} style={{textAlign: 'center'}}>Traffic Test Mode Settings</th>
-		                </tr>
-		            </thead>
+                        <tr >
+                            <th colSpan={5} style={{textAlign: 'center'}}>Traffic Test Mode Settings</th>
+                        </tr>
+                    </thead>
                     <tr style={{height: 50}}>
                         <td style={{width: 110}}>UL: Number:</td>
                         <td style={{width: 100}}><ValueTTUlNumDatagrams /></td>

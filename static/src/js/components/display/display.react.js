@@ -32,28 +32,28 @@ var Display = React.createClass({
 
     componentDidMount: function() {
         pollState(function(data) {
-	        // fixup missing state properties to avoid muliple levels of missing attribute tests
-	        [
-	            "SummaryData",
-	            "DeviceData"
-	        ].map(function(property) {
-	            if (!data[property]) {
-	                data[property] = {};
-	            }
-	        });
+            // fixup missing state properties to avoid muliple levels of missing attribute tests
+            [
+                "SummaryData",
+                "DeviceData"
+            ].map(function(property) {
+                if (!data[property]) {
+                    data[property] = {};
+                }
+            });
             this.setState({data: data});
-	    }.bind(this), 10000);
+        }.bind(this), 10000);
     },
 
-	render:function(){
-	    return (
-	        <div>
-	        	<br />
-	            <Settings DeviceData = {this.state.data["DeviceData"]} />  
-	        	Note: all times are UTC.
-	            <DisplayRow DeviceData = {this.state.data["DeviceData"]} />  
-	        </div>
-	    );
+    render:function(){
+        return (
+            <div>
+                <br />
+                <Settings DeviceData = {this.state.data["DeviceData"]} />  
+                Note: all times are UTC.
+                <DisplayRow DeviceData = {this.state.data["DeviceData"]} />  
+            </div>
+        );
     }
 });
 
@@ -79,7 +79,7 @@ Object.size = function(obj) {
     var size = 0, key;
     for (key in obj) {
         if (obj.hasOwnProperty(key)) {
-        	size++;
+            size++;
         }
     }
     return size;

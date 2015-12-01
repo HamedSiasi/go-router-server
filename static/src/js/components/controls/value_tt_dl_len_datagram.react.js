@@ -27,12 +27,12 @@ var ValueTTDlLenDatagram = React.createClass({
 
     handleChange: function(newValue) {
         if ((newValue.target.value >= AppConstants.TT_DATAGRAM_LEN_MIN) && (newValue.target.value <= AppConstants.TT_DATAGRAM_LEN_MAX)) {
-    	    this.setState ({value: newValue.target.value});
+            this.setState ({value: newValue.target.value});
         }
     },
 
     render:function(){
-	    var value = this.state.value;
+        var value = this.state.value;
         return (
             <input className="form-control bfh-number" type="number" min={AppConstants.TT_DATAGRAM_LEN_MIN} max={AppConstants.TT_DATAGRAM_LEN_MAX} value={value} step={1} onChange={this.handleChange} style={{width: 80}} />
         );

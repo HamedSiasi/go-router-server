@@ -26,13 +26,13 @@ var ValueTTTimeout = React.createClass({
     },
 
     handleChange: function(newValue) {
-    	if ((newValue.target.value >= AppConstants.TT_TIMEOUT_MIN) && (newValue.target.value <= AppConstants.TT_TIMEOUT_MAX)) {
-    	    this.setState ({value: newValue.target.value});
+        if ((newValue.target.value >= AppConstants.TT_TIMEOUT_MIN) && (newValue.target.value <= AppConstants.TT_TIMEOUT_MAX)) {
+            this.setState ({value: newValue.target.value});
         }
     },
 
     render:function(){
-	    var value = this.state.value;
+        var value = this.state.value;
         return (
             <input className="form-control bfh-number" type="number" min={AppConstants.TT_TIMEOUT_MIN} max={AppConstants.TT_TIMEOUT_MAX} value={value} step={60} onChange={this.handleChange} style={{width: 80, marginTop: 10}} />
         );

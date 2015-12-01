@@ -25,13 +25,13 @@ var ValueUuidSelected = React.createClass({
     },
 
     handleChange: function(newValue) {
-    	this.setState({checked: newValue.target.checked});
-    	if (this.props.CallbackParent) {
+        this.setState({checked: newValue.target.checked});
+        if (this.props.CallbackParent) {
             this.props.CallbackParent(this.state);
-    	}
+        }
     },
 
-	render:function(){
+    render:function(){
         return (
             <input type="checkbox" value={this.state.value} checked={this.state.checked} onChange={this.handleChange} style={{width: 15}} />
         );

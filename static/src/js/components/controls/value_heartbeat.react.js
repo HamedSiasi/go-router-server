@@ -22,17 +22,17 @@ var AppConstants = require ('../../constants/app-constants')
 
 var ValueHeartbeat = React.createClass({
     getInitialState: function() {
-	    return {value: AppConstants.HEARTBEAT_DEFAULT};
+        return {value: AppConstants.HEARTBEAT_DEFAULT};
     },
     
     handleChange: function(newValue) {
         if ((newValue.target.value >= AppConstants.HEARTBEAT_MIN) && (newValue.target.value <= AppConstants.HEARTBEAT_MAX)) {
-        	this.setState ({value: newValue.target.value});
+            this.setState ({value: newValue.target.value});
         }
     },
     
     render:function() {
-    	var value = this.state.value;
+        var value = this.state.value;
         return (
             <input className="form-control bfh-number" type="number" min={AppConstants.HEARTBEAT_MIN} max={AppConstants.HEARTBEAT_MAX} value={value} step={1} onChange={this.handleChange} style={{width: 145}} />
         );

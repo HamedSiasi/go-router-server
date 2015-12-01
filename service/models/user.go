@@ -24,12 +24,12 @@ import (
 
 /// Definition of a user
 type User struct {
-	ID        bson.ObjectId `bson:"_id,omitempty" json:"id"`
-	Company   string        `bson:"company" json:"company"`
-	FirstName string        `bson:"firstName" json:"firstName"`
-	LastName  string        `bson:"lastName" json:"lastName"`
-	Email     string        `bson:"email" json:"email"`
-	Password  string        `bson:"password" json:"password"`
+    ID        bson.ObjectId `bson:"_id,omitempty" json:"id"`
+    Company   string        `bson:"company" json:"company"`
+    FirstName string        `bson:"firstName" json:"firstName"`
+    LastName  string        `bson:"lastName" json:"lastName"`
+    Email     string        `bson:"email" json:"email"`
+    Password  string        `bson:"password" json:"password"`
 }
 
 /// Add a user to the database

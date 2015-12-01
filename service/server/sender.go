@@ -234,9 +234,9 @@ func GetValueTime (body interface{}, tag string) (error, time.Time) {
 
 // Determine what message to the UTM is requested by the REST interface
 func (msg *ClientSendMsg) Send(response http.ResponseWriter, request *http.Request) {
-	err := utilities.ValidatePostRequest (request)
-	
-	if err != nil {
+    err := utilities.ValidatePostRequest (request)
+    
+    if err != nil {
         response.WriteHeader(404)
         return
     } else {
@@ -463,16 +463,16 @@ func (m *Msg) Send(uuid string) error {
     // Send an update to the processing loop so that we don't miss
     // out on the totals
     if msgCount > 0 {
-	    encodeStateAdd := &DeviceEncodeStateAdd {
-    	    DeviceUuid:   uuid, 
-       	    ResponseId:   responseId,
-    	    State: TotalsState {
-        	    Timestamp:    time.Now().UTC(),
-        	    Msgs:         msgCount,
-        	    Bytes:        byteCount,
-    	    },
-	    }
-    	processMsgsChannel <- encodeStateAdd
+        encodeStateAdd := &DeviceEncodeStateAdd {
+            DeviceUuid:   uuid, 
+               ResponseId:   responseId,
+            State: TotalsState {
+                Timestamp:    time.Now().UTC(),
+                Msgs:         msgCount,
+                Bytes:        byteCount,
+            },
+        }
+        processMsgsChannel <- encodeStateAdd
     }    
     
     return nil

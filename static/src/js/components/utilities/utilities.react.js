@@ -22,16 +22,16 @@ var React = require('react');
 var MakeLiUuidList = React.createClass({
     render: function() {
         var list = [];
-        if ((this.props.Items != null) && (this.props.Items.length > 0)) {        	
+        if ((this.props.Items != null) && (this.props.Items.length > 0)) {            
             this.props.Items.forEach(function(item, i) {
-            	list.push(
+                list.push(
                     <li><a href="#">&nbsp;{item}&nbsp;</a></li>
                 );
         });
         } else {
-        	list.push(
-	            <li><a href="#">&nbsp;Empty&nbsp;</a></li>
-	        );
+            list.push(
+                <li><a href="#">&nbsp;Empty&nbsp;</a></li>
+            );
         }
 
         return (

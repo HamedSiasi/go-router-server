@@ -31,11 +31,11 @@ var SettingStd = React.createClass({
         return (
             <div >
                 <table >
-	                <thead>
-			            <tr >
-			                <th colSpan={3} style={{textAlign: 'center'}}>General Settings</th>
-			            </tr>
-			        </thead>
+                    <thead>
+                        <tr >
+                            <th colSpan={3} style={{textAlign: 'center'}}>General Settings</th>
+                        </tr>
+                    </thead>
                     <tr style={{height: 50}}>
                         <td style={{width: 170}}> <ValueHeartbeat /></td>
                         <td style={{width: 300}}> <SetHeartbeat Names={this.props.Names} UuidMap = {this.props.UuidMap} /></td> 

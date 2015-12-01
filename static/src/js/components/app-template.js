@@ -22,11 +22,11 @@ var Header = require('./header/header.react')
 
 var Template = React.createClass({
     render:function(){
-	    return (
+        return (
             <div>
                 <Header />
                     {this.props.children}
-		    </div>
+            </div>
         );
     }
 });

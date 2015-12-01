@@ -25,30 +25,30 @@ var Settings = React.createClass({
     render: function() {
             var Names = [];
             var UuidMap = {}; 
-            if (this.props["DeviceData"] && (this.props["DeviceData"].length > 0)) {        	
+            if (this.props["DeviceData"] && (this.props["DeviceData"].length > 0)) {            
                 this.props["DeviceData"].forEach(function(device, i) {
-                	Names.push(device["DeviceName"]);
-                	UuidMap[device["DeviceName"]] = device["Uuid"];
+                    Names.push(device["DeviceName"]);
+                    UuidMap[device["DeviceName"]] = device["Uuid"];
                 });
             }
             return (
             <div className="row" >
-		        <div className="col-lg-5">
-		            <div className="panel panel-info" style={{height: 180, marginTop: 10}}>
-			            <div className="panel-body">
+                <div className="col-lg-5">
+                    <div className="panel panel-info" style={{height: 180, marginTop: 10}}>
+                        <div className="panel-body">
                             <SettingStd Names = {Names} UuidMap = {UuidMap} />
-			            </div>
-		            </div>
-	            </div>
-		        <div className="col-lg-7">
-		            <div className="panel panel-info" style={{height: 180, marginTop: 10}}>
-			            <div className="panel-body">
-                            <SettingTT Names = {Names} UuidMap = {UuidMap} />
-			            </div>
-		            </div>
+                        </div>
+                    </div>
                 </div>
-	        </div>
-	    )
+                <div className="col-lg-7">
+                    <div className="panel panel-info" style={{height: 180, marginTop: 10}}>
+                        <div className="panel-body">
+                            <SettingTT Names = {Names} UuidMap = {UuidMap} />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )
     }
 });
 

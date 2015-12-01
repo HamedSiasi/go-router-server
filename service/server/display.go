@@ -66,17 +66,17 @@ func displayFrontPageData () *FrontPageData {
     var data FrontPageData
     var deviceData FrontPageDeviceData
     
-	// Get the latest state for all devices
-	// This is very "go" syntax.  It means, create a channel called "get".  Pass the address
-	// of the channel into the dataTableChannel (where it is populated).  Then, pass the
-	// channel into the variable state.  All of these things are of type []LatestState.
-	get := make(chan []LatestState)
-	dataTableChannel <- &get
-	allDevicesState := <- get
-	
-	for _, deviceState := range allDevicesState {
-	    
-	    deviceData.Uuid             = deviceState.DeviceUuid
+    // Get the latest state for all devices
+    // This is very "go" syntax.  It means, create a channel called "get".  Pass the address
+    // of the channel into the dataTableChannel (where it is populated).  Then, pass the
+    // channel into the variable state.  All of these things are of type []LatestState.
+    get := make(chan []LatestState)
+    dataTableChannel <- &get
+    allDevicesState := <- get
+    
+    for _, deviceState := range allDevicesState {
+        
+        deviceData.Uuid             = deviceState.DeviceUuid
         deviceData.DeviceName       = deviceState.DeviceName
         deviceData.Connected        = deviceState.Connected
         if deviceState.LatestActivityReportData != nil {
@@ -131,10 +131,10 @@ func displayFrontPageData () *FrontPageData {
             deviceData.NumExpectedMsgs = len (*deviceState.LatestExpectedMsgData.ExpectedMsgList)
         }
         data.DeviceData = append (data.DeviceData, deviceData)
-	}
+    }
 
     // And finally, sort the data by friendly name
-	sort.Sort(ByName(data.DeviceData))
+    sort.Sort(ByName(data.DeviceData))
     
     return &data
 }

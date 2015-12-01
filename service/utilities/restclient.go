@@ -21,23 +21,23 @@ import (
 )
 
 func ValidateGetRequest (request *http.Request) *globals.Error {
-	// Ensure this is a GET request
-	if (request.Method != "GET") || (request.Method == "") {
+    // Ensure this is a GET request
+    if (request.Method != "GET") || (request.Method == "") {
         globals.Dbg.PrintfError("%s [dl_msgs] --> received unsupported REST request %s %s.\n", globals.LogTag, request.Method, request.URL)
         return ClientError("unsupported method", http.StatusBadRequest)
-	}
-	
-	return nil    
+    }
+    
+    return nil    
 }
 
 func ValidatePostRequest (request *http.Request) *globals.Error {
-	// Ensure this is a POST request
-	if (request.Method != "POST") || (request.Method == "") {
+    // Ensure this is a POST request
+    if (request.Method != "POST") || (request.Method == "") {
         globals.Dbg.PrintfError("%s [dl_msgs] --> received unsupported REST request %s %s.\n", globals.LogTag, request.Method, request.URL)
         return ClientError("unsupported method", http.StatusBadRequest)
-	}
-	
-	return nil    
+    }
+    
+    return nil    
 }
 
 /// Definition of a REST client

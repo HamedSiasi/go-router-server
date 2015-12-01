@@ -22429,11 +22429,11 @@ var Header = require('./header/header.react')
 
 var Template = React.createClass({displayName: "Template",
     render:function(){
-	    return (
+        return (
             React.createElement("div", null, 
                 React.createElement(Header, null), 
                     this.props.children
-		    )
+            )
         );
     }
 });
@@ -22514,17 +22514,17 @@ var MakeLiNameList = require('../utilities/utilities.react')
 var GetIntervals = React.createClass({displayName: "GetIntervals",
     render:function(){
         return (
-  	        React.createElement("div", {className: "btn-group"}, 
-  	            React.createElement("button", {type: "button", className: "btn btn-info", style: {width: 120, height: 30, marginTop: 10}}, 
-  	                "Get Intervals"
-  	            ), 
-  	            React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle", "data-toggle": "dropdown", style: {height: 30, marginTop: 10}}, 
-  	                React.createElement("span", {className: "caret"})
-  	            ), 
-      	        React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
+              React.createElement("div", {className: "btn-group"}, 
+                  React.createElement("button", {type: "button", className: "btn btn-info", style: {width: 120, height: 30, marginTop: 10}}, 
+                      "Get Intervals"
+                  ), 
+                  React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle", "data-toggle": "dropdown", style: {height: 30, marginTop: 10}}, 
+                      React.createElement("span", {className: "caret"})
+                  ), 
+                  React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
                     React.createElement(MakeLiNameList, {Items: this.props.Names})
-       	        )
-  	        )
+                   )
+              )
         );
     }
 });
@@ -22557,17 +22557,17 @@ var MakeLiNameList = require('../utilities/utilities.react')
 var GetPing = React.createClass({displayName: "GetPing",
     render:function(){
         return (
-      	    React.createElement("div", {className: "btn-group"}, 
-  	            React.createElement("button", {type: "button", className: "btn btn-info", style: {width: 90, height: 30, marginLeft: 10, marginTop: 10}}, 
-  	                "Get Ping"
-  	            ), 
-  	            React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle", "data-toggle": "dropdown", style: {height: 30, marginTop: 10}}, 
-  	                React.createElement("span", {className: "caret"})
-  	            ), 
-      	        React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
+              React.createElement("div", {className: "btn-group"}, 
+                  React.createElement("button", {type: "button", className: "btn btn-info", style: {width: 90, height: 30, marginLeft: 10, marginTop: 10}}, 
+                      "Get Ping"
+                  ), 
+                  React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle", "data-toggle": "dropdown", style: {height: 30, marginTop: 10}}, 
+                      React.createElement("span", {className: "caret"})
+                  ), 
+                  React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
                     React.createElement(MakeLiNameList, {Items: this.props.Names})
-       	        )
-  	        )
+                   )
+              )
         );
     }
 });
@@ -22600,17 +22600,17 @@ var MakeLiNameList = require('../utilities/utilities.react')
 var GetTime = React.createClass({displayName: "GetTime",
     render:function(){
         return (
-  	        React.createElement("div", {className: "btn-group"}, 
-  	            React.createElement("button", {type: "button", className: "btn btn-info", style: {width: 90, height: 30, marginLeft: 10, marginTop: 10}}, 
-  	                "Get Time"
-  	            ), 
-  	            React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle", "data-toggle": "dropdown", style: {height: 30, marginTop: 10}}, 
-  	                React.createElement("span", {className: "caret"})
-  	            ), 
-      	        React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
+              React.createElement("div", {className: "btn-group"}, 
+                  React.createElement("button", {type: "button", className: "btn btn-info", style: {width: 90, height: 30, marginLeft: 15, marginTop: 10}}, 
+                      "Get Time"
+                  ), 
+                  React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle", "data-toggle": "dropdown", style: {height: 30, marginTop: 10}}, 
+                      React.createElement("span", {className: "caret"})
+                  ), 
+                  React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
                     React.createElement(MakeLiNameList, {Items: this.props.Names})
-       	        )
-  	        )
+                   )
+              )
         );
     }
 });
@@ -22644,18 +22644,18 @@ var SetHeartBeat = React.createClass({displayName: "SetHeartBeat",
     
     render: function() {
         return (
-	        React.createElement("div", {className: "btn-group"}, 
-	            React.createElement("button", {type: "button", className: "btn btn-info"}, "Set Heartbeat (seconds)"), 
-	            React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle", "data-toggle": "dropdown"}, 
-	                React.createElement("span", {className: "caret"})
-	            ), 
-	            React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
-	                React.createElement(MakeLiNameList, {Items: this.props.Names})
-	            )
-	        )
-	    );
-	  }
-	});
+            React.createElement("div", {className: "btn-group"}, 
+                React.createElement("button", {type: "button", className: "btn btn-info", style: {width: 215}}, "Set Heartbeat (seconds)"), 
+                React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle", "data-toggle": "dropdown"}, 
+                    React.createElement("span", {className: "caret"})
+                ), 
+                React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
+                    React.createElement(MakeLiNameList, {Items: this.props.Names})
+                )
+            )
+        );
+      }
+    });
 
 module.exports = SetHeartBeat;
 
@@ -22686,14 +22686,14 @@ var SetReporting = React.createClass({displayName: "SetReporting",
     render:function(){
         return (
             React.createElement("div", {className: "btn-group"}, 
-                React.createElement("button", {type: "button", className: "btn btn-info"}, "Set Reporting (heartbeats)"), 
+                React.createElement("button", {type: "button", className: "btn btn-info", style: {width: 215}}, "Set Reporting (heartbeats)"), 
                 React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle", "data-toggle": "dropdown"}, 
-	                React.createElement("span", {className: "caret"})
-	            ), 
-	            React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
+                    React.createElement("span", {className: "caret"})
+                ), 
+                React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
                     React.createElement(MakeLiNameList, {Items: this.props.Names})
-	            )
-		    )
+                )
+            )
         );
     }
 });
@@ -22724,20 +22724,20 @@ var React = require('react');
 var MakeLiNameList = require('../utilities/utilities.react')
 
 var SetTTParameters = React.createClass({displayName: "SetTTParameters",
-	  render: function() {
-	    return (
-	        React.createElement("div", {className: "btn-group"}, 
-	            React.createElement("button", {type: "button", className: "btn btn-info", style: {width: 165, height: 30, marginTop: 10}}, "Send Parameters"), 
-	            React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle", "data-toggle": "dropdown", style: {height: 30, marginTop: 10}}, 
-	                React.createElement("span", {className: "caret"})
-	            ), 
-	            React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
+      render: function() {
+        return (
+            React.createElement("div", {className: "btn-group"}, 
+                React.createElement("button", {type: "button", className: "btn btn-info", style: {width: 165, height: 30, marginTop: 10}}, "Send Parameters"), 
+                React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle", "data-toggle": "dropdown", style: {height: 30, marginTop: 10}}, 
+                    React.createElement("span", {className: "caret"})
+                ), 
+                React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
                     React.createElement(MakeLiNameList, {Items: this.props.Names})
-	            )
-	        )
-	    );
-	  }
-	});
+                )
+            )
+        );
+      }
+    });
 
 module.exports = SetTTParameters;
 
@@ -22765,20 +22765,20 @@ var React = require('react');
 var MakeLiNameList = require('../utilities/utilities.react')
 
 var SetTTStart = React.createClass({displayName: "SetTTStart",
-	  render: function() {
-	    return (
-	        React.createElement("div", {className: "btn-group"}, 
-	            React.createElement("button", {type: "button", className: "btn btn-info", style: {width: 170, height: 30}}, "Start Test"), 
-	            React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle", "data-toggle": "dropdown", style: {height: 30}}, 
-	                React.createElement("span", {className: "caret"})
-	            ), 
-	            React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
+      render: function() {
+        return (
+            React.createElement("div", {className: "btn-group"}, 
+                React.createElement("button", {type: "button", className: "btn btn-info", style: {width: 170, height: 30}}, "Start Test"), 
+                React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle", "data-toggle": "dropdown", style: {height: 30}}, 
+                    React.createElement("span", {className: "caret"})
+                ), 
+                React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
                     React.createElement(MakeLiNameList, {Items: this.props.Names})
-	            )
-	        )
-	    );
-	  }
-	});
+                )
+            )
+        );
+      }
+    });
 
 module.exports = SetTTStart;
 
@@ -22806,20 +22806,20 @@ var React = require('react');
 var MakeLiNameList = require('../utilities/utilities.react')
 
 var SetTTStop = React.createClass({displayName: "SetTTStop",
-	  render: function() {
-	    return (
-	        React.createElement("div", {className: "btn-group"}, 
-	            React.createElement("button", {type: "button", className: "btn btn-info", style: {width: 170, height: 30}}, "Stop Test"), 
-	            React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle", "data-toggle": "dropdown", style: {height: 30}}, 
-	                React.createElement("span", {className: "caret"})
-	            ), 
-	            React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
+      render: function() {
+        return (
+            React.createElement("div", {className: "btn-group"}, 
+                React.createElement("button", {type: "button", className: "btn btn-info", style: {width: 170, height: 30}}, "Stop Test"), 
+                React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle", "data-toggle": "dropdown", style: {height: 30}}, 
+                    React.createElement("span", {className: "caret"})
+                ), 
+                React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
                     React.createElement(MakeLiNameList, {Items: this.props.Names})
-	            )
-	        )
-	    );
-	  }
-	});
+                )
+            )
+        );
+      }
+    });
 
 module.exports = SetTTStop;
 
@@ -22857,11 +22857,11 @@ var SettingStd = React.createClass({displayName: "SettingStd",
         return (
             React.createElement("div", null, 
                 React.createElement("table", null, 
-	                React.createElement("thead", null, 
-			            React.createElement("tr", null, 
-			                React.createElement("th", {colSpan: 3, style: {textAlign: 'center'}}, "General Settings")
-			            )
-			        ), 
+                    React.createElement("thead", null, 
+                        React.createElement("tr", null, 
+                            React.createElement("th", {colSpan: 3, style: {textAlign: 'center'}}, "General Settings")
+                        )
+                    ), 
                     React.createElement("tr", {style: {height: 50}}, 
                         React.createElement("td", {style: {width: 170}}, " ", React.createElement(ValueHeartbeat, null)), 
                         React.createElement("td", {style: {width: 300}}, " ", React.createElement(SetHeartbeat, {Names: this.props.Names, UuidMap: this.props.UuidMap})), 
@@ -22923,10 +22923,10 @@ var SettingTT = React.createClass({displayName: "SettingTT",
             React.createElement("div", null, 
                 React.createElement("table", null, 
                     React.createElement("thead", null, 
-	                    React.createElement("tr", null, 
-		                    React.createElement("th", {colSpan: 5, style: {textAlign: 'center'}}, "Traffic Test Mode Settings")
-		                )
-		            ), 
+                        React.createElement("tr", null, 
+                            React.createElement("th", {colSpan: 5, style: {textAlign: 'center'}}, "Traffic Test Mode Settings")
+                        )
+                    ), 
                     React.createElement("tr", {style: {height: 50}}, 
                         React.createElement("td", {style: {width: 110}}, "UL: Number:"), 
                         React.createElement("td", {style: {width: 100}}, React.createElement(ValueTTUlNumDatagrams, null)), 
@@ -22977,15 +22977,15 @@ module.exports = SettingTT;
 var React = require('react');
 
 var Connected = React.createClass({displayName: "Connected",
-	render:function() {
-		if (this.props.IsConnected) {
-	        return (
-	            React.createElement("img", {src: "static/dist/assets/images/green.png", style: {maxWidth: 12}})
+    render:function() {
+        if (this.props.IsConnected) {
+            return (
+                React.createElement("img", {src: "static/dist/assets/images/green.png", style: {maxWidth: 12}})
             );
         } else {
-	        return (
-		       React.createElement("img", {src: "static/dist/assets/images/black.png", style: {maxWidth: 12}})
-	        );
+            return (
+               React.createElement("img", {src: "static/dist/assets/images/black.png", style: {maxWidth: 12}})
+            );
         }
     }
 });
@@ -23017,17 +23017,17 @@ var AppConstants = require ('../../constants/app-constants')
 
 var ValueHeartbeat = React.createClass({displayName: "ValueHeartbeat",
     getInitialState: function() {
-	    return {value: AppConstants.HEARTBEAT_DEFAULT};
+        return {value: AppConstants.HEARTBEAT_DEFAULT};
     },
     
     handleChange: function(newValue) {
         if ((newValue.target.value >= AppConstants.HEARTBEAT_MIN) && (newValue.target.value <= AppConstants.HEARTBEAT_MAX)) {
-        	this.setState ({value: newValue.target.value});
+            this.setState ({value: newValue.target.value});
         }
     },
     
     render:function() {
-    	var value = this.state.value;
+        var value = this.state.value;
         return (
             React.createElement("input", {className: "form-control bfh-number", type: "number", min: AppConstants.HEARTBEAT_MIN, max: AppConstants.HEARTBEAT_MAX, value: value, step: 1, onChange: this.handleChange, style: {width: 145}})
         );
@@ -23066,12 +23066,12 @@ var ValueReporting = React.createClass({displayName: "ValueReporting",
 
     handleChange: function(newValue) {
         if ((newValue.target.value >= AppConstants.REPORTING_INTERVAL_MIN) && (newValue.target.value <= AppConstants.REPORTING_INTERVAL_MAX)) {
-    	    this.setState ({value: newValue.target.value});
+            this.setState ({value: newValue.target.value});
         }
     },
 
     render:function() {
-	    var value = this.state.value;
+        var value = this.state.value;
         return (
             React.createElement("input", {className: "form-control bfh-number", type: "number", min: AppConstants.REPORTING_INTERVAL_MIN, max: AppConstants.REPORTING_INTERVAL_MAX, value: value, step: 1, onChange: this.handleChange, style: {width: 145}})
         );
@@ -23110,12 +23110,12 @@ var ValueTTDlLenDatagram = React.createClass({displayName: "ValueTTDlLenDatagram
 
     handleChange: function(newValue) {
         if ((newValue.target.value >= AppConstants.TT_DATAGRAM_LEN_MIN) && (newValue.target.value <= AppConstants.TT_DATAGRAM_LEN_MAX)) {
-    	    this.setState ({value: newValue.target.value});
+            this.setState ({value: newValue.target.value});
         }
     },
 
     render:function(){
-	    var value = this.state.value;
+        var value = this.state.value;
         return (
             React.createElement("input", {className: "form-control bfh-number", type: "number", min: AppConstants.TT_DATAGRAM_LEN_MIN, max: AppConstants.TT_DATAGRAM_LEN_MAX, value: value, step: 1, onChange: this.handleChange, style: {width: 80}})
         );
@@ -23154,12 +23154,12 @@ var ValueTTDlNumDatagrams = React.createClass({displayName: "ValueTTDlNumDatagra
 
     handleChange: function(newValue) {
         if ((newValue.target.value >= AppConstants.TT_DATAGRAMS_NUM_MIN) && (newValue.target.value <= AppConstants.TT_DATAGRAMS_NUM_MAX)) {
-    	    this.setState ({value: newValue.target.value});
+            this.setState ({value: newValue.target.value});
         }
     },
 
     render:function(){
-	    var value = this.state.value;
+        var value = this.state.value;
         return (
             React.createElement("input", {className: "form-control bfh-number", type: "number", min: AppConstants.TT_DATAGRAM_LEN_MIN, max: AppConstants.TT_DATAGRAMS_NUM_MAX, value: value, step: 1, onChange: this.handleChange, style: {width: 80}})
         );
@@ -23197,13 +23197,13 @@ var ValueTTTimeout = React.createClass({displayName: "ValueTTTimeout",
     },
 
     handleChange: function(newValue) {
-    	if ((newValue.target.value >= AppConstants.TT_TIMEOUT_MIN) && (newValue.target.value <= AppConstants.TT_TIMEOUT_MAX)) {
-    	    this.setState ({value: newValue.target.value});
+        if ((newValue.target.value >= AppConstants.TT_TIMEOUT_MIN) && (newValue.target.value <= AppConstants.TT_TIMEOUT_MAX)) {
+            this.setState ({value: newValue.target.value});
         }
     },
 
     render:function(){
-	    var value = this.state.value;
+        var value = this.state.value;
         return (
             React.createElement("input", {className: "form-control bfh-number", type: "number", min: AppConstants.TT_TIMEOUT_MIN, max: AppConstants.TT_TIMEOUT_MAX, value: value, step: 60, onChange: this.handleChange, style: {width: 80, marginTop: 10}})
         );
@@ -23242,12 +23242,12 @@ var ValueTTUlLenDatagram = React.createClass({displayName: "ValueTTUlLenDatagram
 
     handleChange: function(newValue) {
         if ((newValue.target.value >= AppConstants.TT_DATAGRAM_LEN_MIN) && (newValue.target.value <= AppConstants.TT_DATAGRAM_LEN_MAX)) {
-    	    this.setState ({value: newValue.target.value});
+            this.setState ({value: newValue.target.value});
         }
     },
 
     render:function(){
-	    var value = this.state.value;
+        var value = this.state.value;
         return (
             React.createElement("input", {className: "form-control bfh-number", type: "number", min: AppConstants.TT_DATAGRAM_LEN_MIN, max: AppConstants.TT_DATAGRAM_LEN_MAX, value: value, step: 1, onChange: this.handleChange, style: {width: 80}})
         );
@@ -23286,12 +23286,12 @@ var ValueTTUlNumDatagrams = React.createClass({displayName: "ValueTTUlNumDatagra
 
     handleChange: function(newValue) {
         if ((newValue.target.value >= AppConstants.TT_DATAGRAMS_NUM_MIN) && (newValue.target.value <= AppConstants.TT_DATAGRAMS_NUM_MAX)) {
-    	    this.setState ({value: newValue.target.value});
+            this.setState ({value: newValue.target.value});
         }
     },
 
     render:function(){
-	    var value = this.state.value;
+        var value = this.state.value;
         return (
             React.createElement("input", {className: "form-control bfh-number", type: "number", min: AppConstants.TT_DATAGRAM_LEN_MIN, max: AppConstants.TT_DATAGRAMS_NUM_MAX, value: value, step: 1, onChange: this.handleChange, style: {width: 80}})
         );
@@ -23328,13 +23328,13 @@ var ValueUuidSelected = React.createClass({displayName: "ValueUuidSelected",
     },
 
     handleChange: function(newValue) {
-    	this.setState({checked: newValue.target.checked});
-    	if (this.props.CallbackParent) {
+        this.setState({checked: newValue.target.checked});
+        if (this.props.CallbackParent) {
             this.props.CallbackParent(this.state);
-    	}
+        }
     },
 
-	render:function(){
+    render:function(){
         return (
             React.createElement("input", {type: "checkbox", value: this.state.value, checked: this.state.checked, onChange: this.handleChange, style: {width: 15}})
         );
@@ -23378,28 +23378,28 @@ var Display = React.createClass({displayName: "Display",
 
     componentDidMount: function() {
         pollState(function(data) {
-	        // fixup missing state properties to avoid muliple levels of missing attribute tests
-	        [
-	            "SummaryData",
-	            "DeviceData"
-	        ].map(function(property) {
-	            if (!data[property]) {
-	                data[property] = {};
-	            }
-	        });
+            // fixup missing state properties to avoid muliple levels of missing attribute tests
+            [
+                "SummaryData",
+                "DeviceData"
+            ].map(function(property) {
+                if (!data[property]) {
+                    data[property] = {};
+                }
+            });
             this.setState({data: data});
-	    }.bind(this), 10000);
+        }.bind(this), 10000);
     },
 
-	render:function(){
-	    return (
-	        React.createElement("div", null, 
-	        	React.createElement("br", null), 
-	            React.createElement(Settings, {DeviceData: this.state.data["DeviceData"]}), 
-	        	"Note: all times are UTC.", 
-	            React.createElement(DisplayRow, {DeviceData: this.state.data["DeviceData"]})
-	        )
-	    );
+    render:function(){
+        return (
+            React.createElement("div", null, 
+                React.createElement("br", null), 
+                React.createElement(Settings, {DeviceData: this.state.data["DeviceData"]}), 
+                "Note: all times are UTC.", 
+                React.createElement(DisplayRow, {DeviceData: this.state.data["DeviceData"]})
+            )
+        );
     }
 });
 
@@ -23425,7 +23425,7 @@ Object.size = function(obj) {
     var size = 0, key;
     for (key in obj) {
         if (obj.hasOwnProperty(key)) {
-        	size++;
+            size++;
         }
     }
     return size;
@@ -23459,89 +23459,89 @@ var Connected = require('../controls/value_connected.react');
 var Link = require('react-router-component').Link;
 
 var DisplayRow = React.createClass({displayName: "DisplayRow",
-	getInitialState: function(){   
-	    return {deviceCheckedMap: {}};
+    getInitialState: function(){   
+        return {deviceCheckedMap: {}};
     },
     
     handleCheckAll: function(checkAll) {
-		console.log ("handleCheckAll");
-    	if (this.state.deviceCheckedMap && (this.state.deviceCheckedMap.length > 0)) {
-    		for (var key in this.state.deviceCheckedMap) {
-    		    if (this.state.deviceCheckedMap.hasOwnProperty(key)) {
-    		    	/* Store the new checkAll.target.value.checked for this UUID here */
-    			}
-    		}
-    	}
+        console.log ("handleCheckAll");
+        if (this.state.deviceCheckedMap && (this.state.deviceCheckedMap.length > 0)) {
+            for (var key in this.state.deviceCheckedMap) {
+                if (this.state.deviceCheckedMap.hasOwnProperty(key)) {
+                    /* Store the new checkAll.target.value.checked for this UUID here */
+                }
+            }
+        }
     },
     
     render: function() {
-    	var rows = [];
+        var rows = [];
         if (this.props["DeviceData"] && (this.props["DeviceData"].length > 0)) {
             this.props["DeviceData"].forEach(function(device, i) {
-            	// Retrieve the checked state here and pass it to ValueUuidSelected
-            	rows.push(       
-	                React.createElement("tr", {className: "even gradeC", key: i}, 
-	                    React.createElement("td", {style: {textAlign: 'center', width: 15}}, 
-	                        React.createElement(ValueUuidSelected, {Checked: false, Uuid: device["Uuid"]}), React.createElement("br", null), 
-	                        React.createElement(Connected, {IsConnected: device["Connected"]})
-	                    ), 
-	                    React.createElement("td", {style: {width: 250}}, 
+                // Retrieve the checked state here and pass it to ValueUuidSelected
+                rows.push(       
+                    React.createElement("tr", {className: "even gradeC", key: i}, 
+                        React.createElement("td", {style: {textAlign: 'center', width: 15}}, 
+                            React.createElement(ValueUuidSelected, {Checked: false, Uuid: device["Uuid"]}), React.createElement("br", null), 
+                            React.createElement(Connected, {IsConnected: device["Connected"]})
+                        ), 
+                        React.createElement("td", {style: {width: 250}}, 
                             React.createElement("b", null, "Name:"), " ", device["DeviceName"], React.createElement("br", null), 
                             React.createElement("b", null, "UUID:"), " ", device["Uuid"], React.createElement("br", null), 
                             React.createElement("b", null, "Mode:"), " ", device["Mode"], React.createElement("br", null), 
                             React.createElement("b", null, "Reporting:"), " ", device["Reporting"], React.createElement("br", null), 
                             React.createElement("b", null, "Heartbeat:"), " ", device["Heartbeat"]
-	                    ), 
-	                    React.createElement("td", {style: {width: 170}}, 
+                        ), 
+                        React.createElement("td", {style: {width: 170}}, 
                             React.createElement("b", null, "Msgs:"), " ", device["TotalUlMsgs"], React.createElement("br", null), 
                             React.createElement("b", null, "Bytes:"), " ", device["TotalUlBytes"], React.createElement("br", null), 
                             React.createElement("b", null, "Last Msg:"), " ", device["LastUlMsgTime"]
-	                    ), 
-	                    React.createElement("td", {style: {width: 170}}, 
-	                        React.createElement("b", null, "Msgs:"), " ", device["TotalDlMsgs"], React.createElement("br", null), 
-	                        React.createElement("b", null, "Bytes:"), " ", device["TotalDlBytes"], React.createElement("br", null), 
-	                        React.createElement("b", null, "Last Msg:"), " ", device["LastDlMsgTime"]
-	                    ), 
-	                    React.createElement("td", {style: {width: 80}}, 
-	                        React.createElement("i", {className: "fa fa-signal"}), " ", device["Rsrp"], " dBm", React.createElement("br", null), 
-	                        React.createElement("i", {className: "fa fa-floppy-o"}), " ", device["DiskSpaceLeft"], React.createElement("br", null), 
-	                        React.createElement("i", {className: "fa fa-battery-full"}), " ", device["BatteryLevel"], React.createElement("br", null), 
-	                        React.createElement("i", {className: "fa fa-clock-o"}), " ", device["UpDuration"], React.createElement("br", null), 
-	                        React.createElement("i", {className: "fa fa-rotate-left"}), " ", device["NumExpectedMsgs"]
-	                        ), 
-	                    React.createElement("td", {className: "center", style: {width: 200}}
-	                    )
-	                )
-	            );
+                        ), 
+                        React.createElement("td", {style: {width: 170}}, 
+                            React.createElement("b", null, "Msgs:"), " ", device["TotalDlMsgs"], React.createElement("br", null), 
+                            React.createElement("b", null, "Bytes:"), " ", device["TotalDlBytes"], React.createElement("br", null), 
+                            React.createElement("b", null, "Last Msg:"), " ", device["LastDlMsgTime"]
+                        ), 
+                        React.createElement("td", {style: {width: 80}}, 
+                            React.createElement("i", {className: "fa fa-signal"}), " ", device["Rsrp"], " dBm", React.createElement("br", null), 
+                            React.createElement("i", {className: "fa fa-floppy-o"}), " ", device["DiskSpaceLeft"], React.createElement("br", null), 
+                            React.createElement("i", {className: "fa fa-battery-full"}), " ", device["BatteryLevel"], React.createElement("br", null), 
+                            React.createElement("i", {className: "fa fa-clock-o"}), " ", device["UpDuration"], React.createElement("br", null), 
+                            React.createElement("i", {className: "fa fa-rotate-left"}), " ", device["NumExpectedMsgs"]
+                            ), 
+                        React.createElement("td", {className: "center", style: {width: 200}}
+                        )
+                    )
+                );
             });
         }
         
-        return (		
+        return (        
             React.createElement("div", {className: "row"}, 
                 React.createElement("div", {className: "panel panel-default"}, 
                     React.createElement("div", {className: "_panel-heading", style: {width:'100%'}}, 
                         React.createElement("div", {className: "panel-body"}, 
                             React.createElement("div", {className: "dataTable_wrapper"}, 
-	                            React.createElement("table", {className: "table table-striped table-bordered table-hover", id: "dataTables-example"}, 
-	                                React.createElement("thead", null, 
-	                                    React.createElement("tr", {className: "info"}, 
-	                                        React.createElement("th", {style: {textAlign: 'center', width: 15}}, React.createElement("input", {type: "checkbox", onClick: this.handleCheckAll, value: "checkAll", defaultChecked: false})), 
-	                                        React.createElement("th", null, "Device"), 
-	                                        React.createElement("th", null, "Uplink"), 
-	                                        React.createElement("th", null, "Downlink"), 
-	                                        React.createElement("th", null, "Status"), 
-	                                        React.createElement("th", null, "Test Results")
-	                                    )
-	                                ), 
-	                                React.createElement("tbody", {style: {fontSize: 12}}, 
-	                                    rows
-	                                )
-	                            )
-	                        )
-	                    )
-	                )
-	            )
-	        )
+                                React.createElement("table", {className: "table table-striped table-bordered table-hover", id: "dataTables-example"}, 
+                                    React.createElement("thead", null, 
+                                        React.createElement("tr", {className: "info"}, 
+                                            React.createElement("th", {style: {textAlign: 'center', width: 15}}, React.createElement("input", {type: "checkbox", onClick: this.handleCheckAll, value: "checkAll", defaultChecked: false})), 
+                                            React.createElement("th", null, "Device"), 
+                                            React.createElement("th", null, "Uplink"), 
+                                            React.createElement("th", null, "Downlink"), 
+                                            React.createElement("th", null, "Status"), 
+                                            React.createElement("th", null, "Test Results")
+                                        )
+                                    ), 
+                                    React.createElement("tbody", {style: {fontSize: 12}}, 
+                                        rows
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            )
         );
     }
 });
@@ -23661,18 +23661,18 @@ var Index = React.createClass({displayName: "Index",
                     React.createElement("div", {className: "_panel-heading", style: {width:'100%'}}, 
                         React.createElement("div", {className: "panel-body"}, 
                              React.createElement("div", {className: "dataTable_wrapper"}, 
-		                         React.createElement("div", null, 
-		                             React.createElement("div", null, 
-								         "This page intentionally left blank."
-								    )
+                                 React.createElement("div", null, 
+                                     React.createElement("div", null, 
+                                         "This page intentionally left blank."
+                                    )
                                 )
                             )
                         )
                     )
                 )
             )
-		);
-	}
+        );
+    }
 });
 
 module.exports = Index;
@@ -23705,30 +23705,30 @@ var Settings = React.createClass({displayName: "Settings",
     render: function() {
             var Names = [];
             var UuidMap = {}; 
-            if (this.props["DeviceData"] && (this.props["DeviceData"].length > 0)) {        	
+            if (this.props["DeviceData"] && (this.props["DeviceData"].length > 0)) {            
                 this.props["DeviceData"].forEach(function(device, i) {
-                	Names.push(device["DeviceName"]);
-                	UuidMap[device["DeviceName"]] = device["Uuid"];
+                    Names.push(device["DeviceName"]);
+                    UuidMap[device["DeviceName"]] = device["Uuid"];
                 });
             }
             return (
             React.createElement("div", {className: "row"}, 
-		        React.createElement("div", {className: "col-lg-5"}, 
-		            React.createElement("div", {className: "panel panel-info", style: {height: 180, marginTop: 10}}, 
-			            React.createElement("div", {className: "panel-body"}, 
+                React.createElement("div", {className: "col-lg-5"}, 
+                    React.createElement("div", {className: "panel panel-info", style: {height: 180, marginTop: 10}}, 
+                        React.createElement("div", {className: "panel-body"}, 
                             React.createElement(SettingStd, {Names: Names, UuidMap: UuidMap})
-			            )
-		            )
-	            ), 
-		        React.createElement("div", {className: "col-lg-7"}, 
-		            React.createElement("div", {className: "panel panel-info", style: {height: 180, marginTop: 10}}, 
-			            React.createElement("div", {className: "panel-body"}, 
+                        )
+                    )
+                ), 
+                React.createElement("div", {className: "col-lg-7"}, 
+                    React.createElement("div", {className: "panel panel-info", style: {height: 180, marginTop: 10}}, 
+                        React.createElement("div", {className: "panel-body"}, 
                             React.createElement(SettingTT, {Names: Names, UuidMap: UuidMap})
-			            )
-		            )
+                        )
+                    )
                 )
-	        )
-	    )
+            )
+        )
     }
 });
 
@@ -23870,16 +23870,16 @@ var React = require('react');
 var MakeLiUuidList = React.createClass({displayName: "MakeLiUuidList",
     render: function() {
         var list = [];
-        if ((this.props.Items != null) && (this.props.Items.length > 0)) {        	
+        if ((this.props.Items != null) && (this.props.Items.length > 0)) {            
             this.props.Items.forEach(function(item, i) {
-            	list.push(
+                list.push(
                     React.createElement("li", null, React.createElement("a", {href: "#"}, " ", item, " "))
                 );
         });
         } else {
-        	list.push(
-	            React.createElement("li", null, React.createElement("a", {href: "#"}, " Empty "))
-	        );
+            list.push(
+                React.createElement("li", null, React.createElement("a", {href: "#"}, " Empty "))
+            );
         }
 
         return (

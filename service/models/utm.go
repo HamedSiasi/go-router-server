@@ -21,7 +21,7 @@ import (
 // TODO Rob to understand this later
 type UtmMsg struct {
     id      bson.ObjectId `bson:"_id,omitempty" json:"id"`
-  	date    time.Time     `bson:"date" json:"date"`
+      date    time.Time     `bson:"date" json:"date"`
     uuid    string        `bson:"uuid" json:"uuid"`
     msg     string        `bson:"msg" json:"msg"`
 }
@@ -55,13 +55,13 @@ type AmqpErrorMessage struct {
 
 func (u *UtmMsg) Insert(db *mgo.Database, uuid string, msg string) {
 
-	Msg := UtmMsg{}
-	utmColl := db.C("UtmMsgs")
-	Msg.id = bson.NewObjectId()
-	Msg.date = time.Now()
-	Msg.uuid = uuid
-	Msg.msg = msg
-	utmColl.Insert(&Msg)
+    Msg := UtmMsg{}
+    utmColl := db.C("UtmMsgs")
+    Msg.id = bson.NewObjectId()
+    Msg.date = time.Now()
+    Msg.uuid = uuid
+    Msg.msg = msg
+    utmColl.Insert(&Msg)
 
 }
 

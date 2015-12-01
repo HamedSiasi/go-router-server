@@ -21,19 +21,19 @@ var React = require('react');
 var MakeLiNameList = require('../utilities/utilities.react')
 
 var SetTTStop = React.createClass({
-	  render: function() {
-	    return (
-	        <div className="btn-group">
-	            <button type="button" className="btn btn-info" style={{width: 170, height: 30}}>Stop Test</button>
-	            <button type="button" className="btn btn-info dropdown-toggle" data-toggle="dropdown" style={{height: 30}} >
-	                <span className="caret" />
-	            </button>
-	            <ul className="dropdown-menu" role="menu">
+      render: function() {
+        return (
+            <div className="btn-group">
+                <button type="button" className="btn btn-info" style={{width: 170, height: 30}}>Stop Test</button>
+                <button type="button" className="btn btn-info dropdown-toggle" data-toggle="dropdown" style={{height: 30}} >
+                    <span className="caret" />
+                </button>
+                <ul className="dropdown-menu" role="menu">
                     <MakeLiNameList Items={this.props.Names} />
-	            </ul>
-	        </div>
-	    );
-	  }
-	});
+                </ul>
+            </div>
+        );
+      }
+    });
 
 module.exports = SetTTStop;

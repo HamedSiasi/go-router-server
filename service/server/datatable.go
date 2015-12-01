@@ -170,7 +170,7 @@ func operateDataTable() {
                         state.LatestExpectedMsgData =  makeExpectedMsgData(value.ExpectedMsgList, time.Now().UTC())   	                
 	
     					globals.Dbg.PrintfTrace("%s [datatable] --> connection state for device %s updated.\n", globals.LogTag, value.DeviceUuid)
-    					globals.Dbg.PrintfTrace("%s [datatable] --> [%d expected msg(s)].\n", globals.LogTag, len(*(value.ExpectedMsgList)))
+    					globals.Dbg.PrintfTrace("%s [datatable] --> [ %d expected msg(s) ].\n", globals.LogTag, len(*(value.ExpectedMsgList)))
                         // Store latest state in MongoDB
                 		err := utilities.InsertDB ("UtmState", state)
                 		if err != nil {

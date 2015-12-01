@@ -65,10 +65,8 @@ var processMsgsChannel chan<- interface{}
 // Keep track of the encode totals for all devices here
 var totalsEncodeState TotalsState
 
-
-// A list of expected response messages against each device
+// Keep track of expected responses
 var deviceExpectedMsgList map[string]*[]ExpectedMsg
-
 //--------------------------------------------------------------------
 // Functions
 //--------------------------------------------------------------------
@@ -118,8 +116,24 @@ func operateProcess() {
 	deviceEncodeStateList := make(map[string]*DeviceTotalsState)    	
     channel := make(chan interface{})
     processMsgsChannel = channel
+    checkExpectedMsgList := time.NewTicker (time.Minute)
     
     globals.Dbg.PrintfTrace("%s [process] --> channel created and now being serviced.\n", globals.LogTag)
+    
+    // Deal with at least one expected message from each device that might be old now
+    go func() {
+        for _ = range checkExpectedMsgList.C {
+            for uuid, list := range deviceExpectedMsgList {
+                for index, expectedMsg := range *list {
+                    if time.Now().After (expectedMsg.TimeStarted.Add(time.Minute * 10)) {
+                        globals.Dbg.PrintfTrace("%s [process] --> response ID %d from %s is too old now (started @ %s), deleting...\n", globals.LogTag, expectedMsg.ResponseId, uuid, expectedMsg.TimeStarted.String())
+            	        *list = append((*list)[:index], (*list)[index + 1:] ...)
+            	        break
+                    }    
+                }
+           }     
+        }
+    }()
     
     // Process commands on the channel
     go func() {
@@ -156,6 +170,7 @@ func operateProcess() {
         	                    byteCount += count        		           
                                 msgCount++
                                 addResponse (responseIdExpected, value.DeviceUuid)
+                                responseIdExpected = RESPONSE_NONE
                             }    
             		    }
             		}

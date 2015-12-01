@@ -143,12 +143,13 @@ func processDatagrams(q *Queue) {
         							dataTableChannel <- dlMsg
         							processMsgsChannel <- dlMsg
         						}
+                				globals.Dbg.PrintfTrace("%s [server] --> decodeState:\n\n%+v\n\n", globals.LogTag, decodeState)
         					}
         
         					// Ask the process loop for the encode status now
         					get := &DeviceEncodeStateGet{
         					    DeviceUuid: value.DeviceUuid,
-        					    }
+        					}
         					get.State = make(chan DeviceTotalsState)
                         	processMsgsChannel <- get
                         	encodeState := <- get.State
@@ -177,9 +178,9 @@ func processDatagrams(q *Queue) {
         						DeviceUuid:         value.DeviceUuid,
         						DeviceName:         value.DeviceName,
         						UlDevice: TotalsState {
-            						Timestamp: totalsDecodeState.Timestamp,
-            						Msgs:      totalsDecodeState.Msgs,
-            						Bytes:     totalsDecodeState.Bytes,
+            						Timestamp: decodeState.Timestamp,
+            						Msgs:      decodeState.Msgs,
+            						Bytes:     decodeState.Bytes,
         						},
         						DlDevice: TotalsState {
             						Timestamp: encodeState.Timestamp,

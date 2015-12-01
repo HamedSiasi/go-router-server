@@ -48,7 +48,9 @@ var Display = React.createClass({
 	render:function(){
 	    return (
 	        <div>
+	        	<br />
 	            <Settings DeviceData = {this.state.data["DeviceData"]} />  
+	        	Note: all times are UTC.
 	            <DisplayRow DeviceData = {this.state.data["DeviceData"]} />  
 	        </div>
 	    );

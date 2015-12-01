@@ -35,6 +35,8 @@ type FrontPageSummaryData struct {
 type FrontPageDeviceData struct {
     Uuid               string     `json:"Uuid, omitempty"`
     DeviceName         string     `json:"DeviceName, omitempty"`
+    Connected          bool       `json:"Connected, omitempty"`
+    UpDuration         string     `json:"UpDuration, omitempty"`
     Interesting        *JsonTime  `json:"Interesting, omitempty"`
     Mode               string     `json:"Mode, omitempty"`
     TotalUlMsgs        int        `json:"TotalUlMsgs, omitempty"`
@@ -76,6 +78,10 @@ func displayFrontPageData () *FrontPageData {
 	    
 	    deviceData.Uuid             = deviceState.DeviceUuid
         deviceData.DeviceName       = deviceState.DeviceName
+        deviceData.Connected        = deviceState.Connected
+        if deviceState.LatestActivityReportData != nil {
+            deviceData.UpDuration       = makeNiceDurationStringFromSeconds(deviceState.LatestActivityReportData.UpTimeSeconds)
+        }    
         if deviceState.LatestInterest != nil {
             jsonTimeStampInterest := JsonTime(deviceState.LatestInterest.Timestamp)
             deviceData.Interesting = &jsonTimeStampInterest
@@ -178,6 +184,17 @@ func makeNiceTimeStringFromSeconds (seconds uint32) string {
     theTime = theTime.Add (time.Duration (seconds) * time.Second)
     
     return theTime.Format ("15:04:05")
+}
+
+func makeNiceDurationStringFromSeconds (seconds uint32) string {
+    var theTime time.Time
+
+    theTime = theTime.Add (time.Duration (seconds) * time.Second)
+    if theTime.YearDay() > 1 {
+        return theTime.Format ("2d 15:04:05")
+    } else {
+        return theTime.Format ("15:04:05")
+    }
 }
 
 /* End Of File */

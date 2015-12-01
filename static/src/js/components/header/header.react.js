@@ -37,11 +37,11 @@ var Header = React.createClass({
                             <i className="fa fa-user fa-fw" />&nbsp;User&nbsp;<i className="fa fa-caret-down" />
                         </a>
                         <ul className="dropdown-menu dropdown-user">
-                            <li><Link href="#/login"><i className="fa fa-sign-in fa-fw" />&nbsp;Login</Link></li>
-                            <li><Link href="#/logout"><i className="fa fa-sign-out fa-fw" />&nbsp;Logout</Link></li>
+                            <li className="disabled"><Link href="#/login"><i className="fa fa-sign-in fa-fw" />&nbsp;Login</Link></li>
+                            <li className="disabled"><Link href="#/logout"><i className="fa fa-sign-out fa-fw" />&nbsp;Logout</Link></li>
                             <li className="divider" />
-                            <li><Link href="#/register"><i className="fa fa-user fa-fw" />&nbsp;Add User</Link></li>
-                            <li><a href="#"><i className="fa fa-user fa-fw" />&nbsp;User Profile</a></li>
+                            <li className="disabled"><Link href="#/register"><i className="fa fa-user fa-fw" />&nbsp;Add User</Link></li>
+                            <li className="disabled"><a href="#"><i className="fa fa-user fa-fw" />&nbsp;User Profile</a></li>
                         </ul>
                     </li>
                     {/* /.dropdown Data */}

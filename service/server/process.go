@@ -23,6 +23,12 @@ import (
 // Types 
 //--------------------------------------------------------------------
 
+// A message expected back from a device
+type ExpectedMsg struct {
+	TimeStarted time.Time
+	ResponseId  ResponseTypeEnum
+}
+
 // Structure to allow the latest encode state for a particular
 // device to be retrieved over a channel
 type DeviceEncodeStateGet struct {
@@ -35,6 +41,7 @@ type DeviceEncodeStateGet struct {
 // for a device
 type DeviceEncodeStateAdd struct {
 	DeviceUuid   string
+	ResponseId   ResponseTypeEnum
 	State        TotalsState
 }
 
@@ -58,10 +65,55 @@ var processMsgsChannel chan<- interface{}
 // Keep track of the encode totals for all devices here
 var totalsEncodeState TotalsState
 
+
+// A list of expected response messages against each device
+var deviceExpectedMsgList map[string]*[]ExpectedMsg
+
 //--------------------------------------------------------------------
 // Functions
 //--------------------------------------------------------------------
 
+// Remove a response ID from the list if it's been received
+func removeResponse (responseId ResponseTypeEnum, uuid string) {
+    if (responseId != RESPONSE_NONE) {
+    	globals.Dbg.PrintfTrace("%s [process] --> response ID %d received from UUID %s.\n", globals.LogTag, responseId, uuid)
+    	list := deviceExpectedMsgList[uuid]
+    	if list != nil {
+    		globals.Dbg.PrintfTrace("%s [process] --> found UUID %s in the expected message store, %d items in its list.\n", globals.LogTag, uuid, len(*list))
+    	    for index, expectedMsg := range *list {
+    	        if expectedMsg.ResponseId == responseId {
+    	            *list = append((*list)[:index], (*list)[index + 1:] ...)
+    				globals.Dbg.PrintfTrace("%s [process] --> response ID %d removed from list for UUID %s.\n", globals.LogTag, responseId, uuid)
+    	            break
+    	        }
+    	    }
+    	}
+    }	
+}
+
+// Add a response ID to the list
+func addResponse (responseId ResponseTypeEnum, uuid string) {
+	if (responseId != RESPONSE_NONE) {
+		globals.Dbg.PrintfTrace("%s [process] --> now expecting response ID %d from UUID %s.\n", globals.LogTag, responseId, uuid)
+    	list := deviceExpectedMsgList[uuid]
+		if list == nil {
+		    var expectedMsgList []ExpectedMsg 
+		    list = &expectedMsgList
+			deviceExpectedMsgList[uuid] = list
+			globals.Dbg.PrintfTrace("%s [process] --> making a new list for UUID %s, number of lists is now %d.\n", globals.LogTag, uuid, len(deviceExpectedMsgList))
+		}
+		
+		expectedMsg := ExpectedMsg {
+            TimeStarted: time.Now(),
+            ResponseId:  responseId,		    
+		}
+		
+		*list = append(*list, expectedMsg)
+		globals.Dbg.PrintfTrace("%s [process] --> expected list for UUID %s is now size %d.\n", globals.LogTag, uuid, len(*deviceExpectedMsgList[uuid]))
+    }    
+}
+
+// Do the processing
 func operateProcess() {
 	deviceEncodeStateList := make(map[string]*DeviceTotalsState)    	
     channel := make(chan interface{})
@@ -80,7 +132,8 @@ func operateProcess() {
 	                var err error = nil
 	                var byteCount int = 0
 	                var msgCount int = 0
-    		        responseId := RESPONSE_NONE
+    		        responseIdReceived := RESPONSE_NONE
+    		        responseIdExpected := RESPONSE_NONE
 
             		// If the device is not in our list, add it and send an IntervalsGetReq
             		// if we aren't going to send one anyway lower down because of an InitIndUlmsg
@@ -98,10 +151,11 @@ func operateProcess() {
             		    if reflect.TypeOf (value.Message) != reflect.TypeOf((*InitIndUlMsg)(nil)).Elem() &&
             		       reflect.TypeOf (value.Message) != reflect.TypeOf((*IntervalsGetCnfUlMsg)(nil)).Elem() {
             		        var count int 
-    	                    err, count = encodeAndEnqueue (&IntervalsGetReqDlMsg{}, value.DeviceUuid)
+    	                    err, count, responseIdExpected = encodeAndEnqueue (&IntervalsGetReqDlMsg{}, value.DeviceUuid)
                             if err == nil && count > 0 {
         	                    byteCount += count        		           
                                 msgCount++
+                                addResponse (responseIdExpected, value.DeviceUuid)
                             }    
             		    }
             		}
@@ -116,7 +170,7 @@ func operateProcess() {
         				case *PingReqUlMsg:
         					// Respond
             		        var count int 
-		                    err, count = encodeAndEnqueue (&PingCnfDlMsg{}, value.DeviceUuid)
+		                    err, count, responseIdExpected = encodeAndEnqueue (&PingCnfDlMsg{}, value.DeviceUuid)
                             if err == nil && count > 0 {
         	                    byteCount += count        		           
                                 msgCount++
@@ -124,7 +178,7 @@ func operateProcess() {
         				
         				case *PingCnfUlMsg:
 			                // Nothing to do here
-			                responseId = RESPONSE_PING_CNF
+			                responseIdReceived = RESPONSE_PING_CNF
 
 			            case *InitIndUlMsg:
 			                if uint8(RevisionLevel) != utmMsg.RevisionLevel {
@@ -132,7 +186,7 @@ func operateProcess() {
             				}	
         					// Get the reporting intervals for this device
             		        var count int 
-		                    err, count = encodeAndEnqueue (&IntervalsGetReqDlMsg{}, value.DeviceUuid)
+		                    err, count, responseIdExpected = encodeAndEnqueue (&IntervalsGetReqDlMsg{}, value.DeviceUuid)
                             if err == nil && count > 0 {
         	                    byteCount += count        		           
                                 msgCount++
@@ -158,7 +212,7 @@ func operateProcess() {
 			                    }
 			                    
                 		        var count int 
-			                    err, count = encodeAndEnqueue (dateTimeSetReq, value.DeviceUuid)
+			                    err, count, responseIdExpected = encodeAndEnqueue (dateTimeSetReq, value.DeviceUuid)
                                 if err == nil && count > 0 {
             	                    byteCount += count        		           
                                     msgCount++
@@ -167,31 +221,31 @@ func operateProcess() {
 		                   
 			            case *DateTimeSetCnfUlMsg:
 			                // Nothing to do here
-			                responseId = RESPONSE_DATE_TIME_SET_CNF
+			                responseIdReceived = RESPONSE_DATE_TIME_SET_CNF
 			                
 			            case *DateTimeGetCnfUlMsg:
 			                // Nothing to do here
-                            responseId = RESPONSE_DATE_TIME_GET_CNF
+                            responseIdReceived = RESPONSE_DATE_TIME_GET_CNF
                             
 			            case *ModeSetCnfUlMsg:
 	    		            // TODO start sending downlink datagrams if in a traffic test
-			                responseId = RESPONSE_MODE_SET_CNF
+			                responseIdReceived = RESPONSE_MODE_SET_CNF
 			                
 			            case *ModeGetCnfUlMsg:
 			                // Nothing to do here
-			                responseId = RESPONSE_MODE_GET_CNF
+			                responseIdReceived = RESPONSE_MODE_GET_CNF
 			                
 			            case *IntervalsGetCnfUlMsg:
 			                // Nothing to do here
-			                responseId = RESPONSE_INTERVALS_GET_CNF
+			                responseIdReceived = RESPONSE_INTERVALS_GET_CNF
 			                
 			            case *ReportingIntervalSetCnfUlMsg:
 			                // Nothing to do here
-			                responseId = RESPONSE_REPORTING_INTERVAL_SET_CNF
+			                responseIdReceived = RESPONSE_REPORTING_INTERVAL_SET_CNF
 			            
 			            case *HeartbeatSetCnfUlMsg:
 			                // Nothing to do here
-			                responseId = RESPONSE_HEARTBEAT_SET_CNF
+			                responseIdReceived = RESPONSE_HEARTBEAT_SET_CNF
 
 			            case *PollIndUlMsg:
 			                // Nothing to do here
@@ -201,7 +255,7 @@ func operateProcess() {
 			            
 			            case *MeasurementsGetCnfUlMsg:
 			                // Nothing to do here
-			                responseId = RESPONSE_MEASUREMENTS_GET_CNF
+			                responseIdReceived = RESPONSE_MEASUREMENTS_GET_CNF
 
         				// case *MeasurementsControlIndUlMsg:
         				// case *MeasurementControlSetCnfUlMsg:
@@ -214,15 +268,15 @@ func operateProcess() {
 			            
 			            case *TrafficReportGetCnfUlMsg:
 			                // Nothing to do here
-			                responseId = RESPONSE_TRAFFIC_REPORT_GET_CNF
+			                responseIdReceived = RESPONSE_TRAFFIC_REPORT_GET_CNF
 
 			            case *TrafficTestModeParametersSetCnfUlMsg:
     			            // TODO send ModeSetReqDlMsg if in a traffic test 
-			                responseId = RESPONSE_TRAFFIC_TEST_MODE_PARAMETERS_SET_CNF
+			                responseIdReceived = RESPONSE_TRAFFIC_TEST_MODE_PARAMETERS_SET_CNF
 			                
 			            case *TrafficTestModeParametersGetCnfUlMsg:
 			                // Nothing to do here
-			                responseId = RESPONSE_TRAFFIC_TEST_MODE_PARAMETERS_GET_CNF
+			                responseIdReceived = RESPONSE_TRAFFIC_TEST_MODE_PARAMETERS_GET_CNF
 			                
         				case *TrafficTestModeRuleBreakerUlDatagram:
         				    // TODO
@@ -232,14 +286,14 @@ func operateProcess() {
 			            
 			            case *TrafficTestModeReportGetCnfUlMsg:
 			                // Nothing to do here
-			                responseId = RESPONSE_TRAFFIC_TEST_MODE_REPORT_GET_CNF
+			                responseIdReceived = RESPONSE_TRAFFIC_TEST_MODE_REPORT_GET_CNF
 
 			            case *ActivityReportIndUlMsg:
 			                // Nothing to do here
 			            
 			            case *ActivityReportGetCnfUlMsg:
 			                // Nothing to do here
-			                responseId = RESPONSE_ACTIVITY_REPORT_GET_CNF
+			                responseIdReceived = RESPONSE_ACTIVITY_REPORT_GET_CNF
 
             			case *DebugIndUlMsg:
 			                // Nothing to do here
@@ -260,21 +314,9 @@ func operateProcess() {
 	                    totalsEncodeState.Bytes += byteCount
 	                }    
 
-                	// If this was a response message, take it out of the expected list for this UUID
-                	if responseId != RESPONSE_NONE {
-    					globals.Dbg.PrintfTrace("%s [process] --> response ID %d received from UUID %s.\n", globals.LogTag, responseId, value.DeviceUuid)
-                    	list := deviceExpectedMsgList[value.DeviceUuid]
-                		if list != nil {
-        					globals.Dbg.PrintfTrace("%s [process] --> found UUID %s in the expected message store, %d items in its list.\n", globals.LogTag, value.DeviceUuid, len(*list))
-                		    for index, expectedMsg := range *list {
-                		        if expectedMsg.ResponseId == responseId {
-                		            *list = append((*list)[:index], (*list)[index + 1:] ...)
-                					globals.Dbg.PrintfTrace("%s [process] --> response ID %d removed from list for UUID %s.\n", globals.LogTag, responseId, value.DeviceUuid)
-                		            break
-                		        }
-                		    }
-                		}
-                	}
+                	// Deal with expected or received responses
+             	    removeResponse (responseIdReceived, value.DeviceUuid)
+             	    addResponse (responseIdExpected, value.DeviceUuid)
                 	
 					globals.Dbg.PrintfTrace("%s [process] --> processing completed.\n", globals.LogTag)
 	            	
@@ -291,7 +333,10 @@ func operateProcess() {
     	                    encodeState.Totals.Timestamp = value.State.Timestamp
        	            	    encodeState.Totals.Msgs += value.State.Msgs
        	            	    encodeState.Totals.Bytes += value.State.Bytes
-       	            	}    
+       	            	}
+   	            	    
+             	        // Add the response ID
+             	        addResponse (value.ResponseId, value.DeviceUuid)
 		            }
 	            
 	            // Return the encode state for a given UUID 
@@ -313,6 +358,14 @@ func operateProcess() {
     		                Bytes:      encodeState.Bytes,
     		                Totals:     &totalsState,
 	                    }
+    	            	expectedMsgList := deviceExpectedMsgList[value.DeviceUuid]
+                		if expectedMsgList != nil {
+                		    tmp := make([]ExpectedMsg, 0)
+    		                state.ExpectedMsgList = &tmp
+        					for _, expectedMsg := range *expectedMsgList {
+        					    *state.ExpectedMsgList = append(*state.ExpectedMsgList, expectedMsg)
+        					}
+        				}	
 		                value.State <- state
 		                globals.Dbg.PrintfTrace("%s [process] --> provided encode state.\n", globals.LogTag)
 		            } else {

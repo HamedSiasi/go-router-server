@@ -33,20 +33,15 @@ import (
 // Types
 //--------------------------------------------------------------------
 
-// A message expected back from a device
-type ExpectedMsg struct {
-	TimeStarted time.Time
-	ResponseId  ResponseTypeEnum
-}
-
 // A struct representing the state of a device
 // in a single direction (UL or DL)
 type DeviceTotalsState struct {
-    Timestamp    time.Time
-	DeviceUuid   string
-    Msgs         int
-    Bytes        int 
-    Totals       *TotalsState 
+    Timestamp       time.Time
+	DeviceUuid      string
+    Msgs            int
+    Bytes           int 
+    Totals          *TotalsState 
+	ExpectedMsgList *[]ExpectedMsg // Will be nil for uplink
 }
 
 // A struct representing the state of all devices
@@ -74,9 +69,6 @@ type Connection struct {
 
 // Server details
 const configurationFile string = "config.cfg"
-
-// A list of expected response messages against each device
-var deviceExpectedMsgList map[string]*[]ExpectedMsg
 
 // Downlink channel to device
 var downlinkMessages chan<- AmqpMessage
@@ -117,11 +109,12 @@ func processDatagrams(q *Queue) {
         	            	decodeState := deviceDecodeStateList[value.DeviceUuid]
                     		if decodeState == nil {
                     		    decodeState = &DeviceTotalsState {
-                    		        Timestamp:  time.Now().UTC(),
-                    		        DeviceUuid: value.DeviceUuid,
-                    		        Msgs:       0,
-                    		        Bytes:      0,
-                    		        Totals:     &totalsDecodeState,
+                    		        Timestamp:       time.Now().UTC(),
+                    		        DeviceUuid:      value.DeviceUuid,
+                    		        Msgs:            0,
+                    		        Bytes:           0,
+                    		        Totals:          &totalsDecodeState,
+                    		        ExpectedMsgList: nil,
                     		    }
                     			deviceDecodeStateList[value.DeviceUuid] = decodeState;
                     		}
@@ -167,16 +160,9 @@ func processDatagrams(q *Queue) {
                                 Msgs:         encodeState.Totals.Msgs,
                                 Bytes:        encodeState.Totals.Bytes,
         					}
-                		    expectedMsgListCopy := make([]ExpectedMsg, 0)
-        	            	expectedMsgList := deviceExpectedMsgList[value.DeviceUuid]
-                    		if expectedMsgList != nil {
-            					for _, expectedMsg := range *expectedMsgList {
-            					    expectedMsgListCopy = append(expectedMsgListCopy, expectedMsg)
-            					}
-            				}	
         					dataTableChannel <- &Connection {
-        						DeviceUuid:         value.DeviceUuid,
-        						DeviceName:         value.DeviceName,
+        						DeviceUuid:    value.DeviceUuid,
+        						DeviceName:    value.DeviceName,
         						UlDevice: TotalsState {
             						Timestamp: decodeState.Timestamp,
             						Msgs:      decodeState.Msgs,
@@ -187,9 +173,9 @@ func processDatagrams(q *Queue) {
             						Msgs:      encodeState.Msgs,
             						Bytes:     encodeState.Bytes,
         						},
-        						ExpectedMsgList:    &expectedMsgListCopy,
-                                UlTotals:   &ulTotals, 
-                                DlTotals:   &dlTotals,	
+        						ExpectedMsgList: encodeState.ExpectedMsgList,
+                                UlTotals:        &ulTotals, 
+                                DlTotals:        &dlTotals,	
         					}
         				}
         

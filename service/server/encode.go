@@ -27,7 +27,6 @@ import "C"  // There must be no line breaks between this and the commented-out s
 import (
 	"errors"
 	"github.com/davecgh/go-spew/spew"
-	"time"
 	"unsafe"
 	"github.com/robmeades/utm/service/globals"
 	"github.com/robmeades/utm/service/utilities"
@@ -65,9 +64,10 @@ const (
 // Functions
 //--------------------------------------------------------------------
 
-// Encode and enqueue a message, return an error if there is one
-// and the number of bytes encoded
-func encodeAndEnqueue(msg interface{}, uuid string) (error, int) {
+// Encode and enqueue a message, return an error if there is one,
+// the number of bytes encoded and the response expected (which may be
+// none)
+func encodeAndEnqueue(msg interface{}, uuid string) (error, int, ResponseTypeEnum) {
     
     if msg != nil {        
 		// Create a buffer that is big enough to store all
@@ -228,33 +228,13 @@ func encodeAndEnqueue(msg interface{}, uuid string) (error, int) {
     		globals.Dbg.PrintfInfo("%s [decode] --> the XML data is:\n\n%s\n\n", globals.LogTag, spew.Sdump(xmlEncodeBuffer))    		
 			globals.Dbg.PrintfInfo("%s [encode] --> XML buffer pointer 0x%08x, used %d, left %d:.\n", globals.LogTag, *ppXmlBuffer, C.uint32_t(len(xmlEncodeBuffer)) - xmlBufferLen, xmlBufferLen)
     		
-        	// If a response is expected, add it to the list for this device
-        	if (responseId != RESPONSE_NONE) {
-				globals.Dbg.PrintfTrace("%s [encode] --> now expecting response ID %d from UUID %s.\n", globals.LogTag, responseId, uuid)
-            	list := deviceExpectedMsgList[uuid]
-        		if list == nil {
-        		    var expectedMsgList []ExpectedMsg 
-        		    list = &expectedMsgList
-        			deviceExpectedMsgList[uuid] = list
-    				globals.Dbg.PrintfTrace("%s [encode] --> making a new list for UUID %s, number of lists is now %d.\n", globals.LogTag, uuid, len(deviceExpectedMsgList))
-        		}
-        		
-        		expectedMsg := ExpectedMsg {
-                    TimeStarted: time.Now(),
-                    ResponseId:  responseId,		    
-        		}
-        		
-    			*list = append(*list, expectedMsg)
-				globals.Dbg.PrintfTrace("%s [encode] --> expected list for UUID %s is now size %d.\n", globals.LogTag, uuid, len(*list))
-            }    
-            		
-    	    return nil, int(byteCount)
+    	    return nil, int(byteCount), responseId
         }    				   
 	    
-   	    return nil, int(byteCount)
+   	    return nil, int(byteCount), responseId
     }
     
-	return errors.New("No downlink message channel available to enqueue the encoded message.\n"), 0
+	return errors.New("No downlink message channel available to enqueue the encoded message.\n"), 0, RESPONSE_NONE
 }
 
 /* End Of File */

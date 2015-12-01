@@ -126,7 +126,7 @@ func OpenQueue(username, amqpAddress string) (*Queue, error) {
 	            case msg, ok = <-responseChan:
 	                if (!ok) {
             	        globals.Dbg.PrintfTrace("%s [amqp] --> responseChan got a NOT OK thing, returning.\n", globals.LogTag)
-	                    return
+	                    // TODO let's see if it recovers (was return)
 	                }
 	                receivedMsg = true
 	                m := AmqpResponseMessage{}
@@ -139,7 +139,7 @@ func OpenQueue(username, amqpAddress string) (*Queue, error) {
 	            case msg, ok = <-errorChan:
 	                if (!ok) {
             	        globals.Dbg.PrintfTrace("%s [amqp] --> errorChan got a NOT OK thing, returning.\n", globals.LogTag)
-	                    return
+	                    // TODO let's see if it recovers (was return)
 	                }
 	                receivedMsg = true
         	        globals.Dbg.PrintfTrace("%s [amqp] --> AMQP error channel says %v.\n", globals.LogTag, msg)

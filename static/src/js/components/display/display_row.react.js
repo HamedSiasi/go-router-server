@@ -19,49 +19,35 @@
 
 var React = require('react');
 var ValueUuidSelected = require('../controls/value_uuid_selected.react');
+var Connected = require('../controls/value_connected.react');
 var Link = require('react-router-component').Link;
 
 var DisplayRow = React.createClass({
-    getInitialState: function(){   
+	getInitialState: function(){   
 	    return {deviceCheckedMap: {}};
     },
     
     handleCheckAll: function(checkAll) {
-    	var deviceCheckedMap = this.state.deviceCheckedMap;
-    	if (deviceCheckedMap && (deviceCheckedMap.length > 0)) {
-    		for (var key in deviceCheckedMap) {
-    		    if (deviceCheckedMap.hasOwnProperty(key)) {
-    			    deviceCheckedMap[key] = checkAll.target.value.checked;
+		console.log ("handleCheckAll");
+    	if (this.state.deviceCheckedMap && (this.state.deviceCheckedMap.length > 0)) {
+    		for (var key in this.state.deviceCheckedMap) {
+    		    if (this.state.deviceCheckedMap.hasOwnProperty(key)) {
+    		    	/* Store the new checkAll.target.value.checked for this UUID here */
     			}
     		}
     	}
     },
     
-	handleCheckOne: function(checkOne) {
-        var deviceCheckedMap = this.state.deviceCheckedMap;
-        if (deviceCheckedMap && (deviceCheckedMap.length > 0)) {
-            var checked = deviceCheckedMap[checkOne.value];
-            if (checked != null) {
-        	    deviceCheckedMap[checkOne.value] = checkOne.checked;
-            }
-        }
-    }.bind(this),
-
     render: function() {
     	var rows = [];
-    	var deviceCheckedMap = this.state.deviceCheckedMap;
         if (this.props["DeviceData"] && (this.props["DeviceData"].length > 0)) {
             this.props["DeviceData"].forEach(function(device, i) {
-            	var checked = deviceCheckedMap[device["Uuid"]];
-            	if (checked == null) {
-            		deviceCheckedMap[device["Uuid"]] = false;
-            		checked = false;
-            	}
+            	// Retrieve the checked state here and pass it to ValueUuidSelected
             	rows.push(       
 	                <tr className="even gradeC" key={i}>
 	                    <td style={{textAlign: 'center', width: 15}}>
-	                        <ValueUuidSelected Checked={checked} Uuid={device["Uuid"]} CallbackParent={this.handleCheckOne} /><br/> 
-	                        <img src="static/dist/assets/images/green.png" alt="logo" style={{maxWidth: 12}} />
+	                        <ValueUuidSelected Checked={false} Uuid={device["Uuid"]} /><br/>
+	                        <Connected IsConnected={device["Connected"]} />
 	                    </td>
 	                    <td style={{width: 250}}>
                             <b>Name:</b> {device["DeviceName"]}<br />
@@ -83,8 +69,10 @@ var DisplayRow = React.createClass({
 	                    <td style={{width: 80}}>
 	                        <i className="fa fa-signal" /> {device["Rsrp"]} dBm<br />
 	                        <i className="fa fa-floppy-o" /> {device["DiskSpaceLeft"]}<br />
-	                        <i className="fa fa-battery-full" /> {device["BatteryLevel"]}
-	                    </td> 
+	                        <i className="fa fa-battery-full" /> {device["BatteryLevel"]}<br />
+	                        <i className="fa fa-clock-o" /> {device["UpDuration"]}<br />
+	                        <i className="fa fa-rotate-left" /> {device["NumExpectedMsgs"]}
+	                        </td> 
 	                    <td className="center" style={{width: 200}}>
 	                    </td> 
 	                </tr>

@@ -38,19 +38,19 @@ var SettingStd = React.createClass({
 			        </thead>
                     <tr style={{height: 50}}>
                         <td style={{width: 170}}> <ValueHeartbeat /></td>
-                        <td style={{width: 300}}> <SetHeartbeat Names={this.props.Names} /></td> 
+                        <td style={{width: 300}}> <SetHeartbeat Names={this.props.Names} UuidMap = {this.props.UuidMap} /></td> 
                         <td></td> 
                     </tr>
                     <tr >
                         <td><ValueReporting /></td>
-                        <td><SetReporting Names={this.props.Names} /></td> 
+                        <td><SetReporting Names={this.props.Names} UuidMap = {this.props.UuidMap} /></td> 
                         <td></td> 
                     </tr>
                     <tr >
                         <td colSpan={3}>
-                            <GetIntervals Names={this.props.Names} />
-                            <GetTime Names={this.props.Names} />
-                            <GetPing Names={this.props.Names} />
+                            <GetIntervals Names={this.props.Names} UuidMap = {this.props.UuidMap} />
+                            <GetTime Names={this.props.Names} UuidMap = {this.props.UuidMap} />
+                            <GetPing Names={this.props.Names} UuidMap = {this.props.UuidMap} />
                         </td>
                     </tr>
                 </table>

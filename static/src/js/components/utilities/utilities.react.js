@@ -25,12 +25,12 @@ var MakeLiUuidList = React.createClass({
         if ((this.props.Items != null) && (this.props.Items.length > 0)) {        	
             this.props.Items.forEach(function(item, i) {
             	list.push(
-                    <li>&nbsp;{item}&nbsp;</li>
+                    <li><a href="#">&nbsp;{item}&nbsp;</a></li>
                 );
         });
         } else {
         	list.push(
-	            <li>&nbsp;Empty&nbsp;</li>
+	            <li><a href="#">&nbsp;Empty&nbsp;</a></li>
 	        );
         }
 

@@ -18,25 +18,22 @@
  */
 
 var React = require('react');
-var AppConstants = require ('../../constants/app-constants')
 
-var ValueHeartbeat = React.createClass({
+var ValueUuidSelected = React.createClass({
     getInitialState: function() {
-	    return {value: AppConstants.HEARTBEAT_DEFAULT};
+        return {value: this.props.Uuid, checked: this.props.Checked};
     },
-    
+
     handleChange: function(newValue) {
-        if ((newValue.target.value >= AppConstants.HEARTBEAT_MIN) && (newValue.target.value <= AppConstants.HEARTBEAT_MAX)) {
-        	this.setState ({value: newValue.target.value});
-        }
+    	this.state.checked = newValue.target.checked;
+    	this.props.CallbackParent(this.state);
     },
-    
-    render:function() {
-    	var value = this.state.value;
+
+	render:function(){
         return (
-            <input className="form-control bfh-number" type="number" min={AppConstants.HEARTBEAT_MIN} max={AppConstants.HEARTBEAT_MAX} value={value} step={1} onChange={this.handleChange} style={{width: 145}} />
+            <input type="checkbox" value={this.state.value} checked={this.state.checked} onChange={this.handleChange} style={{width: 15}} />
         );
     }
 });
 
-module.exports = ValueHeartbeat;
+module.exports = ValueUuidSelected;

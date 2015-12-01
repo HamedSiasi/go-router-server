@@ -51,7 +51,7 @@ var Header = React.createClass({
                         </a>
                         <ul className="dropdown-menu dropdown-user">
                             <li><Link href="#/display"><i className="fa fa-tachometer" /> Dash Board</Link></li>
-                            <li><a href="#"><i className="fa fa-database" />&nbsp;<del>Report</del></a></li>
+                            <li className="disabled"><a href="#"><i className="fa fa-database" />&nbsp;Report</a></li>
                         </ul>
                     </li>
                     {/* /.dropdown Downloads */}
@@ -60,12 +60,14 @@ var Header = React.createClass({
                             <i className="fa fa-download" />&nbsp;Downloads&nbsp;<i className="fa fa-caret-down" />
                         </a>
                         <ul className="dropdown-menu dropdown-user">                        
-                            <li><a href="#/utm_downloadable_files/utils.zip" download="utm_downloadable_files/utils.zip">
+                            <li className="disabled"><a href="#/utm_downloadable_files/utils.zip" download="utm_downloadable_files/utils.zip">
                                     <i className="fa fa-download" />
-                                        &nbsp;<del>Download Utilities</del>
+                                        &nbsp;Download Utilities
                                 </a>
                             </li>
-                            <li><a href="#/utm_downloadable_files/UTM-N1_User_Manual.pdf" download="utm_downloadable_files/UTM-N1_User_Manual.pdf"><i className="fa fa-book" />&nbsp;<del>Download User Manual</del></a></li>
+                            <li className="disabled"><a href="#/utm_downloadable_files/UTM-N1_User_Manual.pdf" download="utm_downloadable_files/UTM-N1_User_Manual.pdf">
+                                <i className="fa fa-book" />&nbsp;Download User Manual</a>
+                            </li>
                         </ul>
                     </li>
                 </ul>

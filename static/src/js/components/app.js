@@ -29,7 +29,7 @@ var Locations = Router.Locations;
 var Location  = Router.Location;
 
 var App = React.createClass({
-    render:function(){
+    render: function() {
         return (
             <Template>
                 <Locations>

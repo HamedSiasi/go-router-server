@@ -18,11 +18,23 @@
  */
 
 var React = require('react');
+var AppConstants = require ('../../constants/app-constants');
 
 var ValueTTTimeout = React.createClass({
+    getInitialState: function() {
+        return {value: AppConstants.TT_TIMEOUT_DEFAULT};
+    },
+
+    handleChange: function(newValue) {
+    	if ((newValue.target.value >= AppConstants.TT_TIMEOUT_MIN) && (newValue.target.value <= AppConstants.TT_TIMEOUT_MAX)) {
+    	    this.setState ({value: newValue.target.value});
+        }
+    },
+
     render:function(){
+	    var value = this.state.value;
         return (
-            <input className="form-control" type="number" min={1} max={86400} defaultValue={6000} step={1} style={{width: 80, marginTop: 10}} />
+            <input className="form-control bfh-number" type="number" min={AppConstants.TT_TIMEOUT_MIN} max={AppConstants.TT_TIMEOUT_MAX} value={value} step={60} onChange={this.handleChange} style={{width: 80, marginTop: 10}} />
         );
     }
 });

@@ -18,13 +18,23 @@
  */
 
 var React = require('react');
+var AppConstants = require ('../../constants/app-constants');
 
 var ValueReporting = React.createClass({
-    render:function(){
+    getInitialState: function() {
+        return {value: AppConstants.REPORTING_INTERVAL_DEFAULT};
+    },
+
+    handleChange: function(newValue) {
+        if ((newValue.target.value >= AppConstants.REPORTING_INTERVAL_MIN) && (newValue.target.value <= AppConstants.REPORTING_INTERVAL_MAX)) {
+    	    this.setState ({value: newValue.target.value});
+        }
+    },
+
+    render:function() {
+	    var value = this.state.value;
         return (
-            <div>
-        	    <input type="number" className="form-control bfh-number" min={1} max={10} defaultValue={1} style={{width: 145}} />
-            </div>
+            <input className="form-control bfh-number" type="number" min={AppConstants.REPORTING_INTERVAL_MIN} max={AppConstants.REPORTING_INTERVAL_MAX} value={value} step={1} onChange={this.handleChange} style={{width: 145}} />
         );
     }
 });

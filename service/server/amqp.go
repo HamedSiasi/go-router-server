@@ -136,18 +136,20 @@ func OpenQueue(username, amqpAddress string) (*Queue, error) {
 	                return
 	            case msg, ok = <-responseChan:
 	                if (!ok) {
+            	        globals.Dbg.PrintfTrace("%s [amqp] --> responseChan got a NOT OK thing, returning.\n", globals.LogTag)
 	                    return
 	                }
 	                receivedMsg = true
 	                m := AmqpResponseMessage{}
 	                err = json.Unmarshal(msg.Body, &m)
 	                if err == nil {
-	                    q.Msgs <- &m
 	                    globals.Dbg.PrintfTrace("%s [amqp] --> UTM UUID is %+v.\n", globals.LogTag, m.DeviceUuid)
 	                    globals.Dbg.PrintfTrace("%s [amqp] --> UTM name is \"%+v\".\n", globals.LogTag, m.DeviceName)
+	                    q.Msgs <- &m
 	                }
 	            case msg, ok = <-errorChan:
 	                if (!ok) {
+            	        globals.Dbg.PrintfTrace("%s [amqp] --> errorChan got a NOT OK thing, returning.\n", globals.LogTag)
 	                    return
 	                }
 	                receivedMsg = true
@@ -181,6 +183,7 @@ func OpenQueue(username, amqpAddress string) (*Queue, error) {
 	                return
 	            case dlMsg, ok := <-q.Downlink:
 	                if (!ok) {
+            	        globals.Dbg.PrintfTrace("%s [amqp] --> q.Downlink got a NOT OK thing, returning.\n", globals.LogTag)
 	                    return
 	                }
 	                serialisedData, err := json.Marshal(dlMsg)

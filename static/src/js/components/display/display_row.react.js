@@ -18,40 +18,72 @@
  */
 
 var React = require('react');
+var ValueUuidSelected = require('../controls/value_uuid_selected.react');
 var Link = require('react-router-component').Link;
 
 var DisplayRow = React.createClass({
+    getInitialState: function(){   
+	    return {deviceCheckedMap: {}};
+    },
+    
+    handleCheckAll: function(checkAll) {
+    	var deviceCheckedMap = this.state.deviceCheckedMap;
+    	if (deviceCheckedMap && (deviceCheckedMap.length > 0)) {
+    		for (var key in deviceCheckedMap) {
+    		    if (deviceCheckedMap.hasOwnProperty(key)) {
+    			    deviceCheckedMap[key] = checkAll.target.value.checked;
+    			}
+    		}
+    	}
+    },
+    
+	handleCheckOne: function(checkOne) {
+        var deviceCheckedMap = this.state.deviceCheckedMap;
+        if (deviceCheckedMap && (deviceCheckedMap.length > 0)) {
+            var checked = deviceCheckedMap[checkOne.value];
+            if (checked != null) {
+        	    deviceCheckedMap[checkOne.value] = checkOne.checked;
+            }
+        }
+    }.bind(this),
+
     render: function() {
-        var rows = [];
+    	var rows = [];
+    	var deviceCheckedMap = this.state.deviceCheckedMap;
         if (this.props["DeviceData"] && (this.props["DeviceData"].length > 0)) {
-            this.props["DeviceData"].forEach(function(uuid, i) {
-	            rows.push(       
+            this.props["DeviceData"].forEach(function(device, i) {
+            	var checked = deviceCheckedMap[device["Uuid"]];
+            	if (checked == null) {
+            		deviceCheckedMap[device["Uuid"]] = false;
+            		checked = false;
+            	}
+            	rows.push(       
 	                <tr className="even gradeC" key={i}>
 	                    <td style={{textAlign: 'center', width: 15}}>
-	                        <input type="checkbox" /><br />
+	                        <ValueUuidSelected Checked={checked} Uuid={device["Uuid"]} CallbackParent={this.handleCheckOne} /><br/> 
 	                        <img src="static/dist/assets/images/green.png" alt="logo" style={{maxWidth: 12}} />
 	                    </td>
 	                    <td style={{width: 250}}>
-                            <b>Name:</b> {uuid["DeviceName"]}<br />
-                            <b>UUID:</b> {uuid["Uuid"]}<br />
-                            <b>Mode:</b> {uuid["Mode"]}<br />
-                            <b>Reporting:</b> {uuid["Reporting"]}<br />
-                            <b>Heartbeat:</b> {uuid["Heartbeat"]}
+                            <b>Name:</b> {device["DeviceName"]}<br />
+                            <b>UUID:</b> {device["Uuid"]}<br />
+                            <b>Mode:</b> {device["Mode"]}<br />
+                            <b>Reporting:</b> {device["Reporting"]}<br />
+                            <b>Heartbeat:</b> {device["Heartbeat"]}
 	                    </td>
 	                    <td style={{width: 170}}>
-                            <b>Msgs:</b> {uuid["TotalUlMsgs"]}<br />
-                            <b>Bytes:</b> {uuid["TotalUlBytes"]}<br />
-                            <b>Last Msg:</b> {uuid["LastUlMsgTime"]}
+                            <b>Msgs:</b> {device["TotalUlMsgs"]}<br />
+                            <b>Bytes:</b> {device["TotalUlBytes"]}<br />
+                            <b>Last Msg:</b> {device["LastUlMsgTime"]}
 	                    </td>
 	                    <td style={{width: 170}}>
-	                        <b>Msgs:</b> {uuid["TotalDlMsgs"]}<br />
-	                        <b>Bytes:</b> {uuid["TotalDlBytes"]}<br />
-	                        <b>Last Msg:</b> {uuid["LastDlMsgTime"]}
+	                        <b>Msgs:</b> {device["TotalDlMsgs"]}<br />
+	                        <b>Bytes:</b> {device["TotalDlBytes"]}<br />
+	                        <b>Last Msg:</b> {device["LastDlMsgTime"]}
 	                    </td>
 	                    <td style={{width: 80}}>
-	                        <i className="fa fa-signal" /> {uuid["Rsrp"]} dBm<br />
-	                        <i className="fa fa-floppy-o" /> {uuid["DiskSpaceLeft"]}<br />
-	                        <i className="fa fa-battery-full" /> {uuid["BatteryLevel"]}
+	                        <i className="fa fa-signal" /> {device["Rsrp"]} dBm<br />
+	                        <i className="fa fa-floppy-o" /> {device["DiskSpaceLeft"]}<br />
+	                        <i className="fa fa-battery-full" /> {device["BatteryLevel"]}
 	                    </td> 
 	                    <td className="center" style={{width: 200}}>
 	                    </td> 
@@ -69,7 +101,7 @@ var DisplayRow = React.createClass({
 	                            <table className="table table-striped table-bordered table-hover" id="dataTables-example">
 	                                <thead>
 	                                    <tr className="info">
-	                                        <th style={{textAlign: 'center', width: 15}}><input type="checkbox" /></th>
+	                                        <th style={{textAlign: 'center', width: 15}}><input type="checkbox" onClick={this.handleCheckAll} value="checkAll" defaultChecked={false} /></th>
 	                                        <th>Device</th>
 	                                        <th>Uplink</th>
 	                                        <th>Downlink</th>

@@ -26,10 +26,10 @@ var Link = require('react-router-component').Link
 
 var Display = React.createClass({
     getInitialState: function(){   
-        var data = {data:[
-        ]}    
+        var data = {data:[], selected: {}}    
         return data;
     },
+
     componentDidMount: function() {
         pollState(function(data) {
 	        // fixup missing state properties to avoid muliple levels of missing attribute tests

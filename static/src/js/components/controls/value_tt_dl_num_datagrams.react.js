@@ -18,13 +18,23 @@
  */
 
 var React = require('react');
+var AppConstants = require ('../../constants/app-constants');
 
 var ValueTTDlNumDatagrams = React.createClass({
+    getInitialState: function() {
+        return {value: AppConstants.TT_DATAGRAMS_NUM_DEFAULT};
+    },
+
+    handleChange: function(newValue) {
+        if ((newValue.target.value >= AppConstants.TT_DATAGRAMS_NUM_MIN) && (newValue.target.value <= AppConstants.TT_DATAGRAMS_NUM_MAX)) {
+    	    this.setState ({value: newValue.target.value});
+        }
+    },
+
     render:function(){
+	    var value = this.state.value;
         return (
-            <div>
-                <input className="form-control" type="number" min={1} max={10000} defaultValue={100} step={1} style={{width: 80}} />
-            </div>
+            <input className="form-control bfh-number" type="number" min={AppConstants.TT_DATAGRAM_LEN_MIN} max={AppConstants.TT_DATAGRAMS_NUM_MAX} value={value} step={1} onChange={this.handleChange} style={{width: 80}} />
         );
     }
 });

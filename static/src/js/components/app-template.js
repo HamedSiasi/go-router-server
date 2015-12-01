@@ -18,7 +18,7 @@
  */
 
 var React = require('react');
-var Header = require('./Header/Header.react')
+var Header = require('./header/header.react')
 
 var Template = React.createClass({
     render:function(){
@@ -26,7 +26,7 @@ var Template = React.createClass({
             <div>
                 <Header />
                     {this.props.children}
-		     </div>
+		    </div>
         );
     }
 });

@@ -14,6 +14,7 @@ package server
 
 import (
     "time"
+    "sort"
 )
 
 //--------------------------------------------------------------------
@@ -126,8 +127,18 @@ func displayFrontPageData () *FrontPageData {
         data.DeviceData = append (data.DeviceData, deviceData)
 	}
 
-   return &data
+    // And finally, sort the data by friendly name
+	sort.Sort(ByName(data.DeviceData))
+    
+    return &data
 }
+
+// Sort by name
+type ByName []FrontPageDeviceData
+
+func (u ByName) Len() int           { return len(u) }
+func (u ByName) Swap(i, j int)      { u[i], u[j] = u[j], u[i] }
+func (u ByName) Less(i, j int) bool { return u[i].DeviceName < u[j].DeviceName }
 
 // Return the reporting interval as a duration formed as a string
 func getReportingString (intervals *IntervalsData) string {

@@ -42,19 +42,19 @@ var SettingTT = React.createClass({
                         <td style={{width: 100}}><ValueTTUlNumDatagrams /></td>
                         <td style={{width: 110}}>Length:</td>
                         <td style={{width: 100}}><ValueTTUlLenDatagram /></td> 
-                        <td><SetTTStart  Names={this.props.Names} /></td>
+                        <td><SetTTStart Names={this.props.Names} UuidMap = {this.props.UuidMap} /></td>
                     </tr>
                     <tr >
                         <td>DL: Number:</td>
                         <td><ValueTTDlNumDatagrams /></td>
                         <td>Length:</td>
                         <td><ValueTTDlLenDatagram /></td> 
-                        <td><SetTTStop Names={this.props.Names} /></td> 
+                        <td><SetTTStop Names={this.props.Names} UuidMap = {this.props.UuidMap} /></td> 
                     </tr>
                     <tr >
                         <td>Timeout (secs):</td>
                         <td><ValueTTTimeout /></td>
-                        <td colSpan={2}><SetTTParameters Names={this.props.Names} /></td> 
+                        <td colSpan={2}><SetTTParameters Names={this.props.Names} UuidMap = {this.props.UuidMap} /></td> 
                     </tr>
                 </table>
             </div>

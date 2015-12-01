@@ -18,10 +18,6 @@ import (
     "github.com/streadway/amqp"
     "time"
 	"github.com/robmeades/utm/service/globals"
-    
-
-    //"gopkg.in/mgo.v2"
-    //"gopkg.in/mgo.v2/bson"
 )
 
 // Generic struct describing an AMQP message
@@ -106,13 +102,6 @@ func OpenQueue(username, amqpAddress string) (*Queue, error) {
         q.Close()
         return nil, err
     }
-
-    //Open DB
-    //amqpSession, err := mgo.Dial("127.0.0.1:27017")
-
-    // rec_Collection := amqpSession.DB("utm-db").C("receivemessages")
-    // res_Collection := amqpSession.DB("utm-db").C("responsemessages")
-    // err_Collection := amqpSession.DB("utm-db").C("errormessages")
 
     // Uplink loop
     go func() {

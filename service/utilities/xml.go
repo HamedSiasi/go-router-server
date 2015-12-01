@@ -38,7 +38,7 @@ func XmlDataStore(data []byte, uuid string) error {
 	session, err := mgo.Dial("127.0.0.1:27017")
 	if err == nil {
     	defer session.Close()
-		collection := session.DB("utm-db").C("xmlData")
+		collection := session.DB("utm-db").C("UtmXmlData")
 		err = collection.Insert(&utmXml)
 	}
 

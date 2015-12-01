@@ -171,7 +171,7 @@ func operateDataTable() {
 	
     					globals.Dbg.PrintfTrace("%s [datatable] --> connection state for device %s updated.\n", globals.LogTag, value.DeviceUuid)
                         // Store latest state in MongoDB
-                		err := utilities.InsertDB ("blah", state)
+                		err := utilities.InsertDB ("UtmState", state)
                 		if err != nil {
         					globals.Dbg.PrintfTrace("%s [datatable] --> unable to inserted into database though (\"%s\").\n", globals.LogTag, err)
                 		}

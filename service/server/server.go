@@ -93,6 +93,7 @@ func processUlAmqpMsgs(q *Queue) {
     for {
         amqpMessageCount++
         select {
+            
             case msg, isOpen := <-q.UlAmqpMsgs:
             {
                 if isOpen {
@@ -182,8 +183,7 @@ func processUlAmqpMsgs(q *Queue) {
                         }
                         default:
                         {
-                            globals.Dbg.PrintfTrace("%s [server] --> unknown message type on AMQP UlMsg channel: %+v.\n", globals.LogTag, msg)
-                            log.Fatal(globals.LogTag, "invalid message type.")
+                            globals.Dbg.PrintfError("%s [server] --> unknown message type on AMQP UlMsg channel: %+v.\n", globals.LogTag, msg)
                         } // case    
                     } // switch
                 } else {

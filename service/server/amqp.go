@@ -146,7 +146,8 @@ func OpenQueue(username, amqpAddress string) (*Queue, error) {
                     } else {
                         globals.Dbg.PrintfTrace("%s [amqp] --> responseChan has closed on us, returning...\n", globals.LogTag)
                         // Send error on the channel so that things above us can clear up
-                        q.UlAmqpMsgs <- errors.New("AMQP response channel has closed.\n")
+                        err = errors.New("AMQP response channel has closed.\n")
+                        q.UlAmqpMsgs <- &err
                         return
                     }
                 }    

@@ -14,7 +14,7 @@
  */
 
 var React = require('react');
-var AppStore = require('../stores/app-store');
+var AppStore = require('../stores/app_store');
 
 var StoreWatchMixin = function(cb) {
     return {

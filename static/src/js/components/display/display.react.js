@@ -18,16 +18,15 @@
  */
 
 var React = require('react');
-var AppStore = require('../../stores/app-store.js');
 var Settings = require('../panels/settings.react')
 var DisplayRow = require('./display_row.react')
-
 var Link = require('react-router-component').Link
 
 var Display = React.createClass({
     getInitialState: function(){   
-        var data = {data:[], selected: {}}    
-        return data;
+        return {
+        	data:[]
+       	};
     },
 
     componentDidMount: function() {
@@ -74,15 +73,5 @@ function pollState(updateState) {
     }
     pollLoop();
 }
-
-Object.size = function(obj) {
-    var size = 0, key;
-    for (key in obj) {
-        if (obj.hasOwnProperty(key)) {
-            size++;
-        }
-    }
-    return size;
-};
 
 module.exports = Display;

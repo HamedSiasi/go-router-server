@@ -18,7 +18,7 @@
  */
 
 var React = require('react');
-var Template = require('./app-template.js');
+var Template = require('./app_template.js');
 var Router = require('react-router-component');
 var Display = require('./display/display.react');
 var Login = require('./user/login.react');

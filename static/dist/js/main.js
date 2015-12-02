@@ -22414,33 +22414,39 @@ module.exports = require('./lib/React');
  * This source file is the sole property of u-blox Melbourn Ltd.
  * Reproduction or utilization of this source in whole or part is
  * forbidden without the written consent of u-blox Melbourn Ltd.
- * 
- * This file is written in JSX, not HTML.  If you want to put any
- * content in here that should be generated as HTML, stuff it
- * through:
- * 
- * https://facebook.github.io/react/html-jsx.html
- * 
- * ...to get your syntax correct.
  */
 
-var React = require('react');
-var Header = require('./header/header.react')
+var AppConstants = require('../constants/app_store_types');
+var AppDispatcher = require('../dispatchers/app_dispatcher');
 
-var Template = React.createClass({displayName: "Template",
-    render:function(){
-        return (
-            React.createElement("div", null, 
-                React.createElement(Header, null), 
-                    this.props.children
-            )
-        );
+var AppActions = {
+    addUser: function(company, firstName, lastName, email, password) {
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.ADD_USER,
+            company: company,
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            password: password
+        })
+    },
+    setUuidChecked: function(uuid) {
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.STORE_SET_UUID_CHECKED,
+            uuid: uuid
+        })
+    },
+    setUuidUnchecked: function(uuid) {
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.STORE_SET_UUID_UNCHECKED,
+            uuid: uuid
+        })
     }
-});
+}
 
-module.exports = Template;
+module.exports = AppActions;
 
-},{"./header/header.react":212,"react":188}],190:[function(require,module,exports){
+},{"../constants/app_store_types":220,"../dispatchers/app_dispatcher":221}],190:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -22461,7 +22467,7 @@ module.exports = Template;
  */
 
 var React = require('react');
-var Template = require('./app-template.js');
+var Template = require('./app_template.js');
 var Router = require('react-router-component');
 var Display = require('./display/display.react');
 var Login = require('./user/login.react');
@@ -22488,7 +22494,43 @@ var App = React.createClass({displayName: "App",
 
 module.exports = App;
 
-},{"./app-template.js":189,"./display/display.react":210,"./index":213,"./user/login.react":215,"./user/register.react":216,"react":188,"react-router-component":8}],191:[function(require,module,exports){
+},{"./app_template.js":191,"./display/display.react":211,"./index":214,"./user/login.react":216,"./user/register.react":217,"react":188,"react-router-component":8}],191:[function(require,module,exports){
+/**
+ * Copyright (C) u-blox Melbourn Ltd
+ * u-blox Melbourn Ltd, Melbourn, UK
+ * 
+ * All rights reserved.
+ *
+ * This source file is the sole property of u-blox Melbourn Ltd.
+ * Reproduction or utilization of this source in whole or part is
+ * forbidden without the written consent of u-blox Melbourn Ltd.
+ * 
+ * This file is written in JSX, not HTML.  If you want to put any
+ * content in here that should be generated as HTML, stuff it
+ * through:
+ * 
+ * https://facebook.github.io/react/html-jsx.html
+ * 
+ * ...to get your syntax correct.
+ */
+
+var React = require('react');
+var Header = require('./header/header.react')
+
+var Template = React.createClass({displayName: "Template",
+    render:function(){
+        return (
+            React.createElement("div", null, 
+                React.createElement(Header, null), 
+                    this.props.children
+            )
+        );
+    }
+});
+
+module.exports = Template;
+
+},{"./header/header.react":213,"react":188}],192:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -22531,7 +22573,7 @@ var GetIntervals = React.createClass({displayName: "GetIntervals",
 
 module.exports = GetIntervals;
 
-},{"../utilities/utilities.react":217,"react":188}],192:[function(require,module,exports){
+},{"../utilities/utilities.react":218,"react":188}],193:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -22574,7 +22616,7 @@ var GetPing = React.createClass({displayName: "GetPing",
 
 module.exports = GetPing;
 
-},{"../utilities/utilities.react":217,"react":188}],193:[function(require,module,exports){
+},{"../utilities/utilities.react":218,"react":188}],194:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -22617,7 +22659,7 @@ var GetTime = React.createClass({displayName: "GetTime",
 
 module.exports = GetTime;
 
-},{"../utilities/utilities.react":217,"react":188}],194:[function(require,module,exports){
+},{"../utilities/utilities.react":218,"react":188}],195:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -22659,7 +22701,7 @@ var SetHeartBeat = React.createClass({displayName: "SetHeartBeat",
 
 module.exports = SetHeartBeat;
 
-},{"../utilities/utilities.react":217,"react":188}],195:[function(require,module,exports){
+},{"../utilities/utilities.react":218,"react":188}],196:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -22700,7 +22742,7 @@ var SetReporting = React.createClass({displayName: "SetReporting",
 
 module.exports = SetReporting;
 
-},{"../utilities/utilities.react":217,"react":188}],196:[function(require,module,exports){
+},{"../utilities/utilities.react":218,"react":188}],197:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -22741,7 +22783,7 @@ var SetTTParameters = React.createClass({displayName: "SetTTParameters",
 
 module.exports = SetTTParameters;
 
-},{"../utilities/utilities.react":217,"react":188}],197:[function(require,module,exports){
+},{"../utilities/utilities.react":218,"react":188}],198:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -22782,7 +22824,7 @@ var SetTTStart = React.createClass({displayName: "SetTTStart",
 
 module.exports = SetTTStart;
 
-},{"../utilities/utilities.react":217,"react":188}],198:[function(require,module,exports){
+},{"../utilities/utilities.react":218,"react":188}],199:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -22823,7 +22865,7 @@ var SetTTStop = React.createClass({displayName: "SetTTStop",
 
 module.exports = SetTTStop;
 
-},{"../utilities/utilities.react":217,"react":188}],199:[function(require,module,exports){
+},{"../utilities/utilities.react":218,"react":188}],200:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -22887,7 +22929,7 @@ var SettingStd = React.createClass({displayName: "SettingStd",
 
 module.exports = SettingStd;
 
-},{"./get_intervals.react":191,"./get_ping.react":192,"./get_time.react":193,"./set_heartbeat.react":194,"./set_reporting.react":195,"./value_heartbeat.react":202,"./value_reporting.react":203,"react":188}],200:[function(require,module,exports){
+},{"./get_intervals.react":192,"./get_ping.react":193,"./get_time.react":194,"./set_heartbeat.react":195,"./set_reporting.react":196,"./value_heartbeat.react":203,"./value_reporting.react":204,"react":188}],201:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -22954,7 +22996,7 @@ var SettingTT = React.createClass({displayName: "SettingTT",
 
 module.exports = SettingTT;
 
-},{"./set_tt_parameters.react":196,"./set_tt_start.react":197,"./set_tt_stop.react":198,"./value_tt_dl_len_datagram.react":204,"./value_tt_dl_num_datagrams.react":205,"./value_tt_timeout.react":206,"./value_tt_ul_len_datagram.react":207,"./value_tt_ul_num_datagrams.react":208,"react":188}],201:[function(require,module,exports){
+},{"./set_tt_parameters.react":197,"./set_tt_start.react":198,"./set_tt_stop.react":199,"./value_tt_dl_len_datagram.react":205,"./value_tt_dl_num_datagrams.react":206,"./value_tt_timeout.react":207,"./value_tt_ul_len_datagram.react":208,"./value_tt_ul_num_datagrams.react":209,"react":188}],202:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -22992,7 +23034,7 @@ var Connected = React.createClass({displayName: "Connected",
 
 module.exports = Connected;
 
-},{"react":188}],202:[function(require,module,exports){
+},{"react":188}],203:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -23013,7 +23055,7 @@ module.exports = Connected;
  */
 
 var React = require('react');
-var AppConstants = require ('../../constants/app-constants')
+var AppConstants = require ('../../constants/app_limits')
 
 var ValueHeartbeat = React.createClass({displayName: "ValueHeartbeat",
     getInitialState: function() {
@@ -23036,7 +23078,7 @@ var ValueHeartbeat = React.createClass({displayName: "ValueHeartbeat",
 
 module.exports = ValueHeartbeat;
 
-},{"../../constants/app-constants":218,"react":188}],203:[function(require,module,exports){
+},{"../../constants/app_limits":219,"react":188}],204:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -23057,7 +23099,7 @@ module.exports = ValueHeartbeat;
  */
 
 var React = require('react');
-var AppConstants = require ('../../constants/app-constants');
+var AppConstants = require ('../../constants/app_limits');
 
 var ValueReporting = React.createClass({displayName: "ValueReporting",
     getInitialState: function() {
@@ -23080,7 +23122,7 @@ var ValueReporting = React.createClass({displayName: "ValueReporting",
 
 module.exports = ValueReporting;
 
-},{"../../constants/app-constants":218,"react":188}],204:[function(require,module,exports){
+},{"../../constants/app_limits":219,"react":188}],205:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -23101,7 +23143,7 @@ module.exports = ValueReporting;
  */
 
 var React = require('react');
-var AppConstants = require ('../../constants/app-constants');
+var AppConstants = require ('../../constants/app_limits');
 
 var ValueTTDlLenDatagram = React.createClass({displayName: "ValueTTDlLenDatagram",
     getInitialState: function() {
@@ -23124,7 +23166,7 @@ var ValueTTDlLenDatagram = React.createClass({displayName: "ValueTTDlLenDatagram
 
 module.exports = ValueTTDlLenDatagram;
 
-},{"../../constants/app-constants":218,"react":188}],205:[function(require,module,exports){
+},{"../../constants/app_limits":219,"react":188}],206:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -23145,7 +23187,7 @@ module.exports = ValueTTDlLenDatagram;
  */
 
 var React = require('react');
-var AppConstants = require ('../../constants/app-constants');
+var AppConstants = require ('../../constants/app_limits');
 
 var ValueTTDlNumDatagrams = React.createClass({displayName: "ValueTTDlNumDatagrams",
     getInitialState: function() {
@@ -23168,7 +23210,7 @@ var ValueTTDlNumDatagrams = React.createClass({displayName: "ValueTTDlNumDatagra
 
 module.exports = ValueTTDlNumDatagrams;
 
-},{"../../constants/app-constants":218,"react":188}],206:[function(require,module,exports){
+},{"../../constants/app_limits":219,"react":188}],207:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -23189,7 +23231,7 @@ module.exports = ValueTTDlNumDatagrams;
  */
 
 var React = require('react');
-var AppConstants = require ('../../constants/app-constants');
+var AppConstants = require ('../../constants/app_limits');
 
 var ValueTTTimeout = React.createClass({displayName: "ValueTTTimeout",
     getInitialState: function() {
@@ -23212,7 +23254,7 @@ var ValueTTTimeout = React.createClass({displayName: "ValueTTTimeout",
 
 module.exports = ValueTTTimeout;
 
-},{"../../constants/app-constants":218,"react":188}],207:[function(require,module,exports){
+},{"../../constants/app_limits":219,"react":188}],208:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -23233,7 +23275,7 @@ module.exports = ValueTTTimeout;
  */
 
 var React = require('react');
-var AppConstants = require ('../../constants/app-constants');
+var AppConstants = require ('../../constants/app_limits');
 
 var ValueTTUlLenDatagram = React.createClass({displayName: "ValueTTUlLenDatagram",
     getInitialState: function() {
@@ -23256,7 +23298,7 @@ var ValueTTUlLenDatagram = React.createClass({displayName: "ValueTTUlLenDatagram
 
 module.exports = ValueTTUlLenDatagram;
 
-},{"../../constants/app-constants":218,"react":188}],208:[function(require,module,exports){
+},{"../../constants/app_limits":219,"react":188}],209:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -23277,7 +23319,7 @@ module.exports = ValueTTUlLenDatagram;
  */
 
 var React = require('react');
-var AppConstants = require ('../../constants/app-constants');
+var AppConstants = require ('../../constants/app_limits');
 
 var ValueTTUlNumDatagrams = React.createClass({displayName: "ValueTTUlNumDatagrams",
     getInitialState: function() {
@@ -23300,7 +23342,7 @@ var ValueTTUlNumDatagrams = React.createClass({displayName: "ValueTTUlNumDatagra
 
 module.exports = ValueTTUlNumDatagrams;
 
-},{"../../constants/app-constants":218,"react":188}],209:[function(require,module,exports){
+},{"../../constants/app_limits":219,"react":188}],210:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -23321,16 +23363,32 @@ module.exports = ValueTTUlNumDatagrams;
  */
 
 var React = require('react');
+var AppActions = require('../../actions/app_actions.js');
+var AppStore = require('../../stores/app_store.js');
 
 var ValueUuidSelected = React.createClass({displayName: "ValueUuidSelected",
     getInitialState: function() {
-        return {value: this.props.Uuid, checked: this.props.Checked};
+        return {value: this.props.Uuid, checked: AppStore.isUuidChecked(this.props.Uuid)};
     },
 
+    componentDidMount: function() {
+        AppStore.addChangeListener(this.onChange);
+    },
+
+    componentWillUnmount: function() {
+        AppStore.removeChangeListener(this.onChange);
+    },
+
+    onChange: function() {
+        this.setState({checked: AppStore.isUuidChecked(this.state.value)});
+        //this.forceUpdate();
+    },
+    
     handleChange: function(newValue) {
-        this.setState({checked: newValue.target.checked});
-        if (this.props.CallbackParent) {
-            this.props.CallbackParent(this.state);
+    	if (newValue.target.checked == true) {
+            AppActions.setUuidChecked(this.state.value);
+        } else {
+            AppActions.setUuidUnchecked(this.state.value);
         }
     },
 
@@ -23343,7 +23401,7 @@ var ValueUuidSelected = React.createClass({displayName: "ValueUuidSelected",
 
 module.exports = ValueUuidSelected;
 
-},{"react":188}],210:[function(require,module,exports){
+},{"../../actions/app_actions.js":189,"../../stores/app_store.js":223,"react":188}],211:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -23364,16 +23422,15 @@ module.exports = ValueUuidSelected;
  */
 
 var React = require('react');
-var AppStore = require('../../stores/app-store.js');
 var Settings = require('../panels/settings.react')
 var DisplayRow = require('./display_row.react')
-
 var Link = require('react-router-component').Link
 
 var Display = React.createClass({displayName: "Display",
     getInitialState: function(){   
-        var data = {data:[], selected: {}}    
-        return data;
+        return {
+        	data:[]
+       	};
     },
 
     componentDidMount: function() {
@@ -23421,19 +23478,9 @@ function pollState(updateState) {
     pollLoop();
 }
 
-Object.size = function(obj) {
-    var size = 0, key;
-    for (key in obj) {
-        if (obj.hasOwnProperty(key)) {
-            size++;
-        }
-    }
-    return size;
-};
-
 module.exports = Display;
 
-},{"../../stores/app-store.js":221,"../panels/settings.react":214,"./display_row.react":211,"react":188,"react-router-component":8}],211:[function(require,module,exports){
+},{"../panels/settings.react":215,"./display_row.react":212,"react":188,"react-router-component":8}],212:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -23456,21 +23503,24 @@ module.exports = Display;
 var React = require('react');
 var ValueUuidSelected = require('../controls/value_uuid_selected.react');
 var Connected = require('../controls/value_connected.react');
+var AppActions = require('../../actions/app_actions.js');
 var Link = require('react-router-component').Link;
 
 var DisplayRow = React.createClass({displayName: "DisplayRow",
     getInitialState: function(){   
-        return {deviceCheckedMap: {}};
+        return null;
     },
     
     handleCheckAll: function(checkAll) {
-        console.log ("handleCheckAll");
-        if (this.state.deviceCheckedMap && (this.state.deviceCheckedMap.length > 0)) {
-            for (var key in this.state.deviceCheckedMap) {
-                if (this.state.deviceCheckedMap.hasOwnProperty(key)) {
-                    /* Store the new checkAll.target.value.checked for this UUID here */
+        if (this.props["DeviceData"] && (this.props["DeviceData"].length > 0)) {
+        	for (i = 0; i < this.props["DeviceData"].length; i++) {
+            	uuid = this.props["DeviceData"][i]["Uuid"];
+                if (checkAll.target.checked == true) {
+                    AppActions.setUuidChecked(uuid);
+                } else {
+                    AppActions.setUuidUnchecked(uuid);
                 }
-            }
+        	}
         }
     },
     
@@ -23479,10 +23529,10 @@ var DisplayRow = React.createClass({displayName: "DisplayRow",
         if (this.props["DeviceData"] && (this.props["DeviceData"].length > 0)) {
             this.props["DeviceData"].forEach(function(device, i) {
                 // Retrieve the checked state here and pass it to ValueUuidSelected
-                rows.push(       
+                rows.push(
                     React.createElement("tr", {className: "even gradeC", key: i}, 
                         React.createElement("td", {style: {textAlign: 'center', width: 15}}, 
-                            React.createElement(ValueUuidSelected, {Checked: false, Uuid: device["Uuid"]}), React.createElement("br", null), 
+                            React.createElement(ValueUuidSelected, {Uuid: device["Uuid"]}), React.createElement("br", null), 
                             React.createElement(Connected, {IsConnected: device["Connected"]})
                         ), 
                         React.createElement("td", {style: {width: 250}}, 
@@ -23525,7 +23575,7 @@ var DisplayRow = React.createClass({displayName: "DisplayRow",
                                 React.createElement("table", {className: "table table-striped table-bordered table-hover", id: "dataTables-example"}, 
                                     React.createElement("thead", null, 
                                         React.createElement("tr", {className: "info"}, 
-                                            React.createElement("th", {style: {textAlign: 'center', width: 15}}, React.createElement("input", {type: "checkbox", onClick: this.handleCheckAll, value: "checkAll", defaultChecked: false})), 
+                                            React.createElement("th", {style: {textAlign: 'center', width: 15}}, React.createElement("input", {type: "checkbox", onChange: this.handleCheckAll, value: "checkAll", defaultChecked: false})), 
                                             React.createElement("th", null, "Device"), 
                                             React.createElement("th", null, "Uplink"), 
                                             React.createElement("th", null, "Downlink"), 
@@ -23548,7 +23598,7 @@ var DisplayRow = React.createClass({displayName: "DisplayRow",
 
 module.exports = DisplayRow;
 
-},{"../controls/value_connected.react":201,"../controls/value_uuid_selected.react":209,"react":188,"react-router-component":8}],212:[function(require,module,exports){
+},{"../../actions/app_actions.js":189,"../controls/value_connected.react":202,"../controls/value_uuid_selected.react":210,"react":188,"react-router-component":8}],213:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -23630,7 +23680,7 @@ var Header = React.createClass({displayName: "Header",
 
 module.exports = Header;
 
-},{"react":188,"react-router-component":8}],213:[function(require,module,exports){
+},{"react":188,"react-router-component":8}],214:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -23677,7 +23727,7 @@ var Index = React.createClass({displayName: "Index",
 
 module.exports = Index;
 
-},{"react":188}],214:[function(require,module,exports){
+},{"react":188}],215:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -23734,7 +23784,7 @@ var Settings = React.createClass({displayName: "Settings",
 
 module.exports = Settings;
 
-},{"../controls/setting_std.react":199,"../controls/setting_tt.react":200,"react":188}],215:[function(require,module,exports){
+},{"../controls/setting_std.react":200,"../controls/setting_tt.react":201,"react":188}],216:[function(require,module,exports){
 var React = require('react');
 var Link = require('react-router-component').Link;
 
@@ -23768,7 +23818,7 @@ var Login = React.createClass({displayName: "Login",
 
 module.exports = Login;
 
-},{"react":188,"react-router-component":8}],216:[function(require,module,exports){
+},{"react":188,"react-router-component":8}],217:[function(require,module,exports){
 var React = require('react');
 var Link = require('react-router-component').Link;
 
@@ -23845,7 +23895,7 @@ var Register = React.createClass({displayName: "Register",
 
 module.exports = Register;
 
-},{"react":188,"react-router-component":8}],217:[function(require,module,exports){
+},{"react":188,"react-router-component":8}],218:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -23855,14 +23905,6 @@ module.exports = Register;
  * This source file is the sole property of u-blox Melbourn Ltd.
  * Reproduction or utilization of this source in whole or part is
  * forbidden without the written consent of u-blox Melbourn Ltd.
- * 
- * This file is written in JSX, not HTML.  If you want to put any
- * content in here that should be generated as HTML, stuff it
- * through:
- * 
- * https://facebook.github.io/react/html-jsx.html
- * 
- * ...to get your syntax correct.
  */
 
 var React = require('react');
@@ -23873,12 +23915,12 @@ var MakeLiUuidList = React.createClass({displayName: "MakeLiUuidList",
         if ((this.props.Items != null) && (this.props.Items.length > 0)) {            
             this.props.Items.forEach(function(item, i) {
                 list.push(
-                    React.createElement("li", null, React.createElement("a", {href: "#"}, " ", item, " "))
+                    React.createElement("li", {key: i}, React.createElement("a", {href: "#"}, " ", item, " "))
                 );
         });
         } else {
             list.push(
-                React.createElement("li", null, React.createElement("a", {href: "#"}, " Empty "))
+                React.createElement("li", {key: Date.now()}, React.createElement("a", {href: "#"}, " Empty "))  // Date.now{} as a random key
             );
         }
 
@@ -23890,9 +23932,19 @@ var MakeLiUuidList = React.createClass({displayName: "MakeLiUuidList",
     }
 });
 
-module.exports = MakeLiUuidList;
+Object.size = function(obj) {
+    var size = 0, key;
+    for (key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            size++;
+        }
+    }
+    return size;
+};
 
-},{"react":188}],218:[function(require,module,exports){
+module.exports = MakeLiUuidList, Object.size;
+
+},{"react":188}],219:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -23922,7 +23974,23 @@ module.exports = {
     TT_TIMEOUT_MIN: 0,
     STORE_SET_UUID_CHECKED: "STORE_SET_UUID_CHECKED",
 };
-},{}],219:[function(require,module,exports){
+},{}],220:[function(require,module,exports){
+/**
+ * Copyright (C) u-blox Melbourn Ltd
+ * u-blox Melbourn Ltd, Melbourn, UK
+ * 
+ * All rights reserved.
+ *
+ * This source file is the sole property of u-blox Melbourn Ltd.
+ * Reproduction or utilization of this source in whole or part is
+ * forbidden without the written consent of u-blox Melbourn Ltd.
+ */
+
+module.exports = {
+    STORE_SET_UUID_CHECKED: "STORE_SET_UUID_CHECKED",
+    STORE_SET_UUID_UNCHECKED: "STORE_SET_UUID_UNCHECKED"
+};
+},{}],221:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -23953,7 +24021,7 @@ var AppDispatcher = assign(new Dispatcher(), {
 
 module.exports = AppDispatcher;
 
-},{"flux":3,"react/lib/Object.assign":56}],220:[function(require,module,exports){
+},{"flux":3,"react/lib/Object.assign":56}],222:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -23969,7 +24037,7 @@ var App = require('./components/app');
 var React = require('react');
 
 React.render(React.createElement(App, null), document.getElementById('main'));
-},{"./components/app":190,"react":188}],221:[function(require,module,exports){
+},{"./components/app":190,"react":188}],223:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -23985,65 +24053,125 @@ React.render(React.createElement(App, null), document.getElementById('main'));
  * https://facebook.github.io/flux/docs/todo-list.html#content
  */
 
-var AppDispatcher = require('../dispatchers/app-dispatcher');
-var AppConstants = require('../constants/app-constants');
+var AppDispatcher = require('../dispatchers/app_dispatcher');
+var AppConstants = require('../constants/app_store_types');
 var assign = require('react/lib/Object.assign');
 var EventEmitter = require('events').EventEmitter;
 
 var CHANGE_EVENT = 'change';
 
-function _setUuidChecked(uuid){
+//var _uuidsCheckedList = {"61d25940-5307-11e5-80a4-c549fb2d6313": "61d25940-5307-11e5-80a4-c549fb2d6313"}
+var _uuidsCheckedList = {};
 
+//------------------------------------------------------------
+// Private functions
+//------------------------------------------------------------
+
+// Add a UUID to the list as being checked
+function _setUuidChecked(uuid) {
+    _uuidsCheckedList[uuid] = uuid;
 }
 
+// Remove a UUID from the list of checked ones
+function _setUuidUnchecked(uuid) {
+    if (_uuidsCheckedList) {
+   	    delete _uuidsCheckedList[uuid];
+    }
+}
+
+// TODO
 function addUser(company, firstName, lastName, email, password) {
-    obj = {};
-    obj.company = company;
-    obj.firstName = firstName;
-    obj.lastName = lastName;
-    obj.email = email;
-    obj.password = password;
+ obj = {};
+ obj.company = company;
+ obj.firstName = firstName;
+ obj.lastName = lastName;
+ obj.email = email;
+ obj.password = password;
 
-    $.ajax({
-        url: 'http://localhost:3000/register',
-        dataType: 'json',
-        method: 'put',
-        async: false,
-        data: obj,
-        success: function(data) {
-            return  
-        },
-        error: function(xhr, status, err) {
-            console.error('/', status, err.toString());
-        }
-    });
+ $.ajax({
+     url: 'http://localhost:3000/register',
+     dataType: 'json',
+     method: 'put',
+     async: false,
+     data: obj,
+     success: function(data) {
+         return  
+     },
+     error: function(xhr, status, err) {
+         console.error('/', status, err.toString());
+     }
+ });
 }
 
+//------------------------------------------------------------
+// Public functions
+//------------------------------------------------------------
+
+// Handle indexof not being defined, see:
+// http://www.tutorialspoint.com/javascript/array_indexof.htm
+if (!Array.prototype.indexOf)
+{
+    Array.prototype.indexOf = function(elt /*, from*/)
+    {
+        var len = this.length;
+      
+        var from = Number(arguments[1]) || 0;
+        from = (from < 0)
+        ? Math.ceil(from)
+        : Math.floor(from);
+      
+        if (from < 0)
+            from += len;
+      
+        for (; from < len; from++)
+        {
+            if (from in this && this[from] === elt)
+                return from;
+        }
+        return -1;
+    };
+}
+
+
+// The store itself
 var AppStore = assign(EventEmitter.prototype, {
-            emitChange: function() {
-            this.emit(CHANGE_EVENT)
-        },
+    emitChange: function() {
+        this.emit(CHANGE_EVENT)
+    },
 
-        addChangeListener: function(callback) {
-           this.on(CHANGE_EVENT, callback)
-        },
+    addChangeListener: function(callback) {
+        this.on(CHANGE_EVENT, callback)
+    },
 
-        removeChangeListener: function(callback){
-            this.removeListener(CHANGE_EVENT, callback)
-        },
+    removeChangeListener: function(callback) {
+        this.removeListener(CHANGE_EVENT, callback)
+    },
 
-        getUtmsData: function(){
-            return states
-        },
+    getAllUuidsChecked: function () {
+    	return _uuidsCheckedList;
+    },
+    
+    isUuidChecked: function(uuid) {   	
+    	return (_uuidsCheckedList[uuid] != null);
+    },
 
-        dispatcherIndex: AppDispatcher.register(function(payload){
+    dispatcherIndex: AppDispatcher.register(function(payload) {
         var action = payload.action; // this is our action from handleViewAction
     
         switch(action.actionType) {
             case AppConstants.STORE_SET_UUID_CHECKED:
-                _setUuidChecked(payload.action.index);
+                _setUuidChecked(action.uuid);
             break;
-            // Insert more things here
+            case AppConstants.STORE_SET_UUID_UNCHECKED:
+                _setUuidUnchecked(action.uuid);
+            break;
+            case AppConstants.STORE_IS_UUID_CHECKED:
+                _isUuidUnchecked(action.uuid);
+            break;
+             // Insert more things here
+            default:
+                console.log("Unknown action type sent into app store");
+            break;
         }
 
         AppStore.emitChange();
@@ -24053,4 +24181,4 @@ var AppStore = assign(EventEmitter.prototype, {
 })
 
 module.exports = AppStore;
-},{"../constants/app-constants":218,"../dispatchers/app-dispatcher":219,"events":1,"react/lib/Object.assign":56}]},{},[220]);
+},{"../constants/app_store_types":220,"../dispatchers/app_dispatcher":221,"events":1,"react/lib/Object.assign":56}]},{},[222]);

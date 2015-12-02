@@ -20,21 +20,24 @@
 var React = require('react');
 var ValueUuidSelected = require('../controls/value_uuid_selected.react');
 var Connected = require('../controls/value_connected.react');
+var AppActions = require('../../actions/app_actions.js');
 var Link = require('react-router-component').Link;
 
 var DisplayRow = React.createClass({
     getInitialState: function(){   
-        return {deviceCheckedMap: {}};
+        return null;
     },
     
     handleCheckAll: function(checkAll) {
-        console.log ("handleCheckAll");
-        if (this.state.deviceCheckedMap && (this.state.deviceCheckedMap.length > 0)) {
-            for (var key in this.state.deviceCheckedMap) {
-                if (this.state.deviceCheckedMap.hasOwnProperty(key)) {
-                    /* Store the new checkAll.target.value.checked for this UUID here */
+        if (this.props["DeviceData"] && (this.props["DeviceData"].length > 0)) {
+        	for (i = 0; i < this.props["DeviceData"].length; i++) {
+            	uuid = this.props["DeviceData"][i]["Uuid"];
+                if (checkAll.target.checked == true) {
+                    AppActions.setUuidChecked(uuid);
+                } else {
+                    AppActions.setUuidUnchecked(uuid);
                 }
-            }
+        	}
         }
     },
     
@@ -43,10 +46,10 @@ var DisplayRow = React.createClass({
         if (this.props["DeviceData"] && (this.props["DeviceData"].length > 0)) {
             this.props["DeviceData"].forEach(function(device, i) {
                 // Retrieve the checked state here and pass it to ValueUuidSelected
-                rows.push(       
+                rows.push(
                     <tr className="even gradeC" key={i}>
                         <td style={{textAlign: 'center', width: 15}}>
-                            <ValueUuidSelected Checked={false} Uuid={device["Uuid"]} /><br/>
+                            <ValueUuidSelected Uuid={device["Uuid"]} /><br/>
                             <Connected IsConnected={device["Connected"]} />
                         </td>
                         <td style={{width: 250}}>
@@ -89,7 +92,7 @@ var DisplayRow = React.createClass({
                                 <table className="table table-striped table-bordered table-hover" id="dataTables-example">
                                     <thead>
                                         <tr className="info">
-                                            <th style={{textAlign: 'center', width: 15}}><input type="checkbox" onClick={this.handleCheckAll} value="checkAll" defaultChecked={false} /></th>
+                                            <th style={{textAlign: 'center', width: 15}}><input type="checkbox" onChange={this.handleCheckAll} value="checkAll" defaultChecked={false} /></th>
                                             <th>Device</th>
                                             <th>Uplink</th>
                                             <th>Downlink</th>

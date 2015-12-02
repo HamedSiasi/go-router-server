@@ -18,7 +18,7 @@
  */
 
 var React = require('react');
-var AppConstants = require ('../../constants/app-constants');
+var AppConstants = require ('../../constants/app_limits');
 
 var ValueReporting = React.createClass({
     getInitialState: function() {

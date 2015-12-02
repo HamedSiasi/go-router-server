@@ -18,16 +18,32 @@
  */
 
 var React = require('react');
+var AppActions = require('../../actions/app_actions.js');
+var AppStore = require('../../stores/app_store.js');
 
 var ValueUuidSelected = React.createClass({
     getInitialState: function() {
-        return {value: this.props.Uuid, checked: this.props.Checked};
+        return {value: this.props.Uuid, checked: AppStore.isUuidChecked(this.props.Uuid)};
     },
 
+    componentDidMount: function() {
+        AppStore.addChangeListener(this.onChange);
+    },
+
+    componentWillUnmount: function() {
+        AppStore.removeChangeListener(this.onChange);
+    },
+
+    onChange: function() {
+        this.setState({checked: AppStore.isUuidChecked(this.state.value)});
+        //this.forceUpdate();
+    },
+    
     handleChange: function(newValue) {
-        this.setState({checked: newValue.target.checked});
-        if (this.props.CallbackParent) {
-            this.props.CallbackParent(this.state);
+    	if (newValue.target.checked == true) {
+            AppActions.setUuidChecked(this.state.value);
+        } else {
+            AppActions.setUuidUnchecked(this.state.value);
         }
     },
 

@@ -8,9 +8,9 @@
  * Reproduction or utilization of this source in whole or part is
  * forbidden without the written consent of u-blox Melbourn Ltd.
  * 
- * This file is written in JSX, not HTML.  If you want to put any
- * content in here that should be generated as HTML, stuff it
- * through:
+ * Parts of this file are written in JSX, not HTML.  If you want
+ * to put any content in here that should be generated as HTML,
+ * stuff it through:
  * 
  * https://facebook.github.io/react/html-jsx.html
  * 
@@ -36,7 +36,6 @@ var ValueUuidSelected = React.createClass({
 
     onChange: function() {
         this.setState({checked: AppStore.isUuidChecked(this.state.value)});
-        //this.forceUpdate();
     },
     
     handleChange: function(newValue) {

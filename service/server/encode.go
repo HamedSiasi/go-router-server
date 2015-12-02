@@ -213,28 +213,29 @@ func encodeAndEnqueue(msg interface{}, uuid string) (error, int, ResponseTypeEnu
             msg := AmqpMessage {
                 DeviceUuid:   uuid,
                 EndpointUuid: 4,
-            }
-            
+            }            
             for _, v := range payload {
                 msg.Payload = append(msg.Payload, int(v))
             }
     
             globals.Dbg.PrintfTrace("%s [encode] --> %d byte message for AMQP downlink:\n\n%+v\n", globals.LogTag, byteCount, msg)
-            downlinkMessages <- msg            
-            globals.Dbg.PrintfTrace("%s [encode] --> encoded %d bytes into AMQP message:\n\n%+v\n", globals.LogTag, byteCount, msg)
-
-            // Store XmlData in MongoDB
-            utilities.XmlDataStore(xmlEncodeBuffer, uuid)
-            globals.Dbg.PrintfInfo("%s [decode] --> the XML data is:\n\n%s\n\n", globals.LogTag, spew.Sdump(xmlEncodeBuffer))            
-            globals.Dbg.PrintfInfo("%s [encode] --> XML buffer pointer 0x%08x, used %d, left %d:.\n", globals.LogTag, *ppXmlBuffer, C.uint32_t(len(xmlEncodeBuffer)) - xmlBufferLen, xmlBufferLen)
-            
-            return nil, int(byteCount), responseId
+            if DlMsgs != nil {
+                DlMsgs <- msg            
+                globals.Dbg.PrintfTrace("%s [encode] --> encoded %d bytes into AMQP message:\n\n%+v\n", globals.LogTag, byteCount, msg)
+    
+                // Store XmlData in MongoDB
+                utilities.XmlDataStore(xmlEncodeBuffer, uuid)
+                globals.Dbg.PrintfInfo("%s [decode] --> the XML data is:\n\n%s\n\n", globals.LogTag, spew.Sdump(xmlEncodeBuffer))            
+                globals.Dbg.PrintfInfo("%s [encode] --> XML buffer pointer 0x%08x, used %d, left %d:.\n", globals.LogTag, *ppXmlBuffer, C.uint32_t(len(xmlEncodeBuffer)) - xmlBufferLen, xmlBufferLen)
+            } else {
+                return errors.New("No downlink message channel available to enqueue the encoded message.\n"), 0, RESPONSE_NONE    
+            }                
         }                       
         
-           return nil, int(byteCount), responseId
+        return nil, int(byteCount), responseId
     }
     
-    return errors.New("No downlink message channel available to enqueue the encoded message.\n"), 0, RESPONSE_NONE
+    return nil, 0, RESPONSE_NONE
 }
 
 /* End Of File */

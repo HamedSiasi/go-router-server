@@ -18,6 +18,7 @@ import (
     "github.com/streadway/amqp"
     "time"
     "github.com/robmeades/utm/service/globals"
+    "errors"
 )
 
 // Generic struct describing an AMQP message
@@ -47,8 +48,8 @@ type AmqpErrorMessage struct {
 type Queue struct {
     Conn     *amqp.Connection
     Quit     chan interface{}
-    Msgs     chan interface{}
-    Downlink chan AmqpMessage
+    UlAmqpMsgs   chan interface{}
+    DlAmqpMsgs   chan AmqpMessage
 }
 
 
@@ -71,14 +72,17 @@ func consumeQueue(channel *amqp.Channel, chanName string) (<-chan amqp.Delivery,
     return msgChan, nil
 }
 
-/// Open an AMQP and loop around UL and DL message processing.
+/// Open the necessary AMQP channels and create structured
+// channels to pass data up and down throught the channels,
+// then set off two Go routines that loop around UL and DL
+// message processing.
 // Note that the UL and DL message processing is in separate loops,
 // otherwise they can block each other.
 func OpenQueue(username, amqpAddress string) (*Queue, error) {
     q := Queue{}
     q.Quit = make(chan interface{})
-    q.Msgs = make(chan interface{})
-    q.Downlink = make(chan AmqpMessage)
+    q.UlAmqpMsgs = make(chan interface{})
+    q.DlAmqpMsgs = make(chan AmqpMessage)
 
     Conn, err := amqp.Dial(amqpAddress)
     if err != nil {
@@ -91,12 +95,16 @@ func OpenQueue(username, amqpAddress string) (*Queue, error) {
         q.Close()
         return nil, err
     }
-
+    
+    // This is an actual Go chanel, the uplink AMQP channel
     responseChan, err := consumeQueue(channel, username+".response")
     if err != nil {
         q.Close()
         return nil, err
     }
+    
+    // No-one seems to know what this is for but you apparently
+    // have to consume it
     errorChan, err := consumeQueue(channel, username+".error")
     if err != nil {
         q.Close()
@@ -106,42 +114,45 @@ func OpenQueue(username, amqpAddress string) (*Queue, error) {
     // Uplink loop
     go func() {
         defer func() {
-            // Close the downlinkMessages channel when
-            //the AMQP handler is closed down and set it to nil
-            downlinkMessages = nil
-            close(q.Downlink)
-            //amqpSession.Close()
+            // Close the downlink message channel when
+            // the AMQP handler is closed down and set it to nil
+            DlMsgs = nil
+            close(q.DlAmqpMsgs)
         }()
         
         // Continually process AMQP UL messages until commanded to Quit
         for {
             var msg amqp.Delivery
-            var ok bool
+            var isOpen bool
             receivedMsg := false
             globals.Dbg.PrintfTrace("%s [amqp] --> AMQP waiting for UL stimulus.\n", globals.LogTag)
             select {
-                case <-q.Quit: {
-                    globals.Dbg.PrintfTrace("%s [amqp] --> AMQP UL quitting.\n", globals.LogTag)
+                case <-q.Quit:
+                {
+                    globals.Dbg.PrintfTrace("%s [amqp] --> AMQP UL quitting...\n", globals.LogTag)
                     return
                 }    
-                case msg, ok = <-responseChan: {
-                    if (ok) {
+                case msg, isOpen = <-responseChan:
+                {
+                    if (isOpen) {
                         receivedMsg = true
                         m := AmqpResponseMessage{}
                         err = json.Unmarshal(msg.Body, &m)
                         if err == nil {
                             globals.Dbg.PrintfTrace("%s [amqp] --> UTM UUID is %+v.\n", globals.LogTag, m.DeviceUuid)
                             globals.Dbg.PrintfTrace("%s [amqp] --> UTM name is \"%+v\".\n", globals.LogTag, m.DeviceName)
-                            q.Msgs <- &m
+                            q.UlAmqpMsgs <- &m
                         }    
                     } else {
-                        globals.Dbg.PrintfTrace("%s [amqp] --> responseChan got a NOT OK thing, returning.\n", globals.LogTag)
-                        time.Sleep(time.Second)
-                        // TODO let's see if it recovers (was return)
+                        globals.Dbg.PrintfTrace("%s [amqp] --> responseChan has closed on us, returning...\n", globals.LogTag)
+                        // Send error on the channel so that things above us can clear up
+                        q.UlAmqpMsgs <- errors.New("AMQP response channel has closed.\n")
+                        return
                     }
                 }    
-                case msg, ok = <-errorChan: {
-                    if (ok) {
+                case msg, isOpen = <-errorChan:
+                {
+                    if (isOpen) {
                         receivedMsg = true
                         globals.Dbg.PrintfTrace("%s [amqp] --> AMQP error channel says %v.\n", globals.LogTag, msg)
                         m := AmqpErrorMessage{}
@@ -150,9 +161,10 @@ func OpenQueue(username, amqpAddress string) (*Queue, error) {
                             globals.Dbg.PrintfTrace("%s--> error is %v.\n", globals.LogTag, m)
                         }
                     } else {
-                        globals.Dbg.PrintfTrace("%s [amqp] --> errorChan got a NOT OK thing, returning.\n", globals.LogTag)
-                        time.Sleep(time.Second)
-                        // TODO let's see if it recovers (was return)                        
+                        globals.Dbg.PrintfTrace("%s [amqp] --> errorChan has closed on us, returning...\n", globals.LogTag)
+                        // Send error on the channel so that things above us can clear up
+                        q.UlAmqpMsgs <- errors.New("AMQP error channel has closed.\n")
+                        return                        
                     }                        
                 }
             }
@@ -169,35 +181,38 @@ func OpenQueue(username, amqpAddress string) (*Queue, error) {
     
     // Downlink loop
     go func() {        
-        // Continually process DL AMQP Uplink messages until commanded to Quit
+        // Continually process AMQP DL messages until commanded to Quit
         for {
             globals.Dbg.PrintfTrace("%s [amqp] --> AMQP waiting for DL stimulus.\n", globals.LogTag)
             select {
-                case <-q.Quit: {
+                case <-q.Quit:
+                {
                     globals.Dbg.PrintfTrace("%s [amqp] --> AMQP DL loop quitting.\n", globals.LogTag)
                     return
                 }    
-                case dlMsg, ok := <-q.Downlink: {
-                    if (!ok) {
-                        globals.Dbg.PrintfTrace("%s [amqp] --> q.Downlink got a NOT OK thing, returning.\n", globals.LogTag)
-                        return
-                    }
-                    serialisedData, err := json.Marshal(dlMsg)
-                    if err != nil {
-                        globals.Dbg.PrintfError("%s [amqp] --> attempting to JSONify DL AMQP message:\n\n%+v\n\n...results in error: \"%s\".\n", globals.LogTag, dlMsg, err.Error())
-                    } else {
-                        publishedMsg := amqp.Publishing{
-                            DeliveryMode: amqp.Persistent,
-                            Timestamp:    time.Now(),
-                            ContentType:  "application/json",
-                            Body:         serialisedData,
-                        }
-                        err = channel.Publish(username, "send", false, false, publishedMsg)
+                case dlMsg, isOpen := <-q.DlAmqpMsgs:
+                {
+                    if (isOpen) {
+                        serialisedData, err := json.Marshal(dlMsg)
                         if err != nil {
-                            globals.Dbg.PrintfError("%s [amqp] --> unable to publish DL message:\n\n%+v\n\n...due to error: \"%s\".\n", globals.LogTag, publishedMsg, err.Error())
+                            globals.Dbg.PrintfError("%s [amqp] --> attempting to JSONify DL AMQP message:\n\n%+v\n\n...results in error: \"%s\".\n", globals.LogTag, dlMsg, err.Error())
                         } else {
-                            globals.Dbg.PrintfTrace("%s [amqp] --> published DL message:\n\n%+v\n\n%s\n", globals.LogTag, publishedMsg, string(serialisedData))
+                            publishedMsg := amqp.Publishing{
+                                DeliveryMode: amqp.Persistent,
+                                Timestamp:    time.Now(),
+                                ContentType:  "application/json",
+                                Body:         serialisedData,
+                            }
+                            err = channel.Publish(username, "send", false, false, publishedMsg)
+                            if err != nil {
+                                globals.Dbg.PrintfError("%s [amqp] --> unable to publish DL message:\n\n%+v\n\n...due to error: \"%s\".\n", globals.LogTag, publishedMsg, err.Error())
+                            } else {
+                                globals.Dbg.PrintfTrace("%s [amqp] --> published DL message:\n\n%+v\n\n%s\n", globals.LogTag, publishedMsg, string(serialisedData))
+                            }
                         }
+                    } else {
+                        globals.Dbg.PrintfTrace("%s [amqp] --> the downlink channel has closed on us, returning...\n", globals.LogTag)
+                        return
                     }
                 }    
             }            
@@ -207,8 +222,8 @@ func OpenQueue(username, amqpAddress string) (*Queue, error) {
     return &q, nil
 }
 
+/// Close the AMQP connection
 func (q *Queue) Close() {
-    // FIXME: maybe dont need a Quit chan... can get EOF info from AMQP chans somehow.
     q.Conn.Close()
     close(q.Quit)
 }

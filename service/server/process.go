@@ -66,7 +66,9 @@ var processMsgsChannel chan<- interface{}
 var totalsEncodeState TotalsState
 
 // Keep track of expected responses
+// Note: this is 
 var deviceExpectedMsgList map[string]*[]ExpectedMsg
+
 //--------------------------------------------------------------------
 // Functions
 //--------------------------------------------------------------------
@@ -116,10 +118,28 @@ func operateProcess() {
     deviceEncodeStateList := make(map[string]*DeviceTotalsState)        
     channel := make(chan interface{})
     processMsgsChannel = channel
+    deviceExpectedMsgList = make(map[string]*[]ExpectedMsg)
+    removeOldExpectedMsgs := time.NewTicker(time.Minute * 10)
     checkExpectedMsgList := time.NewTicker (time.Minute)
     
     globals.Dbg.PrintfTrace("%s [process] --> channel created and now being serviced.\n", globals.LogTag)
     
+    // Remove old stuff from the expected message list on a tick
+    go func() {
+        for _ = range removeOldExpectedMsgs.C {
+            for uuid, expectedMsgList := range deviceExpectedMsgList {
+                var x = 0
+                for x < len(*expectedMsgList) {
+                    if time.Now().After((*expectedMsgList)[x].TimeStarted.Add(time.Hour)) {
+                        globals.Dbg.PrintfTrace("%s [server] --> giving up after waiting > 1 hour for %d from device %s.\n", globals.LogTag, (*expectedMsgList)[x].ResponseId, uuid)
+                        *expectedMsgList = append((*expectedMsgList)[:x], (*expectedMsgList)[x+1:]...)
+                    }
+                    x++
+                }
+            }
+        }
+    }()
+
     // Deal with at least one expected message from each device that might be old now
     go func() {
         for _ = range checkExpectedMsgList.C {

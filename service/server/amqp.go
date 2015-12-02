@@ -120,35 +120,41 @@ func OpenQueue(username, amqpAddress string) (*Queue, error) {
             receivedMsg := false
             globals.Dbg.PrintfTrace("%s [amqp] --> AMQP waiting for UL stimulus.\n", globals.LogTag)
             select {
-                case <-q.Quit:
+                case <-q.Quit: {
                     globals.Dbg.PrintfTrace("%s [amqp] --> AMQP UL quitting.\n", globals.LogTag)
                     return
-                case msg, ok = <-responseChan:
-                    if (!ok) {
+                }    
+                case msg, ok = <-responseChan: {
+                    if (ok) {
+                        receivedMsg = true
+                        m := AmqpResponseMessage{}
+                        err = json.Unmarshal(msg.Body, &m)
+                        if err == nil {
+                            globals.Dbg.PrintfTrace("%s [amqp] --> UTM UUID is %+v.\n", globals.LogTag, m.DeviceUuid)
+                            globals.Dbg.PrintfTrace("%s [amqp] --> UTM name is \"%+v\".\n", globals.LogTag, m.DeviceName)
+                            q.Msgs <- &m
+                        }    
+                    } else {
                         globals.Dbg.PrintfTrace("%s [amqp] --> responseChan got a NOT OK thing, returning.\n", globals.LogTag)
+                        time.Sleep(time.Second)
                         // TODO let's see if it recovers (was return)
                     }
-                    receivedMsg = true
-                    m := AmqpResponseMessage{}
-                    err = json.Unmarshal(msg.Body, &m)
-                    if err == nil {
-                        globals.Dbg.PrintfTrace("%s [amqp] --> UTM UUID is %+v.\n", globals.LogTag, m.DeviceUuid)
-                        globals.Dbg.PrintfTrace("%s [amqp] --> UTM name is \"%+v\".\n", globals.LogTag, m.DeviceName)
-                        q.Msgs <- &m
-                    }
-                case msg, ok = <-errorChan:
-                    if (!ok) {
+                }    
+                case msg, ok = <-errorChan: {
+                    if (ok) {
+                        receivedMsg = true
+                        globals.Dbg.PrintfTrace("%s [amqp] --> AMQP error channel says %v.\n", globals.LogTag, msg)
+                        m := AmqpErrorMessage{}
+                        err = json.Unmarshal(msg.Body, &m)
+                        if err == nil {
+                            globals.Dbg.PrintfTrace("%s--> error is %v.\n", globals.LogTag, m)
+                        }
+                    } else {
                         globals.Dbg.PrintfTrace("%s [amqp] --> errorChan got a NOT OK thing, returning.\n", globals.LogTag)
-                        // TODO let's see if it recovers (was return)
-                    }
-                    receivedMsg = true
-                    globals.Dbg.PrintfTrace("%s [amqp] --> AMQP error channel says %v.\n", globals.LogTag, msg)
-                    m := AmqpErrorMessage{}
-                    err = json.Unmarshal(msg.Body, &m)
-                    if err == nil {
-                        globals.Dbg.PrintfTrace("%s--> error is %v.\n", globals.LogTag, m)
-                    }
-                        
+                        time.Sleep(time.Second)
+                        // TODO let's see if it recovers (was return)                        
+                    }                        
+                }
             }
             
             if receivedMsg {
@@ -167,10 +173,11 @@ func OpenQueue(username, amqpAddress string) (*Queue, error) {
         for {
             globals.Dbg.PrintfTrace("%s [amqp] --> AMQP waiting for DL stimulus.\n", globals.LogTag)
             select {
-                case <-q.Quit:
+                case <-q.Quit: {
                     globals.Dbg.PrintfTrace("%s [amqp] --> AMQP DL loop quitting.\n", globals.LogTag)
                     return
-                case dlMsg, ok := <-q.Downlink:
+                }    
+                case dlMsg, ok := <-q.Downlink: {
                     if (!ok) {
                         globals.Dbg.PrintfTrace("%s [amqp] --> q.Downlink got a NOT OK thing, returning.\n", globals.LogTag)
                         return
@@ -192,6 +199,7 @@ func OpenQueue(username, amqpAddress string) (*Queue, error) {
                             globals.Dbg.PrintfTrace("%s [amqp] --> published DL message:\n\n%+v\n\n%s\n", globals.LogTag, publishedMsg, string(serialisedData))
                         }
                     }
+                }    
             }            
         }
     }()

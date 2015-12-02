@@ -15,12 +15,10 @@ package server
 import (
     "fmt"
     "github.com/brettlangdon/forge"
-    //"github.com/gorilla/mux"
     "github.com/robmeades/utm/service/globals"
     "github.com/robmeades/utm/service/utilities"
     "log"
     "net/http"
-    //"os"
     "github.com/codegangsta/negroni"
     "github.com/goincremental/negroni-sessions"
     "github.com/goincremental/negroni-sessions/cookiestore"

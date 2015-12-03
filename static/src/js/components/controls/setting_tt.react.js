@@ -23,6 +23,7 @@ var ValueTTUlLenDatagram = require('./value_tt_ul_len_datagram.react');
 var ValueTTDlNumDatagrams = require('./value_tt_dl_num_datagrams.react');
 var ValueTTDlLenDatagram = require('./value_tt_dl_len_datagram.react');
 var ValueTTTimeout = require('./value_tt_timeout.react');
+var ValueTTDlInterval = require('./value_tt_dl_interval.react');
 var SetTTParameters = require('./set_tt_parameters.react');
 var SetTTStart = require('./set_tt_start.react');
 var SetTTStop = require('./set_tt_stop.react');
@@ -54,7 +55,9 @@ var SettingTT = React.createClass({
                     <tr >
                         <td>Timeout (secs):</td>
                         <td><ValueTTTimeout /></td>
-                        <td colSpan={2}><SetTTParameters Names={this.props.Names} UuidMap = {this.props.UuidMap} /></td> 
+                        <td>Dl Gap (secs):</td>
+                        <td><ValueTTDlInterval /></td>
+                        <td><SetTTParameters Names={this.props.Names} UuidMap = {this.props.UuidMap} /></td> 
                     </tr>
                 </table>
             </div>

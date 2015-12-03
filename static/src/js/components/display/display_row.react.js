@@ -21,6 +21,7 @@ var React = require('react');
 var ValueUuidSelected = require('../controls/value_uuid_selected.react');
 var Connected = require('../controls/value_connected.react');
 var AppActions = require('../../actions/app_actions.js');
+var Moment = require('moment');
 var Link = require('react-router-component').Link;
 
 var DisplayRow = React.createClass({
@@ -62,12 +63,12 @@ var DisplayRow = React.createClass({
                         <td style={{width: 170}}>
                             <b>Msgs:</b> {device["TotalUlMsgs"]}<br />
                             <b>Bytes:</b> {device["TotalUlBytes"]}<br />
-                            <b>Last Msg:</b> {device["LastUlMsgTime"]}
+                            <b>Last Msg:</b> {Moment.utc(Date.parse(device["LastUlMsgTime"])).format("YYYY-MM-DD HH:mm:ss")}
                         </td>
                         <td style={{width: 170}}>
                             <b>Msgs:</b> {device["TotalDlMsgs"]}<br />
                             <b>Bytes:</b> {device["TotalDlBytes"]}<br />
-                            <b>Last Msg:</b> {device["LastDlMsgTime"]}
+                            <b>Last Msg:</b> {Moment.utc(Date.parse(device["LastDlMsgTime"])).format("YYYY-MM-DD HH:mm:ss")}
                         </td>
                         <td style={{width: 80}}>
                             <i className="fa fa-signal" /> {device["Rsrp"]} dBm<br />

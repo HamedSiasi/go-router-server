@@ -13,7 +13,8 @@
     "react-router": "^1.0.0",
     "react-router-component": "^0.25.1",
     "reactify": "^1.1.1",
-    "vinyl-source-stream": "^1.1.0"
+    "vinyl-source-stream": "^1.1.0",
+    "moment": "^2.10.6"
   },
   "devDependencies": {},
   "scripts": {

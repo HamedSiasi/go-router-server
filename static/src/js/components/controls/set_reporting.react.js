@@ -18,7 +18,7 @@
  */
 
 var React = require('react');
-var MakeLiNameList = require('../utilities/utilities.react')
+var MakeLiNameList = require('../utilities/make_li_name_list.react')
 
 var SetReporting = React.createClass({
     render:function(){

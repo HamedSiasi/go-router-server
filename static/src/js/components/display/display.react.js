@@ -20,6 +20,7 @@
 var React = require('react');
 var Settings = require('../panels/settings.react')
 var DisplayRow = require('./display_row.react')
+var Summary = require('../panels/summary.react')
 var Link = require('react-router-component').Link
 
 var Display = React.createClass({
@@ -49,7 +50,7 @@ var Display = React.createClass({
             <div>
                 <br />
                 <Settings DeviceData = {this.state.data["DeviceData"]} />  
-                Note: all times are UTC.
+                <Summary SummaryData = {this.state.data["SummaryData"]} />  
                 <DisplayRow DeviceData = {this.state.data["DeviceData"]} />  
             </div>
         );

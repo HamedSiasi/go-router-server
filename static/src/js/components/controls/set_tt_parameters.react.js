@@ -18,13 +18,13 @@
  */
 
 var React = require('react');
-var MakeLiNameList = require('../utilities/utilities.react')
+var MakeLiNameList = require('../utilities/make_li_name_list.react')
 
 var SetTTParameters = React.createClass({
       render: function() {
         return (
             <div className="btn-group">
-                <button type="button" className="btn btn-info" style={{width: 165, height: 30, marginTop: 10}}>Send Parameters</button>
+                <button type="button" className="btn btn-info" style={{width: 170, height: 30, marginTop: 10}}>Send Parameters</button>
                 <button type="button" className="btn btn-info dropdown-toggle" data-toggle="dropdown" style={{height: 30, marginTop: 10}} >
                     <span className="caret" />
                 </button>

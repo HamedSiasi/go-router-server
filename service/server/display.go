@@ -103,15 +103,27 @@ func displayFrontPageData () *FrontPageData {
             if deviceState.LatestTrafficVolumeData.UlTotals != nil {
                 data.SummaryData.TotalUlMsgs = deviceState.LatestTrafficVolumeData.UlTotals.Msgs
                 data.SummaryData.TotalUlBytes = deviceState.LatestTrafficVolumeData.UlTotals.Bytes
-                if data.SummaryData.TotalUlMsgs > 0 { 
-                    data.SummaryData.LastUlMsgTime = &deviceState.LatestTrafficVolumeData.UlTotals.Timestamp
+                if data.SummaryData.TotalUlMsgs > 0 {
+                    if data.SummaryData.LastUlMsgTime != nil {
+                        if deviceState.LatestTrafficVolumeData.UlTotals.Timestamp.After(*data.SummaryData.LastUlMsgTime) {
+                            data.SummaryData.LastUlMsgTime = &deviceState.LatestTrafficVolumeData.UlTotals.Timestamp
+                        }
+                    } else {
+                        data.SummaryData.LastUlMsgTime = &deviceState.LatestTrafficVolumeData.UlTotals.Timestamp
+                    }
                 }    
             }
             if deviceState.LatestTrafficVolumeData.DlTotals != nil {
                 data.SummaryData.TotalDlMsgs = deviceState.LatestTrafficVolumeData.DlTotals.Msgs
                 data.SummaryData.TotalDlBytes = deviceState.LatestTrafficVolumeData.DlTotals.Bytes
                 if data.SummaryData.TotalDlMsgs > 0 { 
-                    data.SummaryData.LastDlMsgTime = &deviceState.LatestTrafficVolumeData.DlTotals.Timestamp
+                    if data.SummaryData.LastDlMsgTime != nil {
+                        if deviceState.LatestTrafficVolumeData.DlTotals.Timestamp.After(*data.SummaryData.LastDlMsgTime) {
+                            data.SummaryData.LastDlMsgTime = &deviceState.LatestTrafficVolumeData.DlTotals.Timestamp
+                        }
+                    } else {
+                        data.SummaryData.LastDlMsgTime = &deviceState.LatestTrafficVolumeData.DlTotals.Timestamp
+                    }
                 }    
             }    
         }

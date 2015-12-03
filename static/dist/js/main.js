@@ -26789,12 +26789,12 @@ var DisplayRow = React.createClass({displayName: "DisplayRow",
                         React.createElement("td", {style: {width: 170}}, 
                             React.createElement("b", null, "Msgs:"), " ", device["TotalUlMsgs"], React.createElement("br", null), 
                             React.createElement("b", null, "Bytes:"), " ", device["TotalUlBytes"], React.createElement("br", null), 
-                            React.createElement("b", null, "Last Msg:"), " ", Moment.utc(Date.parse(device["LastUlMsgTime"])).format("YYYY-MM-DD HH:mm:ss")
+                            React.createElement("b", null, "Last Msg:"), " ", Moment.utc(Date.parse(device["LastUlMsgTime"])).local().format("YYYY-MM-DD HH:mm:ss")
                         ), 
                         React.createElement("td", {style: {width: 170}}, 
                             React.createElement("b", null, "Msgs:"), " ", device["TotalDlMsgs"], React.createElement("br", null), 
                             React.createElement("b", null, "Bytes:"), " ", device["TotalDlBytes"], React.createElement("br", null), 
-                            React.createElement("b", null, "Last Msg:"), " ", Moment.utc(Date.parse(device["LastDlMsgTime"])).format("YYYY-MM-DD HH:mm:ss")
+                            React.createElement("b", null, "Last Msg:"), " ", Moment.utc(Date.parse(device["LastDlMsgTime"])).local().format("YYYY-MM-DD HH:mm:ss")
                         ), 
                         React.createElement("td", {style: {width: 80}}, 
                             React.createElement("i", {className: "fa fa-signal"}), " ", device["Rsrp"], " dBm", React.createElement("br", null), 

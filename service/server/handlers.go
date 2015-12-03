@@ -112,13 +112,17 @@ func GetFrontPageData(response http.ResponseWriter, request *http.Request) *glob
     err := utilities.ValidateGetRequest(request)
     if err == nil {
         displayData := displayFrontPageData()
-        // Send the requested data
-        response.Header().Set("Content-Type", "application/json")
-        response.WriteHeader(http.StatusOK)
-        err := json.NewEncoder(response).Encode(displayData)
-        if err != nil {
-            globals.Dbg.PrintfError("%s [handler] --> received REST request %s but attempting to serialise the result:\n%s\n...yielded error %s.\n", globals.LogTag, request.URL, spew.Sdump(displayData), err.Error())
-            return utilities.ServerError(err)
+        if displayData != nil {
+            // Send the requested data
+            response.Header().Set("Content-Type", "application/json")
+            response.WriteHeader(http.StatusOK)
+            err := json.NewEncoder(response).Encode(displayData)
+            if err != nil {
+                globals.Dbg.PrintfError("%s [handler] --> received REST request %s but attempting to serialise the result:\n%s\n...yielded error %s.\n", globals.LogTag, request.URL, spew.Sdump(displayData), err.Error())
+                return utilities.ServerError(err)
+            }
+        } else {
+            return utilities.ServerError(err)            
         }
     }
 

@@ -384,7 +384,7 @@ func operateProcess() {
                             for _, expectedMsg := range *expectedMsgList {
                                 *state.ExpectedMsgList = append(*state.ExpectedMsgList, expectedMsg)
                             }
-                        }    
+                        }
                         value.State <- state
                         globals.Dbg.PrintfTrace("%s [process] --> provided encode state.\n", globals.LogTag)
                     } else {

@@ -73,81 +73,83 @@ func displayFrontPageData () *FrontPageData {
     // channel into the variable state.  All of these things are of type []LatestState.
     get := make(chan []LatestState)
     dataTableChannel <- &get
-    allDevicesState := <- get
+    allDevicesState, isOpen := <- get
     
-    for _, deviceState := range allDevicesState {
-        
-        data.SummaryData.DevicesKnown++;
-        deviceData.Uuid             = deviceState.DeviceUuid
-        deviceData.DeviceName       = deviceState.DeviceName
-        deviceData.Connected        = deviceState.Connected
-        if (deviceData.Connected) {
-            data.SummaryData.DevicesConnected++
-        }    
-        if deviceState.LatestActivityReportData != nil {
-            deviceData.UpDuration       = makeNiceDurationStringFromSeconds(deviceState.LatestActivityReportData.UpTimeSeconds)
-        }    
-        if deviceState.LatestInterest != nil {
-            deviceData.Interesting = &deviceState.LatestInterest.Timestamp
-        }
-        if deviceState.LatestModeData != nil {
-            deviceData.Mode             = deviceState.LatestModeData.Mode
-        }    
-        if deviceState.LatestTrafficVolumeData != nil {
-            deviceData.TotalUlMsgs      = deviceState.LatestTrafficVolumeData.UlMsgs
-            deviceData.TotalUlBytes     = deviceState.LatestTrafficVolumeData.UlBytes
-            deviceData.LastUlMsgTime = &deviceState.LatestTrafficVolumeData.LastUlMsgTime
-            deviceData.TotalDlMsgs      = deviceState.LatestTrafficVolumeData.DlMsgs
-            deviceData.TotalDlBytes     = deviceState.LatestTrafficVolumeData.DlBytes
-            deviceData.LastDlMsgTime = &deviceState.LatestTrafficVolumeData.LastDlMsgTime
-            if deviceState.LatestTrafficVolumeData.UlTotals != nil {
-                data.SummaryData.TotalUlMsgs = deviceState.LatestTrafficVolumeData.UlTotals.Msgs
-                data.SummaryData.TotalUlBytes = deviceState.LatestTrafficVolumeData.UlTotals.Bytes
-                if data.SummaryData.TotalUlMsgs > 0 {
-                    if data.SummaryData.LastUlMsgTime != nil {
-                        if deviceState.LatestTrafficVolumeData.UlTotals.Timestamp.After(*data.SummaryData.LastUlMsgTime) {
+    if isOpen {        
+        for _, deviceState := range allDevicesState {
+            
+            data.SummaryData.DevicesKnown++;
+            deviceData.Uuid             = deviceState.DeviceUuid
+            deviceData.DeviceName       = deviceState.DeviceName
+            deviceData.Connected        = deviceState.Connected
+            if (deviceData.Connected) {
+                data.SummaryData.DevicesConnected++
+            }    
+            if deviceState.LatestActivityReportData != nil {
+                deviceData.UpDuration       = makeNiceDurationStringFromSeconds(deviceState.LatestActivityReportData.UpTimeSeconds)
+            }    
+            if deviceState.LatestInterest != nil {
+                deviceData.Interesting = &deviceState.LatestInterest.Timestamp
+            }
+            if deviceState.LatestModeData != nil {
+                deviceData.Mode             = deviceState.LatestModeData.Mode
+            }    
+            if deviceState.LatestTrafficVolumeData != nil {
+                deviceData.TotalUlMsgs      = deviceState.LatestTrafficVolumeData.UlMsgs
+                deviceData.TotalUlBytes     = deviceState.LatestTrafficVolumeData.UlBytes
+                deviceData.LastUlMsgTime = &deviceState.LatestTrafficVolumeData.LastUlMsgTime
+                deviceData.TotalDlMsgs      = deviceState.LatestTrafficVolumeData.DlMsgs
+                deviceData.TotalDlBytes     = deviceState.LatestTrafficVolumeData.DlBytes
+                deviceData.LastDlMsgTime = &deviceState.LatestTrafficVolumeData.LastDlMsgTime
+                if deviceState.LatestTrafficVolumeData.UlTotals != nil {
+                    data.SummaryData.TotalUlMsgs = deviceState.LatestTrafficVolumeData.UlTotals.Msgs
+                    data.SummaryData.TotalUlBytes = deviceState.LatestTrafficVolumeData.UlTotals.Bytes
+                    if data.SummaryData.TotalUlMsgs > 0 {
+                        if data.SummaryData.LastUlMsgTime != nil {
+                            if deviceState.LatestTrafficVolumeData.UlTotals.Timestamp.After(*data.SummaryData.LastUlMsgTime) {
+                                data.SummaryData.LastUlMsgTime = &deviceState.LatestTrafficVolumeData.UlTotals.Timestamp
+                            }
+                        } else {
                             data.SummaryData.LastUlMsgTime = &deviceState.LatestTrafficVolumeData.UlTotals.Timestamp
                         }
-                    } else {
-                        data.SummaryData.LastUlMsgTime = &deviceState.LatestTrafficVolumeData.UlTotals.Timestamp
-                    }
-                }    
-            }
-            if deviceState.LatestTrafficVolumeData.DlTotals != nil {
-                data.SummaryData.TotalDlMsgs = deviceState.LatestTrafficVolumeData.DlTotals.Msgs
-                data.SummaryData.TotalDlBytes = deviceState.LatestTrafficVolumeData.DlTotals.Bytes
-                if data.SummaryData.TotalDlMsgs > 0 { 
-                    if data.SummaryData.LastDlMsgTime != nil {
-                        if deviceState.LatestTrafficVolumeData.DlTotals.Timestamp.After(*data.SummaryData.LastDlMsgTime) {
+                    }    
+                }
+                if deviceState.LatestTrafficVolumeData.DlTotals != nil {
+                    data.SummaryData.TotalDlMsgs = deviceState.LatestTrafficVolumeData.DlTotals.Msgs
+                    data.SummaryData.TotalDlBytes = deviceState.LatestTrafficVolumeData.DlTotals.Bytes
+                    if data.SummaryData.TotalDlMsgs > 0 { 
+                        if data.SummaryData.LastDlMsgTime != nil {
+                            if deviceState.LatestTrafficVolumeData.DlTotals.Timestamp.After(*data.SummaryData.LastDlMsgTime) {
+                                data.SummaryData.LastDlMsgTime = &deviceState.LatestTrafficVolumeData.DlTotals.Timestamp
+                            }
+                        } else {
                             data.SummaryData.LastDlMsgTime = &deviceState.LatestTrafficVolumeData.DlTotals.Timestamp
                         }
-                    } else {
-                        data.SummaryData.LastDlMsgTime = &deviceState.LatestTrafficVolumeData.DlTotals.Timestamp
-                    }
+                    }    
                 }    
-            }    
+            }
+            if deviceState.LatestSignalStrengthData != nil {
+                deviceData.Rsrp             = deviceState.LatestSignalStrengthData.RsrpDbm            
+            }
+            if deviceState.LatestUtmStatusData != nil {
+                deviceData.BatteryLevel     = deviceState.LatestUtmStatusData.EnergyLeft
+                deviceData.DiskSpaceLeft    = deviceState.LatestUtmStatusData.DiskSpaceLeft
+            }
+            if deviceState.LatestIntervalsData != nil {
+                deviceData.Reporting        = getReportingString (deviceState.LatestIntervalsData)
+                deviceData.Heartbeat        = getHeartbeatString (deviceState.LatestIntervalsData)
+            }
+            deviceData.NumExpectedMsgs = 0
+            if deviceState.LatestExpectedMsgData != nil && deviceState.LatestExpectedMsgData.ExpectedMsgList != nil {
+                deviceData.NumExpectedMsgs = len (*deviceState.LatestExpectedMsgData.ExpectedMsgList)
+                data.SummaryData.NumExpectedMsgs += deviceData.NumExpectedMsgs
+            }
+            data.DeviceData = append (data.DeviceData, deviceData)
         }
-        if deviceState.LatestSignalStrengthData != nil {
-            deviceData.Rsrp             = deviceState.LatestSignalStrengthData.RsrpDbm            
-        }
-        if deviceState.LatestUtmStatusData != nil {
-            deviceData.BatteryLevel     = deviceState.LatestUtmStatusData.EnergyLeft
-            deviceData.DiskSpaceLeft    = deviceState.LatestUtmStatusData.DiskSpaceLeft
-        }
-        if deviceState.LatestIntervalsData != nil {
-            deviceData.Reporting        = getReportingString (deviceState.LatestIntervalsData)
-            deviceData.Heartbeat        = getHeartbeatString (deviceState.LatestIntervalsData)
-        }
-        deviceData.NumExpectedMsgs = 0
-        if deviceState.LatestExpectedMsgData != nil && deviceState.LatestExpectedMsgData.ExpectedMsgList != nil {
-            deviceData.NumExpectedMsgs = len (*deviceState.LatestExpectedMsgData.ExpectedMsgList)
-            data.SummaryData.NumExpectedMsgs += deviceData.NumExpectedMsgs
-        }
-        data.DeviceData = append (data.DeviceData, deviceData)
+    
+        // And finally, sort the data by friendly name
+        sort.Sort(ByName(data.DeviceData))
     }
-
-    // And finally, sort the data by friendly name
-    sort.Sort(ByName(data.DeviceData))
     
     return &data
 }

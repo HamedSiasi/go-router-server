@@ -143,37 +143,43 @@ func processUlAmqpMsgs(q *Queue) {
                                 }
                                 get.State = make(chan DeviceTotalsState)
                                 processMsgsChannel <- get
-                                encodeState := <- get.State
-            
-                                // Send the datatable a message with connection
-                                // data for this device plus the totals for all
-                                ulTotals := TotalsState {
-                                    Timestamp:    totalsDecodeState.Timestamp,
-                                    Msgs:         totalsDecodeState.Msgs,
-                                    Bytes:        totalsDecodeState.Bytes,
-                                }
-                                dlTotals := TotalsState {
-                                    Timestamp:    encodeState.Timestamp,
-                                    Msgs:         encodeState.Totals.Msgs,
-                                    Bytes:        encodeState.Totals.Bytes,
-                                }
-                                dataTableChannel <- &Connection {
-                                    DeviceUuid:    value.DeviceUuid,
-                                    DeviceName:    value.DeviceName,
-                                    UlDevice: TotalsState {
-                                        Timestamp: decodeState.Timestamp,
-                                        Msgs:      decodeState.Msgs,
-                                        Bytes:     decodeState.Bytes,
-                                    },
-                                    DlDevice: TotalsState {
-                                        Timestamp: encodeState.Timestamp,
-                                        Msgs:      encodeState.Msgs,
-                                        Bytes:     encodeState.Bytes,
-                                    },
-                                    ExpectedMsgList: encodeState.ExpectedMsgList,
-                                    UlTotals:        &ulTotals, 
-                                    DlTotals:        &dlTotals,    
-                                }
+                                encodeState, isOpen := <- get.State
+                                
+                                // Only do this if the channel wasn't closed prematurely
+                                // (e.g. due to an unknown UE being requested, which might
+                                // happen if it's sending rubbish and so no messages
+                                // will have been decoded)
+                                if isOpen {
+                                    // Send the datatable a message with connection
+                                    // data for this device plus the totals for all
+                                    ulTotals := TotalsState {
+                                        Timestamp:    totalsDecodeState.Timestamp,
+                                        Msgs:         totalsDecodeState.Msgs,
+                                        Bytes:        totalsDecodeState.Bytes,
+                                    }
+                                    dlTotals := TotalsState {
+                                        Timestamp:    encodeState.Timestamp,
+                                        Msgs:         encodeState.Totals.Msgs,
+                                        Bytes:        encodeState.Totals.Bytes,
+                                    }
+                                    dataTableChannel <- &Connection {
+                                        DeviceUuid:    value.DeviceUuid,
+                                        DeviceName:    value.DeviceName,
+                                        UlDevice: TotalsState {
+                                            Timestamp: decodeState.Timestamp,
+                                            Msgs:      decodeState.Msgs,
+                                            Bytes:     decodeState.Bytes,
+                                        },
+                                        DlDevice: TotalsState {
+                                            Timestamp: encodeState.Timestamp,
+                                            Msgs:      encodeState.Msgs,
+                                            Bytes:     encodeState.Bytes,
+                                        },
+                                        ExpectedMsgList: encodeState.ExpectedMsgList,
+                                        UlTotals:        &ulTotals, 
+                                        DlTotals:        &dlTotals,    
+                                    }
+                                }    
                             }
                         } 
                         case *error:

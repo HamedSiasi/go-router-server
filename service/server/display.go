@@ -30,6 +30,7 @@ type FrontPageSummaryData struct {
     LastDlMsgTime      *time.Time `json:"LastDlMsgTime, omitempty"`
     DevicesKnown       int        `json:"DevicesKnown, omitempty"`
     DevicesConnected   int        `json:"DevicesConnected, omitempty"`
+    NumExpectedMsgs    int        `json:"NumExpectedMsgs, omitempty"`
 }
 
 type FrontPageDeviceData struct {
@@ -128,6 +129,7 @@ func displayFrontPageData () *FrontPageData {
         deviceData.NumExpectedMsgs = 0
         if deviceState.LatestExpectedMsgData != nil && deviceState.LatestExpectedMsgData.ExpectedMsgList != nil {
             deviceData.NumExpectedMsgs = len (*deviceState.LatestExpectedMsgData.ExpectedMsgList)
+            data.SummaryData.NumExpectedMsgs += deviceData.NumExpectedMsgs
         }
         data.DeviceData = append (data.DeviceData, deviceData)
     }

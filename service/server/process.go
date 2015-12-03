@@ -119,8 +119,7 @@ func operateProcess() {
     channel := make(chan interface{})
     processMsgsChannel = channel
     deviceExpectedMsgList = make(map[string]*[]ExpectedMsg)
-    removeOldExpectedMsgs := time.NewTicker(time.Minute * 10)
-    checkExpectedMsgList := time.NewTicker (time.Minute)
+    removeOldExpectedMsgs := time.NewTicker(time.Minute)
     
     globals.Dbg.PrintfTrace("%s [process] --> channel created and now being serviced.\n", globals.LogTag)
     
@@ -140,21 +139,6 @@ func operateProcess() {
         }
     }()
 
-    // Deal with at least one expected message from each device that might be old now
-    go func() {
-        for _ = range checkExpectedMsgList.C {
-            for uuid, list := range deviceExpectedMsgList {
-                for index, expectedMsg := range *list {
-                    if time.Now().After (expectedMsg.TimeStarted.Add(time.Minute * 10)) {
-                        globals.Dbg.PrintfTrace("%s [process] --> response ID %d from %s is too old now (started @ %s), deleting...\n", globals.LogTag, expectedMsg.ResponseId, uuid, expectedMsg.TimeStarted.String())
-                        *list = append((*list)[:index], (*list)[index + 1:] ...)
-                        break
-                    }    
-                }
-           }     
-        }
-    }()
-    
     // Process commands on the channel
     go func() {
         for cmd := range channel {

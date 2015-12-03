@@ -27060,8 +27060,9 @@ var Summary = React.createClass({displayName: "Summary",
             var lastUlTime = Moment.utc(Date.parse(summaryData["LastUlMsgTime"])).fromNow();
             var totalUlBytes = summaryData["TotalUlBytes"];
             var totalDlBytes = summaryData["TotalDlBytes"];
+            var numExpectedMsgs = summaryData["NumExpectedMsgs"];
             return (
-                React.createElement("p", {className: "align-right"}, "Summary: ", React.createElement("b", null, devicesConnected), " devices connected (", React.createElement("b", null, devicesKnown), " known), last uplink ", React.createElement("b", null, lastUlTime), ", ", React.createElement("b", null, totalUlBytes), " uplink bytes since server start, ", React.createElement("b", null, totalDlBytes), " downlink bytes since server start.")
+                React.createElement("p", {className: "align-right"}, "Summary: ", React.createElement("b", null, devicesConnected), " device(s) connected (", React.createElement("b", null, devicesKnown), " known), last uplink ", React.createElement("b", null, lastUlTime), ", ", React.createElement("b", null, totalUlBytes), " uplink byte(s) since server start, ", React.createElement("b", null, totalDlBytes), " downlink byte(s) since server start, ", React.createElement("b", null, numExpectedMsgs), " confirm(s) outstanding.")
             )
         } else {
             return (

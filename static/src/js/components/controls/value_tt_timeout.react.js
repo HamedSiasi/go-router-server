@@ -19,24 +19,57 @@
 
 var React = require('react');
 var AppConstants = require ('../../constants/app_limits');
+var AppActions = require('../../actions/app_actions.js');
+var AppConstants = require ('../../constants/app_limits')
+var AppStore = require('../../stores/app_store.js');
 
-var ValueTTTimeout = React.createClass({
+var ValueTtTimeout = React.createClass({
     getInitialState: function() {
+        AppActions.setTtTimeoutSeconds(AppConstants.TT_TIMEOUT_DEFAULT);
+        // Place this here until we decide to have a GUI item for it
+        AppActions.setTtNoReportsDuringTest(AppConstants.TT_NO_REPORTS_DURING_TEST_DEFAULT);
         return {value: AppConstants.TT_TIMEOUT_DEFAULT};
     },
 
+    componentDidMount: function() {
+        AppStore.addChangeListener(this.onChange);
+    },
+
+    componentWillUnmount: function() {
+        AppStore.removeChangeListener(this.onChange);
+    },
+
+    onChange: function() {
+        this.setState({value: AppStore.getTtParameters()["timeoutSeconds"]});
+    },
+
     handleChange: function(newValue) {
-        if ((newValue.target.value >= AppConstants.TT_TIMEOUT_MIN) && (newValue.target.value <= AppConstants.TT_TIMEOUT_MAX)) {
-            this.setState ({value: newValue.target.value});
+        this.setState ({value: newValue.target.valueAsNumber});
+    },
+
+    handleBlur: function(newValue) {
+	    var tmp = newValue.target.valueAsNumber;
+        if (!tmp) {
+    	    tmp = AppConstants.TT_TIMEOUT_MIN;
         }
+    
+        if (tmp < AppConstants.TT_TIMEOUT_MIN) {
+            tmp = AppConstants.TT_TIMEOUT_MIN;
+        }
+        if (tmp > AppConstants.TT_TIMEOUT_MAX) {
+    	    tmp = AppConstants.TT_TIMEOUT_MAX;
+        }
+    
+        this.setState ({value: tmp});
+        AppActions.setTtTimeoutSeconds(tmp);        	
     },
 
     render:function(){
         var value = this.state.value;
         return (
-            <input className="form-control bfh-number" type="number" min={AppConstants.TT_TIMEOUT_MIN} max={AppConstants.TT_TIMEOUT_MAX} value={value} step={60} onChange={this.handleChange} style={{width: 80, marginTop: 10}} />
+            <input className="form-control bfh-number" type="number" value={value} step={5}  onChange={this.handleChange} onClick={this.handleBlur} onBlur={this.handleBlur} style={{width: 80, marginTop: 10}} />
         );
     }
 });
 
-module.exports = ValueTTTimeout;
+module.exports = ValueTtTimeout;

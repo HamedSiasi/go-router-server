@@ -20,8 +20,11 @@ var EventEmitter = require('events').EventEmitter;
 
 var CHANGE_EVENT = 'change';
 
-//var _uuidsCheckedList = {"61d25940-5307-11e5-80a4-c549fb2d6313": "61d25940-5307-11e5-80a4-c549fb2d6313"}
 var _uuidsCheckedList = {};
+var _heartbeatSeconds;
+var _heartbeatSnapToRtc;
+var _reportingInterval;
+var _ttParameters = {};
 
 //------------------------------------------------------------
 // Private functions
@@ -37,6 +40,44 @@ function _setUuidUnchecked(uuid) {
     if (_uuidsCheckedList) {
    	    delete _uuidsCheckedList[uuid];
     }
+}
+
+// Store the heartbeat value
+function _storeHeartbeatSeconds(heartbeatSeconds) {
+	_heartbeatSeconds = heartbeatSeconds;
+}
+
+//Store the heartbeat snap-to-rtc value
+function _storeHeartbeatSnapToRtc(heartbeatSnapToRtc) {
+	_heartbeatSnapToRtc = heartbeatSnapToRtc;
+}
+
+//Store the reporting interval value
+function _storeReportingInterval(reportingInterval) {
+	_reportingInterval = reportingInterval;
+}
+
+//Store the traffic test parameters
+function _storeTtNumUlDatagrams(numUlDatagrams) {
+	_ttParameters["numUlDatagrams"] = numUlDatagrams;
+}
+function _storeTtLenUlDatagram(lenUlDatagram) {
+	_ttParameters["lenUlDatagram"] = lenUlDatagram;
+}
+function _storeTtNumDlDatagrams(numDlDatagrams) {
+	_ttParameters["numDlDatagrams"] = numDlDatagrams;
+}
+function _storeTtLenDlDatagram(lenDlDatagram) {
+	_ttParameters["lenDlDatagram"] = lenDlDatagram;
+}
+function _storeTtTimeoutSeconds(timeoutSeconds) {
+	_ttParameters["timeoutSeconds"] = timeoutSeconds;
+}
+function _storeTtNoReportsDuringTest(noReportsDuringTest) {
+	_ttParameters["noReportsDuringTest"] = noReportsDuringTest;
+}
+function _storeTtDlIntervalSeconds(dlIntervalSeconds) {
+	_ttParameters["dlIntervalSeconds"] = dlIntervalSeconds;
 }
 
 // TODO
@@ -115,6 +156,22 @@ var AppStore = assign(EventEmitter.prototype, {
     	return (_uuidsCheckedList[uuid] != null);
     },
 
+    getHeartbeatSeconds: function () {
+    	return _heartbeatSeconds;
+    },
+    
+    getHeartbeatSnapToRtc: function () {
+    	return _heartbeatSnapToRtc;
+    },
+    
+    getReportingInterval: function () {
+    	return _reportingInterval;
+    },
+    
+    getTtParameters: function () {
+    	return _ttParameters;
+    },
+    
     dispatcherIndex: AppDispatcher.register(function(payload) {
         var action = payload.action; // this is our action from handleViewAction
     
@@ -127,6 +184,36 @@ var AppStore = assign(EventEmitter.prototype, {
             break;
             case AppConstants.STORE_IS_UUID_CHECKED:
                 _isUuidUnchecked(action.uuid);
+            break;
+            case AppConstants.STORE_HEARTBEAT_SECONDS:
+                _storeHeartbeatSeconds(action.heartbeatSeconds);
+            break;
+            case AppConstants.STORE_HEARTBEAT_SNAP_TO_RTC:
+                _storeHeartbeatSnapToRtc(action.heartbeatSnapToRtc);
+            break;
+            case AppConstants.STORE_REPORTING_INTERVAL:
+                _storeReportingInterval(action.reportingInterval);
+            break;
+            case AppConstants.STORE_TT_NUM_UL_DATAGRAMS:
+                _storeTtNumUlDatagrams(action.numUlDatagrams);
+            break;
+            case AppConstants.STORE_TT_LEN_UL_DATAGRAM:
+                _storeTtLenUlDatagram(action.lenUlDatagram);
+            break;
+            case AppConstants.STORE_TT_NUM_DL_DATAGRAMS:
+                _storeTtNumDlDatagrams(action.numDlDatagrams);
+            break;
+            case AppConstants.STORE_TT_LEN_DL_DATAGRAM:
+                _storeTtLenDlDatagram(action.lenDlDatagram);
+            break;
+            case AppConstants.STORE_TT_TIMEOUT_SECONDS:
+                _storeTtTimeoutSeconds(action.timeoutSeconds);
+            break;
+            case AppConstants.STORE_TT_NO_REPORTS_DURING_TEST:
+                _storeTtNoReportsDuringTest(action.noReportsDuringTest);
+            break;
+            case AppConstants.STORE_TT_DL_INTERVAL_SECONDS:
+                _storeTtDlIntervalSeconds(action.dlIntervalSeconds);
             break;
              // Insert more things here
             default:

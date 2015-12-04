@@ -23,6 +23,24 @@ var DisplayRow = require('./display_row.react')
 var Summary = require('../panels/summary.react')
 var Link = require('react-router-component').Link
 
+function pollState(updateState) {
+    function pollLoop() {
+        var x = new XMLHttpRequest();
+        x.onreadystatechange = function() {
+            if (x.readyState == 4) {
+                if (x.status == 200) {
+                    var data = JSON.parse(x.responseText);
+                    updateState(data);
+                }
+                window.setTimeout(pollLoop, 1000);
+            }
+        };
+        x.open("GET", "frontPageData", true);
+        x.send();
+    }
+    pollLoop();
+}
+
 var Display = React.createClass({
     getInitialState: function(){   
         return {
@@ -56,23 +74,5 @@ var Display = React.createClass({
         );
     }
 });
-
-function pollState(updateState) {
-    function pollLoop() {
-        var x = new XMLHttpRequest();
-        x.onreadystatechange = function() {
-            if (x.readyState == 4) {
-                if (x.status == 200) {
-                    var data = JSON.parse(x.responseText);
-                    updateState(data);
-                }
-                window.setTimeout(pollLoop, 1000);
-            }
-        };
-        x.open("GET", "frontPageData", true);
-        x.send();
-    }
-    pollLoop();
-}
 
 module.exports = Display;

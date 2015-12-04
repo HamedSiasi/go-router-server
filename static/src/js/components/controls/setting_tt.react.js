@@ -18,17 +18,17 @@
  */
 
 var React = require('react');
-var ValueTTUlNumDatagrams = require('./value_tt_ul_num_datagrams.react');
-var ValueTTUlLenDatagram = require('./value_tt_ul_len_datagram.react');
-var ValueTTDlNumDatagrams = require('./value_tt_dl_num_datagrams.react');
-var ValueTTDlLenDatagram = require('./value_tt_dl_len_datagram.react');
-var ValueTTTimeout = require('./value_tt_timeout.react');
-var ValueTTDlInterval = require('./value_tt_dl_interval.react');
-var SetTTParameters = require('./set_tt_parameters.react');
-var SetTTStart = require('./set_tt_start.react');
-var SetTTStop = require('./set_tt_stop.react');
+var ValueTtNumUlDatagrams = require('./value_tt_ul_num_datagrams.react');
+var ValueTtLenUlDatagram = require('./value_tt_ul_len_datagram.react');
+var ValueTtNumDlDatagrams = require('./value_tt_dl_num_datagrams.react');
+var ValueTtLenDlDatagram = require('./value_tt_dl_len_datagram.react');
+var ValueTtTimeout = require('./value_tt_timeout.react');
+var ValueTtDlInterval = require('./value_tt_dl_interval.react');
+var SetTtParameters = require('./set_tt_parameters.react');
+var SetTtStart = require('./set_tt_start.react');
+var SetTtStop = require('./set_tt_stop.react');
 
-var SettingTT = React.createClass({
+var SettingTt = React.createClass({
     render: function() {
         return (
             <div >
@@ -40,24 +40,24 @@ var SettingTT = React.createClass({
                     </thead>
                     <tr style={{height: 50}}>
                         <td style={{width: 110}}>UL: Number:</td>
-                        <td style={{width: 100}}><ValueTTUlNumDatagrams /></td>
+                        <td style={{width: 100}}><ValueTtNumUlDatagrams /></td>
                         <td style={{width: 110}}>Length:</td>
-                        <td style={{width: 100}}><ValueTTUlLenDatagram /></td> 
-                        <td><SetTTStart Names={this.props.Names} UuidMap = {this.props.UuidMap} /></td>
+                        <td style={{width: 100}}><ValueTtLenUlDatagram /></td> 
+                        <td><SetTtStart Names={this.props.Names} UuidMap = {this.props.UuidMap} /></td>
                     </tr>
                     <tr >
                         <td>DL: Number:</td>
-                        <td><ValueTTDlNumDatagrams /></td>
+                        <td><ValueTtNumDlDatagrams /></td>
                         <td>Length:</td>
-                        <td><ValueTTDlLenDatagram /></td> 
-                        <td><SetTTStop Names={this.props.Names} UuidMap = {this.props.UuidMap} /></td> 
+                        <td><ValueTtLenDlDatagram /></td> 
+                        <td><SetTtStop Names={this.props.Names} UuidMap = {this.props.UuidMap} /></td> 
                     </tr>
                     <tr >
                         <td>Timeout (secs):</td>
-                        <td><ValueTTTimeout /></td>
-                        <td>Dl Gap (secs):</td>
-                        <td><ValueTTDlInterval /></td>
-                        <td><SetTTParameters Names={this.props.Names} UuidMap = {this.props.UuidMap} /></td> 
+                        <td><ValueTtTimeout /></td>
+                        <td>DL Gap (secs):</td>
+                        <td><ValueTtDlInterval /></td>
+                        <td><SetTtParameters Names={this.props.Names} UuidMap = {this.props.UuidMap} /></td> 
                     </tr>
                 </table>
             </div>
@@ -65,4 +65,4 @@ var SettingTT = React.createClass({
     }
 });
 
-module.exports = SettingTT;
+module.exports = SettingTt;

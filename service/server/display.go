@@ -15,6 +15,7 @@ package server
 import (
     "time"
     "sort"
+    "github.com/robmeades/utm/service/globals"
 )
 
 //--------------------------------------------------------------------
@@ -147,12 +148,28 @@ func displayFrontPageData () *FrontPageData {
             data.DeviceData = append (data.DeviceData, deviceData)
         }
     
-        // And finally, sort the data by friendly name
+        // And finally, sort the data by whether the device is connected or not and then by friendly name
+        sort.Sort(ByConnected(data.DeviceData))
         sort.Sort(ByName(data.DeviceData))
+        globals.Dbg.PrintfTrace("%s [display] --> Displaying this:\n\n%+v\n\n", globals.LogTag, data)
     }
     
     return &data
 }
+
+// Sort by Connected
+type ByConnected []FrontPageDeviceData
+
+func (u ByConnected) Len() int           { return len(u) }
+func (u ByConnected) Swap(i, j int)      { u[i], u[j] = u[j], u[i] }
+func (u ByConnected) Less(i, j int) bool { return BToI(u[i].Connected) < BToI(u[j].Connected) }
+
+func BToI(b bool) int {
+    if b {
+        return 1
+    }
+    return 0
+ }
 
 // Sort by name
 type ByName []FrontPageDeviceData

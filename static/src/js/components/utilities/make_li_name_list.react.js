@@ -17,12 +17,12 @@ var MakeLiUuidList = React.createClass({
         if ((this.props.Items != null) && (this.props.Items.length > 0)) {            
             this.props.Items.forEach(function(item, i) {
                 list.push(
-                    <li key={i}><a href="#">&nbsp;{item}&nbsp;</a></li>
+                    <li key={i}><a href="#" className="NoUnderline" >&nbsp;{item}&nbsp;</a></li>
                 );
         });
         } else {
             list.push(
-                <li key={Date.now()}><a href="#">&nbsp;Empty&nbsp;</a></li>  // Date.now{} as a random key
+                <li key={Date.now()}><a href="#" className="NoUnderline" >&nbsp;Empty&nbsp;</a></li>  // Date.now{} as a random key
             );
         }
 

@@ -46,7 +46,6 @@ var DisplayRow = React.createClass({
         var rows = [];
         if (this.props["DeviceData"] && (this.props["DeviceData"].length > 0)) {
             this.props["DeviceData"].forEach(function(device, i) {
-                // Retrieve the checked state here and pass it to ValueUuidSelected
                 rows.push(
                     <tr className="even gradeC" key={i}>
                         <td style={{textAlign: 'center', width: 15}}>

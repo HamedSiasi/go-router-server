@@ -560,6 +560,8 @@ func (value *DebugIndUlMsg) DeepCopy() *DebugIndUlMsg {
 }
 
 // TrafficTestModeParametersSetReqDlMsg
+// IMPORTANT if any changes are made here, match them
+// in the server version of the message over in sender.go
 type TrafficTestModeParametersSetReqDlMsg struct {
     NumUlDatagrams      uint32
     LenUlDatagram       uint32
@@ -584,6 +586,8 @@ func (value *TrafficTestModeParametersSetReqDlMsg) DeepCopy() *TrafficTestModePa
 }
 
 // TrafficTestModeParametersSetCnfUlMsg
+// IMPORTANT if any changes are made here, match them
+// in the server version of the message over in sender.go
 type TrafficTestModeParametersSetCnfUlMsg struct {
     NumUlDatagrams      uint32
     LenUlDatagram       uint32
@@ -613,6 +617,8 @@ type TrafficTestModeParametersGetReqDlMsg struct {
 }
 
 // TrafficTestModeParametersGetCnfUlMsg
+// IMPORTANT if any changes are made here, match them
+// in the server version of the message over in sender.go
 type TrafficTestModeParametersGetCnfUlMsg struct {
     NumUlDatagrams      uint32
     LenUlDatagram       uint32

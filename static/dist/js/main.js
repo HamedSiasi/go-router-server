@@ -25637,7 +25637,68 @@ var AppActions = {
             actionType: AppConstants.STORE_SET_UUID_UNCHECKED,
             uuid: uuid
         })
+    },
+    setHeartbeatSeconds: function(hearbeatSeconds) {
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.STORE_HEARTBEAT_SECONDS,
+            heartbeatSeconds: hearbeatSeconds
+        })
+    },
+    setHeartbeatSnapToRtc: function(hearbeatSnapToRtc) {
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.STORE_HEARTBEAT_SNAP_TO_RTC,
+            heartbeatSnapToRtc: hearbeatSnapToRtc
+        })
+    },
+    setReportingInterval: function(reportingInterval) {
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.STORE_REPORTING_INTERVAL,
+            reportingInterval: reportingInterval
+        })
+    },
+    setTtNumUlDatagrams: function(value) {
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.STORE_TT_NUM_UL_DATAGRAMS,
+            numUlDatagrams: value
+        })
+    },
+    setTtLenUlDatagram: function(value) {
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.STORE_TT_LEN_UL_DATAGRAM,
+            lenUlDatagram: value
+        })
+    },
+    setTtNumDlDatagrams: function(value) {
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.STORE_TT_NUM_DL_DATAGRAMS,
+            numDlDatagrams: value
+        })
+    },
+    setTtLenDlDatagram: function(value) {
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.STORE_TT_LEN_DL_DATAGRAM,
+            lenDlDatagram: value
+         })
+    },
+    setTtTimeoutSeconds: function(value) {
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.STORE_TT_TIMEOUT_SECONDS,
+            timeoutSeconds: value
+         })
+    },
+    setTtDlIntervalSeconds: function(value) {
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.STORE_TT_DL_INTERVAL_SECONDS,
+            dlIntervalSeconds: value
+         })
+    },
+    setTtNoReportsDuringTest: function(value) {
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.STORE_TT_NO_REPORTS_DURING_TEST,
+            noReportsDuringTest: value
+        })
     }
+
 }
 
 module.exports = AppActions;
@@ -25748,19 +25809,44 @@ module.exports = Template;
 
 var React = require('react');
 var MakeLiNameList = require('../utilities/make_li_name_list.react')
+var AppStore = require('../../stores/app_store.js');
 
 var GetIntervals = React.createClass({displayName: "GetIntervals",
+
+	sendAllMsg: function() {
+        var request = new XMLHttpRequest();
+        var uuidList = AppStore.getAllUuidsChecked();
+        
+        for (var name in this.props.UuidMap) {
+            if ((this.props.UuidMap.hasOwnProperty(name)) && (uuidList [this.props.UuidMap[name]])) {
+    	        var postData = "{\"device_uuid\": \"" + this.props.UuidMap[name] + "\", \"type\": \"SEND_INTERVALS_GET\", \"body\": {} }";
+
+                // What to do when the server response comes back
+                // Note this is not the device response, just the server
+                // HTTP confirm.
+                request.onload = function () {
+                    // TODO something here?
+                }
+                request.open("POST", "sendMsg", true);
+                request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+                // Actually sends the request to the server.
+                request.send(postData);
+            }
+        }
+    },
+
     render:function(){
         return (
               React.createElement("div", {className: "btn-group"}, 
-                  React.createElement("button", {type: "button", className: "btn btn-info", style: {width: 120, height: 30, marginTop: 10}}, 
+                  React.createElement("button", {type: "button", className: "btn btn-info", onClick: this.sendAllMsg, style: {width: 120, height: 30, marginTop: 10}}, 
                       "Get Intervals"
                   ), 
-                  React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle", "data-toggle": "dropdown", style: {height: 30, marginTop: 10}}, 
+                  React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle disabled", "data-toggle": "dropdown", style: {height: 30, marginTop: 10}}, 
                       React.createElement("span", {className: "caret"})
                   ), 
                   React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
-                    React.createElement(MakeLiNameList, {Items: this.props.Names})
+                      React.createElement(MakeLiNameList, {Items: this.props.Names})
                    )
               )
         );
@@ -25769,7 +25855,7 @@ var GetIntervals = React.createClass({displayName: "GetIntervals",
 
 module.exports = GetIntervals;
 
-},{"../utilities/make_li_name_list.react":221,"react":189}],194:[function(require,module,exports){
+},{"../../stores/app_store.js":226,"../utilities/make_li_name_list.react":221,"react":189}],194:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -25791,28 +25877,54 @@ module.exports = GetIntervals;
 
 var React = require('react');
 var MakeLiNameList = require('../utilities/make_li_name_list.react')
+var AppStore = require('../../stores/app_store.js');
 
 var GetPing = React.createClass({displayName: "GetPing",
+
+    sendAllMsg: function() {
+        var request = new XMLHttpRequest();        
+        var uuidList = AppStore.getAllUuidsChecked();
+        
+        for (var name in this.props.UuidMap) {
+            if ((this.props.UuidMap.hasOwnProperty(name)) && (uuidList [this.props.UuidMap[name]])) {
+                var postData = "{\"device_uuid\": \"" + this.props.UuidMap[name] +
+                		"\", \"type\": \"SEND_PING\", \"body\": {} }";
+
+                // What to do when the server response comes back
+                // Note this is not the device response, just the server
+                // HTTP confirm.
+                request.onload = function () {
+                    // TODO something here?
+                }
+                request.open("POST", "sendMsg", true);
+                request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+                // Actually sends the request to the server.
+                request.send(postData);
+            }
+        }
+    },
+	
     render:function(){
         return (
-              React.createElement("div", {className: "btn-group"}, 
-                  React.createElement("button", {type: "button", className: "btn btn-info", style: {width: 90, height: 30, marginLeft: 10, marginTop: 10}}, 
-                      "Get Ping"
-                  ), 
-                  React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle", "data-toggle": "dropdown", style: {height: 30, marginTop: 10}}, 
-                      React.createElement("span", {className: "caret"})
-                  ), 
-                  React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
+            React.createElement("div", {className: "btn-group"}, 
+                React.createElement("button", {type: "button", className: "btn btn-info", onClick: this.sendAllMsg, style: {width: 90, height: 30, marginLeft: 10, marginTop: 10}}, 
+                    "Get Ping"
+                ), 
+                React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle disabled", "data-toggle": "dropdown", style: {height: 30, marginTop: 10}}, 
+                    React.createElement("span", {className: "caret"})
+                ), 
+                React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
                     React.createElement(MakeLiNameList, {Items: this.props.Names})
-                   )
-              )
+                )
+            )
         );
     }
 });
 
 module.exports = GetPing;
 
-},{"../utilities/make_li_name_list.react":221,"react":189}],195:[function(require,module,exports){
+},{"../../stores/app_store.js":226,"../utilities/make_li_name_list.react":221,"react":189}],195:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -25834,15 +25946,41 @@ module.exports = GetPing;
 
 var React = require('react');
 var MakeLiNameList = require('../utilities/make_li_name_list.react')
+var AppStore = require('../../stores/app_store.js');
 
 var GetTime = React.createClass({displayName: "GetTime",
+
+    sendAllMsg: function() {
+        var request = new XMLHttpRequest();
+        var uuidList = AppStore.getAllUuidsChecked();
+        
+        for (var name in this.props.UuidMap) {
+            if ((this.props.UuidMap.hasOwnProperty(name)) && (uuidList [this.props.UuidMap[name]])) {
+                var postData = "{\"device_uuid\": \"" + this.props.UuidMap[name] +
+                		"\", \"type\": \"SEND_DATE_TIME_GET\", \"body\": {} }";
+
+                // What to do when the server response comes back
+                // Note this is not the device response, just the server
+                // HTTP confirm.
+                request.onload = function () {
+                    // TODO something here?
+                }
+                request.open("POST", "sendMsg", true);
+                request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+                // Actually sends the request to the server.
+                request.send(postData);
+            }
+        }
+    },
+	
     render:function(){
         return (
               React.createElement("div", {className: "btn-group"}, 
-                  React.createElement("button", {type: "button", className: "btn btn-info", style: {width: 90, height: 30, marginLeft: 15, marginTop: 10}}, 
+                  React.createElement("button", {type: "button", className: "btn btn-info", onClick: this.sendAllMsg, style: {width: 90, height: 30, marginLeft: 15, marginTop: 10}}, 
                       "Get Time"
                   ), 
-                  React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle", "data-toggle": "dropdown", style: {height: 30, marginTop: 10}}, 
+                  React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle disabled", "data-toggle": "dropdown", style: {height: 30, marginTop: 10}}, 
                       React.createElement("span", {className: "caret"})
                   ), 
                   React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
@@ -25855,7 +25993,7 @@ var GetTime = React.createClass({displayName: "GetTime",
 
 module.exports = GetTime;
 
-},{"../utilities/make_li_name_list.react":221,"react":189}],196:[function(require,module,exports){
+},{"../../stores/app_store.js":226,"../utilities/make_li_name_list.react":221,"react":189}],196:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -25877,14 +26015,42 @@ module.exports = GetTime;
 
 var React = require('react');
 var MakeLiNameList = require('../utilities/make_li_name_list.react')
+var AppStore = require('../../stores/app_store.js');
 
 var SetHeartBeat = React.createClass({displayName: "SetHeartBeat",
     
+    sendAllMsg: function() {
+        var request = new XMLHttpRequest();
+        var uuidList = AppStore.getAllUuidsChecked();
+        
+        for (var name in this.props.UuidMap) {
+            if ((this.props.UuidMap.hasOwnProperty(name)) && (uuidList [this.props.UuidMap[name]])) {
+            	var heartbeatSeconds = AppStore.getHeartbeatSeconds();
+            	var heartbeatSnapToRtc = AppStore.getHeartbeatSnapToRtc();
+                var postData = "{\"device_uuid\": \"" + this.props.UuidMap[name] +
+                        "\", \"type\": \"SEND_HEARTBEAT_SET\", \"body\": {\"heartbeat_seconds\": \"" +
+                        heartbeatSeconds + "\", \"heartbeat_snap_to_rtc\": \"" + (heartbeatSnapToRtc == true) + "\"} }";
+
+                // What to do when the server response comes back
+                // Note this is not the device response, just the server
+                // HTTP confirm.
+                request.onload = function () {
+                    // TODO something here?
+                }
+                request.open("POST", "sendMsg", true);
+                request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+                // Actually sends the request to the server.
+                request.send(postData);
+            }
+        }
+    },
+
     render: function() {
         return (
             React.createElement("div", {className: "btn-group"}, 
-                React.createElement("button", {type: "button", className: "btn btn-info", style: {width: 215}}, "Set Heartbeat (seconds)"), 
-                React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle", "data-toggle": "dropdown"}, 
+                React.createElement("button", {type: "button", className: "btn btn-info", onClick: this.sendAllMsg, style: {width: 215}}, "Set Heartbeat (seconds)"), 
+                React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle disabled", "data-toggle": "dropdown"}, 
                     React.createElement("span", {className: "caret"})
                 ), 
                 React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
@@ -25897,7 +26063,7 @@ var SetHeartBeat = React.createClass({displayName: "SetHeartBeat",
 
 module.exports = SetHeartBeat;
 
-},{"../utilities/make_li_name_list.react":221,"react":189}],197:[function(require,module,exports){
+},{"../../stores/app_store.js":226,"../utilities/make_li_name_list.react":221,"react":189}],197:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -25919,13 +26085,39 @@ module.exports = SetHeartBeat;
 
 var React = require('react');
 var MakeLiNameList = require('../utilities/make_li_name_list.react')
+var AppStore = require('../../stores/app_store.js');
 
-var SetReporting = React.createClass({displayName: "SetReporting",
+    var SetReporting = React.createClass({displayName: "SetReporting",
+        sendAllMsg: function() {
+        var request = new XMLHttpRequest();
+        var uuidList = AppStore.getAllUuidsChecked();
+
+        for (var name in this.props.UuidMap) {
+            if ((this.props.UuidMap.hasOwnProperty(name)) && (uuidList [this.props.UuidMap[name]])) {
+                var reportingInterval = AppStore.getReportingInterval();
+                var postData = "{\"device_uuid\": \"" + this.props.UuidMap[name] +
+                        "\", \"type\": \"SEND_REPORTING_INTERVAL_SET\", \"body\": {\"reporting_interval\": \"" + reportingInterval + "\"} }";
+
+                // What to do when the server response comes back
+                // Note this is not the device response, just the server
+                // HTTP confirm.
+                request.onload = function () {
+                    // TODO something here?
+                }
+                request.open("POST", "sendMsg", true);
+                request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+                // Actually sends the request to the server.
+                request.send(postData);
+            }
+        }
+    },
+
     render:function(){
         return (
             React.createElement("div", {className: "btn-group"}, 
-                React.createElement("button", {type: "button", className: "btn btn-info", style: {width: 215}}, "Set Reporting (heartbeats)"), 
-                React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle", "data-toggle": "dropdown"}, 
+                React.createElement("button", {type: "button", className: "btn btn-info", onClick: this.sendAllMsg, style: {width: 215}}, "Set Reporting (heartbeats)"), 
+                React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle disabled", "data-toggle": "dropdown"}, 
                     React.createElement("span", {className: "caret"})
                 ), 
                 React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
@@ -25938,7 +26130,7 @@ var SetReporting = React.createClass({displayName: "SetReporting",
 
 module.exports = SetReporting;
 
-},{"../utilities/make_li_name_list.react":221,"react":189}],198:[function(require,module,exports){
+},{"../../stores/app_store.js":226,"../utilities/make_li_name_list.react":221,"react":189}],198:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -25960,13 +26152,46 @@ module.exports = SetReporting;
 
 var React = require('react');
 var MakeLiNameList = require('../utilities/make_li_name_list.react')
+var AppStore = require('../../stores/app_store.js');
 
 var SetTTParameters = React.createClass({displayName: "SetTTParameters",
-      render: function() {
+
+	sendAllMsg: function() {
+        var request = new XMLHttpRequest();
+        var uuidList = AppStore.getAllUuidsChecked();
+
+        for (var name in this.props.UuidMap) {
+            if ((this.props.UuidMap.hasOwnProperty(name)) && (uuidList [this.props.UuidMap[name]])) {
+                var ttParameters = AppStore.getTtParameters();
+                var postData = "{\"device_uuid\": \"" + this.props.UuidMap[name] +
+                		"\", \"type\": \"SEND_TRAFFIC_TEST_MODE_PARAMETERS_SERVER_SET\", \"body\": {\"num_ul_datagrams\": \"" + ttParameters["numUlDatagrams"] +
+                        "\", \"len_ul_datagram\": \"" + ttParameters["lenUlDatagram"] +
+                        "\", \"num_dl_datagrams\": \"" + ttParameters["numDlDatagrams"] +
+                        "\", \"len_dl_datagram\": \"" + ttParameters["lenDlDatagram"] +
+                        "\", \"timeout_seconds\": \"" + ttParameters["timeoutSeconds"] +
+                        "\", \"no_reports_during_test\": \"" + ttParameters["noReportsDuringTest"] +
+                        "\", \"dl_interval_seconds\": \"" +	ttParameters["dlIntervalSeconds"] + "\"} }";
+
+                // What to do when the server response comes back
+                // Note this is not the device response, just the server
+                // HTTP confirm.
+                request.onload = function () {
+                    // TODO something here?
+                }
+                request.open("POST", "sendMsg", true);
+                request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+                // Actually sends the request to the server.
+                request.send(postData);
+            }
+        }
+    },
+    
+	render: function() {
         return (
             React.createElement("div", {className: "btn-group"}, 
-                React.createElement("button", {type: "button", className: "btn btn-info", style: {width: 170, height: 30, marginTop: 10}}, "Send Parameters"), 
-                React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle", "data-toggle": "dropdown", style: {height: 30, marginTop: 10}}, 
+                React.createElement("button", {type: "button", className: "btn btn-info", onClick: this.sendAllMsg, style: {width: 170, marginTop: 10}}, "Send Parameters"), 
+                React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle disabled", "data-toggle": "dropdown", style: {marginTop: 10}}, 
                     React.createElement("span", {className: "caret"})
                 ), 
                 React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
@@ -25979,7 +26204,7 @@ var SetTTParameters = React.createClass({displayName: "SetTTParameters",
 
 module.exports = SetTTParameters;
 
-},{"../utilities/make_li_name_list.react":221,"react":189}],199:[function(require,module,exports){
+},{"../../stores/app_store.js":226,"../utilities/make_li_name_list.react":221,"react":189}],199:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26001,13 +26226,39 @@ module.exports = SetTTParameters;
 
 var React = require('react');
 var MakeLiNameList = require('../utilities/make_li_name_list.react')
+var AppStore = require('../../stores/app_store.js');
 
-var SetTTStart = React.createClass({displayName: "SetTTStart",
-      render: function() {
+var SetTtStart = React.createClass({displayName: "SetTtStart",
+
+    sendAllMsg: function() {
+        var request = new XMLHttpRequest();
+        var uuidList = AppStore.getAllUuidsChecked();
+        
+        for (var name in this.props.UuidMap) {
+            if ((this.props.UuidMap.hasOwnProperty(name)) && (uuidList [this.props.UuidMap[name]])) {
+                var postData = "{\"device_uuid\": \"" + this.props.UuidMap[name] +
+                        "\", \"type\": \"SEND_MODE_SET\", \"body\": {\"mode\": \"MODE_TRAFFIC_TEST\"} }";
+
+                // What to do when the server response comes back
+                // Note this is not the device response, just the server
+                // HTTP confirm.
+                request.onload = function () {
+                    // TODO something here?
+                }
+                request.open("POST", "sendMsg", true);
+                request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+                // Actually sends the request to the server.
+                request.send(postData);
+            }
+        }
+    },
+    
+	render: function() {
         return (
             React.createElement("div", {className: "btn-group"}, 
-                React.createElement("button", {type: "button", className: "btn btn-info", style: {width: 170, height: 30}}, "Start Test"), 
-                React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle", "data-toggle": "dropdown", style: {height: 30}}, 
+                React.createElement("button", {type: "button", className: "btn btn-info", onClick: this.sendAllMsg, style: {width: 170, height: 30}}, "Start Test"), 
+                React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle disabled", "data-toggle": "dropdown", style: {height: 30}}, 
                     React.createElement("span", {className: "caret"})
                 ), 
                 React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
@@ -26018,9 +26269,9 @@ var SetTTStart = React.createClass({displayName: "SetTTStart",
       }
     });
 
-module.exports = SetTTStart;
+module.exports = SetTtStart;
 
-},{"../utilities/make_li_name_list.react":221,"react":189}],200:[function(require,module,exports){
+},{"../../stores/app_store.js":226,"../utilities/make_li_name_list.react":221,"react":189}],200:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26042,13 +26293,39 @@ module.exports = SetTTStart;
 
 var React = require('react');
 var MakeLiNameList = require('../utilities/make_li_name_list.react')
+var AppStore = require('../../stores/app_store.js');
 
-var SetTTStop = React.createClass({displayName: "SetTTStop",
-      render: function() {
+var SetTtStop = React.createClass({displayName: "SetTtStop",
+
+    sendAllMsg: function() {
+        var request = new XMLHttpRequest();
+        var uuidList = AppStore.getAllUuidsChecked();
+        
+        for (var name in this.props.UuidMap) {
+            if ((this.props.UuidMap.hasOwnProperty(name)) && (uuidList [this.props.UuidMap[name]])) {
+                var postData = "{\"device_uuid\": \"" + this.props.UuidMap[name] +
+                        "\", \"type\": \"SEND_MODE_SET\", \"body\": {\"mode\": \"MODE_STANDARD_TRX\"} }";
+
+                // What to do when the server response comes back
+                // Note this is not the device response, just the server
+                // HTTP confirm.
+                request.onload = function () {
+                    // TODO something here?
+                }
+                request.open("POST", "sendMsg", true);
+                request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+                // Actually sends the request to the server.
+                request.send(postData);
+            }
+        }
+    },
+	
+	render: function() {
         return (
             React.createElement("div", {className: "btn-group"}, 
-                React.createElement("button", {type: "button", className: "btn btn-info", style: {width: 170, height: 30}}, "Stop Test"), 
-                React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle", "data-toggle": "dropdown", style: {height: 30}}, 
+                React.createElement("button", {type: "button", className: "btn btn-info", onClick: this.sendAllMsg, style: {width: 170, height: 30}}, "Stop Test"), 
+                React.createElement("button", {type: "button", className: "btn btn-info dropdown-toggle disabled", "data-toggle": "dropdown", style: {height: 30}}, 
                     React.createElement("span", {className: "caret"})
                 ), 
                 React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
@@ -26059,9 +26336,9 @@ var SetTTStop = React.createClass({displayName: "SetTTStop",
       }
     });
 
-module.exports = SetTTStop;
+module.exports = SetTtStop;
 
-},{"../utilities/make_li_name_list.react":221,"react":189}],201:[function(require,module,exports){
+},{"../../stores/app_store.js":226,"../utilities/make_li_name_list.react":221,"react":189}],201:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26146,17 +26423,17 @@ module.exports = SettingStd;
  */
 
 var React = require('react');
-var ValueTTUlNumDatagrams = require('./value_tt_ul_num_datagrams.react');
-var ValueTTUlLenDatagram = require('./value_tt_ul_len_datagram.react');
-var ValueTTDlNumDatagrams = require('./value_tt_dl_num_datagrams.react');
-var ValueTTDlLenDatagram = require('./value_tt_dl_len_datagram.react');
-var ValueTTTimeout = require('./value_tt_timeout.react');
-var ValueTTDlInterval = require('./value_tt_dl_interval.react');
-var SetTTParameters = require('./set_tt_parameters.react');
-var SetTTStart = require('./set_tt_start.react');
-var SetTTStop = require('./set_tt_stop.react');
+var ValueTtNumUlDatagrams = require('./value_tt_ul_num_datagrams.react');
+var ValueTtLenUlDatagram = require('./value_tt_ul_len_datagram.react');
+var ValueTtNumDlDatagrams = require('./value_tt_dl_num_datagrams.react');
+var ValueTtLenDlDatagram = require('./value_tt_dl_len_datagram.react');
+var ValueTtTimeout = require('./value_tt_timeout.react');
+var ValueTtDlInterval = require('./value_tt_dl_interval.react');
+var SetTtParameters = require('./set_tt_parameters.react');
+var SetTtStart = require('./set_tt_start.react');
+var SetTtStop = require('./set_tt_stop.react');
 
-var SettingTT = React.createClass({displayName: "SettingTT",
+var SettingTt = React.createClass({displayName: "SettingTt",
     render: function() {
         return (
             React.createElement("div", null, 
@@ -26168,24 +26445,24 @@ var SettingTT = React.createClass({displayName: "SettingTT",
                     ), 
                     React.createElement("tr", {style: {height: 50}}, 
                         React.createElement("td", {style: {width: 110}}, "UL: Number:"), 
-                        React.createElement("td", {style: {width: 100}}, React.createElement(ValueTTUlNumDatagrams, null)), 
+                        React.createElement("td", {style: {width: 100}}, React.createElement(ValueTtNumUlDatagrams, null)), 
                         React.createElement("td", {style: {width: 110}}, "Length:"), 
-                        React.createElement("td", {style: {width: 100}}, React.createElement(ValueTTUlLenDatagram, null)), 
-                        React.createElement("td", null, React.createElement(SetTTStart, {Names: this.props.Names, UuidMap: this.props.UuidMap}))
+                        React.createElement("td", {style: {width: 100}}, React.createElement(ValueTtLenUlDatagram, null)), 
+                        React.createElement("td", null, React.createElement(SetTtStart, {Names: this.props.Names, UuidMap: this.props.UuidMap}))
                     ), 
                     React.createElement("tr", null, 
                         React.createElement("td", null, "DL: Number:"), 
-                        React.createElement("td", null, React.createElement(ValueTTDlNumDatagrams, null)), 
+                        React.createElement("td", null, React.createElement(ValueTtNumDlDatagrams, null)), 
                         React.createElement("td", null, "Length:"), 
-                        React.createElement("td", null, React.createElement(ValueTTDlLenDatagram, null)), 
-                        React.createElement("td", null, React.createElement(SetTTStop, {Names: this.props.Names, UuidMap: this.props.UuidMap}))
+                        React.createElement("td", null, React.createElement(ValueTtLenDlDatagram, null)), 
+                        React.createElement("td", null, React.createElement(SetTtStop, {Names: this.props.Names, UuidMap: this.props.UuidMap}))
                     ), 
                     React.createElement("tr", null, 
                         React.createElement("td", null, "Timeout (secs):"), 
-                        React.createElement("td", null, React.createElement(ValueTTTimeout, null)), 
-                        React.createElement("td", null, "Dl Gap (secs):"), 
-                        React.createElement("td", null, React.createElement(ValueTTDlInterval, null)), 
-                        React.createElement("td", null, React.createElement(SetTTParameters, {Names: this.props.Names, UuidMap: this.props.UuidMap}))
+                        React.createElement("td", null, React.createElement(ValueTtTimeout, null)), 
+                        React.createElement("td", null, "DL Gap (secs):"), 
+                        React.createElement("td", null, React.createElement(ValueTtDlInterval, null)), 
+                        React.createElement("td", null, React.createElement(SetTtParameters, {Names: this.props.Names, UuidMap: this.props.UuidMap}))
                     )
                 )
             )
@@ -26193,7 +26470,7 @@ var SettingTT = React.createClass({displayName: "SettingTT",
     }
 });
 
-module.exports = SettingTT;
+module.exports = SettingTt;
 
 },{"./set_tt_parameters.react":198,"./set_tt_start.react":199,"./set_tt_stop.react":200,"./value_tt_dl_interval.react":206,"./value_tt_dl_len_datagram.react":207,"./value_tt_dl_num_datagrams.react":208,"./value_tt_timeout.react":209,"./value_tt_ul_len_datagram.react":210,"./value_tt_ul_num_datagrams.react":211,"react":189}],203:[function(require,module,exports){
 /**
@@ -26254,30 +26531,61 @@ module.exports = Connected;
  */
 
 var React = require('react');
+var AppActions = require('../../actions/app_actions.js');
 var AppConstants = require ('../../constants/app_limits')
+var AppStore = require('../../stores/app_store.js');
 
 var ValueHeartbeat = React.createClass({displayName: "ValueHeartbeat",
     getInitialState: function() {
+        AppActions.setHeartbeatSeconds(AppConstants.HEARTBEAT_DEFAULT);
+        // This shouldn't really be here but it need to go somewhere until I have a tick box
+        AppActions.setHeartbeatSnapToRtc(AppConstants.HEARTBEAT_SNAP_TO_RTC_DEFAULT);
         return {value: AppConstants.HEARTBEAT_DEFAULT};
     },
     
+    componentDidMount: function() {
+        AppStore.addChangeListener(this.onChange);
+    },
+
+    componentWillUnmount: function() {
+        AppStore.removeChangeListener(this.onChange);
+    },
+
+    onChange: function() {
+        this.setState({value: AppStore.getHeartbeatSeconds()});
+    },
+
     handleChange: function(newValue) {
-        if ((newValue.target.value >= AppConstants.HEARTBEAT_MIN) && (newValue.target.value <= AppConstants.HEARTBEAT_MAX)) {
-            this.setState ({value: newValue.target.value});
+        this.setState ({value: newValue.target.valueAsNumber});
+    },
+    
+    handleBlur: function(newValue) {
+    	var tmp = newValue.target.valueAsNumber;
+        if (!tmp) {
+        	tmp = AppConstants.HEARTBEAT_MIN;
         }
+        
+        if (tmp < AppConstants.HEARTBEAT_MIN) {
+        	tmp = AppConstants.HEARTBEAT_MIN;
+        }
+        if (tmp > AppConstants.HEARTBEAT_MAX) {
+        	tmp = AppConstants.HEARTBEAT_MAX;
+        }
+        
+        this.setState ({value: tmp});
+        AppActions.setHeartbeatSeconds(tmp);        	
     },
     
     render:function() {
-        var value = this.state.value;
         return (
-            React.createElement("input", {className: "form-control bfh-number", type: "number", min: AppConstants.HEARTBEAT_MIN, max: AppConstants.HEARTBEAT_MAX, value: value, step: 1, onChange: this.handleChange, style: {width: 145}})
+            React.createElement("input", {className: "form-control bfh-number", type: "number", value: this.state.value, step: 10, onChange: this.handleChange, onClick: this.handleBlur, onBlur: this.handleBlur, style: {width: 145}})
         );
     }
 });
 
 module.exports = ValueHeartbeat;
 
-},{"../../constants/app_limits":222,"react":189}],205:[function(require,module,exports){
+},{"../../actions/app_actions.js":190,"../../constants/app_limits":222,"../../stores/app_store.js":226,"react":189}],205:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26298,30 +26606,60 @@ module.exports = ValueHeartbeat;
  */
 
 var React = require('react');
-var AppConstants = require ('../../constants/app_limits');
+var AppActions = require('../../actions/app_actions.js');
+var AppConstants = require ('../../constants/app_limits')
+var AppStore = require('../../stores/app_store.js');
 
 var ValueReporting = React.createClass({displayName: "ValueReporting",
     getInitialState: function() {
+        AppActions.setReportingInterval(AppConstants.REPORTING_INTERVAL_DEFAULT);
         return {value: AppConstants.REPORTING_INTERVAL_DEFAULT};
     },
 
-    handleChange: function(newValue) {
-        if ((newValue.target.value >= AppConstants.REPORTING_INTERVAL_MIN) && (newValue.target.value <= AppConstants.REPORTING_INTERVAL_MAX)) {
-            this.setState ({value: newValue.target.value});
-        }
+    componentDidMount: function() {
+        AppStore.addChangeListener(this.onChange);
     },
 
+    componentWillUnmount: function() {
+        AppStore.removeChangeListener(this.onChange);
+    },
+
+    onChange: function() {
+        this.setState({value: AppStore.getReportingInterval()});
+    },
+
+    handleChange: function(newValue) {
+        this.setState ({value: newValue.target.valueAsNumber});
+    },
+    
+    handleBlur: function(newValue) {
+    	var tmp = newValue.target.valueAsNumber;
+        if (!tmp) {
+        	tmp = AppConstants.REPORTING_INTERVAL_MIN;
+        }
+        
+        if (tmp < AppConstants.REPORTING_INTERVAL_MIN) {
+        	tmp = AppConstants.REPORTING_INTERVAL_MIN;
+        }
+        if (tmp > AppConstants.REPORTING_INTERVAL_MAX) {
+        	tmp = AppConstants.REPORTING_INTERVAL_MAX;
+        }
+        
+        this.setState ({value: tmp});
+        AppActions.setReportingInterval(tmp);        	
+    },
+    
     render:function() {
         var value = this.state.value;
         return (
-            React.createElement("input", {className: "form-control bfh-number", type: "number", min: AppConstants.REPORTING_INTERVAL_MIN, max: AppConstants.REPORTING_INTERVAL_MAX, value: value, step: 1, onChange: this.handleChange, style: {width: 145}})
+            React.createElement("input", {className: "form-control bfh-number", type: "number", value: this.state.value, step: 1, onChange: this.handleChange, onClick: this.handleBlur, onBlur: this.handleBlur, style: {width: 145}})
         );
     }
 });
 
 module.exports = ValueReporting;
 
-},{"../../constants/app_limits":222,"react":189}],206:[function(require,module,exports){
+},{"../../actions/app_actions.js":190,"../../constants/app_limits":222,"../../stores/app_store.js":226,"react":189}],206:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26342,30 +26680,60 @@ module.exports = ValueReporting;
  */
 
 var React = require('react');
-var AppConstants = require ('../../constants/app_limits');
+var AppActions = require('../../actions/app_actions.js');
+var AppConstants = require ('../../constants/app_limits')
+var AppStore = require('../../stores/app_store.js');
 
 var ValueTTDlInterval = React.createClass({displayName: "ValueTTDlInterval",
     getInitialState: function() {
+        AppActions.setTtDlIntervalSeconds(AppConstants.TT_DL_INTERVAL_DEFAULT);
         return {value: AppConstants.TT_DL_INTERVAL_DEFAULT};
     },
 
-    handleChange: function(newValue) {
-        if ((newValue.target.value >= AppConstants.TT_DL_INTERVAL_MIN) && (newValue.target.value <= AppConstants.TT_DL_INTERVAL_MAX)) {
-            this.setState ({value: newValue.target.value});
-        }
+    componentDidMount: function() {
+        AppStore.addChangeListener(this.onChange);
     },
 
+    componentWillUnmount: function() {
+        AppStore.removeChangeListener(this.onChange);
+    },
+
+    onChange: function() {
+        this.setState({value: AppStore.getTtParameters()["dlIntervalSeconds"]});
+    },
+
+    handleChange: function(newValue) {
+        this.setState ({value: newValue.target.valueAsNumber});
+    },
+    
+    handleBlur: function(newValue) {
+    	var tmp = newValue.target.valueAsNumber;
+        if (!tmp) {
+        	tmp = AppConstants.TT_DL_INTERVAL_MIN;
+        }
+        
+        if (tmp < AppConstants.TT_DL_INTERVAL_MIN) {
+        	tmp = AppConstants.TT_DL_INTERVAL_MIN;
+        }
+        if (tmp > AppConstants.TT_DL_INTERVAL_MAX) {
+        	tmp = AppConstants.TT_DL_INTERVAL_MAX;
+        }
+        
+        this.setState ({value: tmp});
+        AppActions.setTtDlIntervalSeconds(tmp);        	
+    },
+    
     render:function(){
         var value = this.state.value;
         return (
-            React.createElement("input", {className: "form-control bfh-number", type: "number", min: AppConstants.TT_DL_INTERVAL_MIN, max: AppConstants.TT_DL_INTERVAL_MAX, value: value, step: 1, onChange: this.handleChange, style: {width: 80, marginTop: 10}})
+            React.createElement("input", {className: "form-control bfh-number", type: "number", value: value, step: 5, onChange: this.handleChange, onClick: this.handleBlur, onBlur: this.handleBlur, style: {width: 80, marginTop: 10}})
         );
     }
 });
 
 module.exports = ValueTTDlInterval;
 
-},{"../../constants/app_limits":222,"react":189}],207:[function(require,module,exports){
+},{"../../actions/app_actions.js":190,"../../constants/app_limits":222,"../../stores/app_store.js":226,"react":189}],207:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26386,30 +26754,60 @@ module.exports = ValueTTDlInterval;
  */
 
 var React = require('react');
-var AppConstants = require ('../../constants/app_limits');
+var AppActions = require('../../actions/app_actions.js');
+var AppConstants = require ('../../constants/app_limits')
+var AppStore = require('../../stores/app_store.js');
 
-var ValueTTDlLenDatagram = React.createClass({displayName: "ValueTTDlLenDatagram",
+var ValueTtLenDlDatagram = React.createClass({displayName: "ValueTtLenDlDatagram",
     getInitialState: function() {
+        AppActions.setTtLenDlDatagram(AppConstants.TT_DATAGRAM_LEN_DEFAULT);
         return {value: AppConstants.TT_DATAGRAM_LEN_DEFAULT};
     },
 
+    componentDidMount: function() {
+        AppStore.addChangeListener(this.onChange);
+    },
+
+    componentWillUnmount: function() {
+        AppStore.removeChangeListener(this.onChange);
+    },
+
+    onChange: function() {
+        this.setState({value: AppStore.getTtParameters()["lenDlDatagram"]});
+    },
+
     handleChange: function(newValue) {
-        if ((newValue.target.value >= AppConstants.TT_DATAGRAM_LEN_MIN) && (newValue.target.value <= AppConstants.TT_DATAGRAM_LEN_MAX)) {
-            this.setState ({value: newValue.target.value});
+        this.setState ({value: newValue.target.valueAsNumber});
+    },
+
+    handleBlur: function(newValue) {
+	    var tmp = newValue.target.valueAsNumber;
+        if (!tmp) {
+    	    tmp = AppConstants.TT_DATAGRAM_LEN_MIN;
         }
+    
+        if (tmp < AppConstants.TT_DATAGRAM_LEN_MIN) {
+            tmp = AppConstants.TT_DATAGRAM_LEN_MIN;
+        }
+        if (tmp > AppConstants.TT_DATAGRAM_LEN_MAX) {
+    	    tmp = AppConstants.TT_DATAGRAM_LEN_MAX;
+        }
+    
+        this.setState ({value: tmp});
+        AppActions.setTtLenDlDatagram(tmp);        	
     },
 
     render:function(){
         var value = this.state.value;
         return (
-            React.createElement("input", {className: "form-control bfh-number", type: "number", min: AppConstants.TT_DATAGRAM_LEN_MIN, max: AppConstants.TT_DATAGRAM_LEN_MAX, value: value, step: 1, onChange: this.handleChange, style: {width: 80}})
+            React.createElement("input", {className: "form-control bfh-number", type: "number", value: value, step: 5, onChange: this.handleChange, onClick: this.handleBlur, onBlur: this.handleBlur, style: {width: 80}})
         );
     }
 });
 
-module.exports = ValueTTDlLenDatagram;
+module.exports = ValueTtLenDlDatagram;
 
-},{"../../constants/app_limits":222,"react":189}],208:[function(require,module,exports){
+},{"../../actions/app_actions.js":190,"../../constants/app_limits":222,"../../stores/app_store.js":226,"react":189}],208:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26431,29 +26829,60 @@ module.exports = ValueTTDlLenDatagram;
 
 var React = require('react');
 var AppConstants = require ('../../constants/app_limits');
+var AppActions = require('../../actions/app_actions.js');
+var AppConstants = require ('../../constants/app_limits')
+var AppStore = require('../../stores/app_store.js');
 
-var ValueTTDlNumDatagrams = React.createClass({displayName: "ValueTTDlNumDatagrams",
+var ValueTtNumDlDatagrams = React.createClass({displayName: "ValueTtNumDlDatagrams",
     getInitialState: function() {
+        AppActions.setTtNumDlDatagrams(AppConstants.TT_DATAGRAMS_NUM_DEFAULT);
         return {value: AppConstants.TT_DATAGRAMS_NUM_DEFAULT};
     },
 
+    componentDidMount: function() {
+        AppStore.addChangeListener(this.onChange);
+    },
+
+    componentWillUnmount: function() {
+        AppStore.removeChangeListener(this.onChange);
+    },
+
+    onChange: function() {
+        this.setState({value: AppStore.getTtParameters()["numDlDatagrams"]});
+    },
+
     handleChange: function(newValue) {
-        if ((newValue.target.value >= AppConstants.TT_DATAGRAMS_NUM_MIN) && (newValue.target.value <= AppConstants.TT_DATAGRAMS_NUM_MAX)) {
-            this.setState ({value: newValue.target.value});
+        this.setState ({value: newValue.target.valueAsNumber});
+    },
+
+    handleBlur: function(newValue) {
+	    var tmp = newValue.target.valueAsNumber;
+        if (!tmp) {
+    	    tmp = AppConstants.TT_DATAGRAMS_NUM_MIN;
         }
+    
+        if (tmp < AppConstants.TT_DATAGRAMS_NUM_MIN) {
+            tmp = AppConstants.TT_DATAGRAMS_NUM_MIN;
+        }
+        if (tmp > AppConstants.TT_DATAGRAMS_NUM_MAX) {
+    	    tmp = AppConstants.TT_DATAGRAMS_NUM_MAX;
+        }
+    
+        this.setState ({value: tmp});
+        AppActions.setTtNumDlDatagrams(tmp);        	
     },
 
     render:function(){
         var value = this.state.value;
         return (
-            React.createElement("input", {className: "form-control bfh-number", type: "number", min: AppConstants.TT_DATAGRAM_LEN_MIN, max: AppConstants.TT_DATAGRAMS_NUM_MAX, value: value, step: 1, onChange: this.handleChange, style: {width: 80}})
+            React.createElement("input", {className: "form-control bfh-number", type: "number", value: value, step: 5, onChange: this.handleChange, onClick: this.handleBlur, onBlur: this.handleBlur, style: {width: 80}})
         );
     }
 });
 
-module.exports = ValueTTDlNumDatagrams;
+module.exports = ValueTtNumDlDatagrams;
 
-},{"../../constants/app_limits":222,"react":189}],209:[function(require,module,exports){
+},{"../../actions/app_actions.js":190,"../../constants/app_limits":222,"../../stores/app_store.js":226,"react":189}],209:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26475,29 +26904,62 @@ module.exports = ValueTTDlNumDatagrams;
 
 var React = require('react');
 var AppConstants = require ('../../constants/app_limits');
+var AppActions = require('../../actions/app_actions.js');
+var AppConstants = require ('../../constants/app_limits')
+var AppStore = require('../../stores/app_store.js');
 
-var ValueTTTimeout = React.createClass({displayName: "ValueTTTimeout",
+var ValueTtTimeout = React.createClass({displayName: "ValueTtTimeout",
     getInitialState: function() {
+        AppActions.setTtTimeoutSeconds(AppConstants.TT_TIMEOUT_DEFAULT);
+        // Place this here until we decide to have a GUI item for it
+        AppActions.setTtNoReportsDuringTest(AppConstants.TT_NO_REPORTS_DURING_TEST_DEFAULT);
         return {value: AppConstants.TT_TIMEOUT_DEFAULT};
     },
 
+    componentDidMount: function() {
+        AppStore.addChangeListener(this.onChange);
+    },
+
+    componentWillUnmount: function() {
+        AppStore.removeChangeListener(this.onChange);
+    },
+
+    onChange: function() {
+        this.setState({value: AppStore.getTtParameters()["timeoutSeconds"]});
+    },
+
     handleChange: function(newValue) {
-        if ((newValue.target.value >= AppConstants.TT_TIMEOUT_MIN) && (newValue.target.value <= AppConstants.TT_TIMEOUT_MAX)) {
-            this.setState ({value: newValue.target.value});
+        this.setState ({value: newValue.target.valueAsNumber});
+    },
+
+    handleBlur: function(newValue) {
+	    var tmp = newValue.target.valueAsNumber;
+        if (!tmp) {
+    	    tmp = AppConstants.TT_TIMEOUT_MIN;
         }
+    
+        if (tmp < AppConstants.TT_TIMEOUT_MIN) {
+            tmp = AppConstants.TT_TIMEOUT_MIN;
+        }
+        if (tmp > AppConstants.TT_TIMEOUT_MAX) {
+    	    tmp = AppConstants.TT_TIMEOUT_MAX;
+        }
+    
+        this.setState ({value: tmp});
+        AppActions.setTtTimeoutSeconds(tmp);        	
     },
 
     render:function(){
         var value = this.state.value;
         return (
-            React.createElement("input", {className: "form-control bfh-number", type: "number", min: AppConstants.TT_TIMEOUT_MIN, max: AppConstants.TT_TIMEOUT_MAX, value: value, step: 60, onChange: this.handleChange, style: {width: 80, marginTop: 10}})
+            React.createElement("input", {className: "form-control bfh-number", type: "number", value: value, step: 5, onChange: this.handleChange, onClick: this.handleBlur, onBlur: this.handleBlur, style: {width: 80, marginTop: 10}})
         );
     }
 });
 
-module.exports = ValueTTTimeout;
+module.exports = ValueTtTimeout;
 
-},{"../../constants/app_limits":222,"react":189}],210:[function(require,module,exports){
+},{"../../actions/app_actions.js":190,"../../constants/app_limits":222,"../../stores/app_store.js":226,"react":189}],210:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26518,30 +26980,60 @@ module.exports = ValueTTTimeout;
  */
 
 var React = require('react');
-var AppConstants = require ('../../constants/app_limits');
+var AppActions = require('../../actions/app_actions.js');
+var AppConstants = require ('../../constants/app_limits')
+var AppStore = require('../../stores/app_store.js');
 
-var ValueTTUlLenDatagram = React.createClass({displayName: "ValueTTUlLenDatagram",
+var ValueTtLenUlDatagram = React.createClass({displayName: "ValueTtLenUlDatagram",
     getInitialState: function() {
+        AppActions.setTtLenUlDatagram(AppConstants.TT_DATAGRAM_LEN_DEFAULT);
         return {value: AppConstants.TT_DATAGRAM_LEN_DEFAULT};
     },
 
+    componentDidMount: function() {
+        AppStore.addChangeListener(this.onChange);
+    },
+
+    componentWillUnmount: function() {
+        AppStore.removeChangeListener(this.onChange);
+    },
+
+    onChange: function() {
+        this.setState({value: AppStore.getTtParameters()["lenUlDatagram"]});
+    },
+
     handleChange: function(newValue) {
-        if ((newValue.target.value >= AppConstants.TT_DATAGRAM_LEN_MIN) && (newValue.target.value <= AppConstants.TT_DATAGRAM_LEN_MAX)) {
-            this.setState ({value: newValue.target.value});
+        this.setState ({value: newValue.target.valueAsNumber});
+    },
+
+    handleBlur: function(newValue) {
+	    var tmp = newValue.target.valueAsNumber;
+        if (!tmp) {
+    	    tmp = AppConstants.TT_DATAGRAM_LEN_MIN;
         }
+    
+        if (tmp < AppConstants.TT_DATAGRAM_LEN_MIN) {
+            tmp = AppConstants.TT_DATAGRAM_LEN_MIN;
+        }
+        if (tmp > AppConstants.TT_DATAGRAM_LEN_MAX) {
+    	    tmp = AppConstants.TT_DATAGRAM_LEN_MAX;
+        }
+    
+        this.setState ({value: tmp});
+        AppActions.setTtLenUlDatagram(tmp);        	
     },
 
     render:function(){
         var value = this.state.value;
         return (
-            React.createElement("input", {className: "form-control bfh-number", type: "number", min: AppConstants.TT_DATAGRAM_LEN_MIN, max: AppConstants.TT_DATAGRAM_LEN_MAX, value: value, step: 1, onChange: this.handleChange, style: {width: 80}})
+            React.createElement("input", {className: "form-control bfh-number", type: "number", value: value, step: 5, onChange: this.handleChange, onClick: this.handleBlur, onBlur: this.handleBlur, style: {width: 80}})
         );
     }
 });
 
-module.exports = ValueTTUlLenDatagram;
+module.exports = ValueTtLenUlDatagram;
 
-},{"../../constants/app_limits":222,"react":189}],211:[function(require,module,exports){
+},{"../../actions/app_actions.js":190,"../../constants/app_limits":222,"../../stores/app_store.js":226,"react":189}],211:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26563,29 +27055,60 @@ module.exports = ValueTTUlLenDatagram;
 
 var React = require('react');
 var AppConstants = require ('../../constants/app_limits');
+var AppActions = require('../../actions/app_actions.js');
+var AppConstants = require ('../../constants/app_limits')
+var AppStore = require('../../stores/app_store.js');
 
-var ValueTTUlNumDatagrams = React.createClass({displayName: "ValueTTUlNumDatagrams",
+var ValueTtNumUlDatagrams = React.createClass({displayName: "ValueTtNumUlDatagrams",
     getInitialState: function() {
+        AppActions.setTtNumUlDatagrams(AppConstants.TT_DATAGRAMS_NUM_DEFAULT);
         return {value: AppConstants.TT_DATAGRAMS_NUM_DEFAULT};
     },
 
+    componentDidMount: function() {
+        AppStore.addChangeListener(this.onChange);
+    },
+
+    componentWillUnmount: function() {
+        AppStore.removeChangeListener(this.onChange);
+    },
+
+    onChange: function() {
+        this.setState({value: AppStore.getTtParameters()["numUlDatagrams"]});
+    },
+
     handleChange: function(newValue) {
-        if ((newValue.target.value >= AppConstants.TT_DATAGRAMS_NUM_MIN) && (newValue.target.value <= AppConstants.TT_DATAGRAMS_NUM_MAX)) {
-            this.setState ({value: newValue.target.value});
+        this.setState ({value: newValue.target.valueAsNumber});
+    },
+
+    handleBlur: function(newValue) {
+	    var tmp = newValue.target.valueAsNumber;
+        if (!tmp) {
+    	    tmp = AppConstants.TT_DATAGRAMS_NUM_MIN;
         }
+    
+        if (tmp < AppConstants.TT_DATAGRAMS_NUM_MIN) {
+            tmp = AppConstants.TT_DATAGRAMS_NUM_MIN;
+        }
+        if (tmp > AppConstants.TT_DATAGRAMS_NUM_MAX) {
+    	    tmp = AppConstants.TT_DATAGRAMS_NUM_MAX;
+        }
+    
+        this.setState ({value: tmp});
+        AppActions.setTtNumUlDatagrams(tmp);        	
     },
 
     render:function(){
         var value = this.state.value;
         return (
-            React.createElement("input", {className: "form-control bfh-number", type: "number", min: AppConstants.TT_DATAGRAM_LEN_MIN, max: AppConstants.TT_DATAGRAMS_NUM_MAX, value: value, step: 1, onChange: this.handleChange, style: {width: 80}})
+            React.createElement("input", {className: "form-control bfh-number", type: "number", value: value, step: 5, onChange: this.handleChange, onClick: this.handleBlur, onBlur: this.handleBlur, style: {width: 80}})
         );
     }
 });
 
-module.exports = ValueTTUlNumDatagrams;
+module.exports = ValueTtNumUlDatagrams;
 
-},{"../../constants/app_limits":222,"react":189}],212:[function(require,module,exports){
+},{"../../actions/app_actions.js":190,"../../constants/app_limits":222,"../../stores/app_store.js":226,"react":189}],212:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26669,6 +27192,24 @@ var DisplayRow = require('./display_row.react')
 var Summary = require('../panels/summary.react')
 var Link = require('react-router-component').Link
 
+function pollState(updateState) {
+    function pollLoop() {
+        var x = new XMLHttpRequest();
+        x.onreadystatechange = function() {
+            if (x.readyState == 4) {
+                if (x.status == 200) {
+                    var data = JSON.parse(x.responseText);
+                    updateState(data);
+                }
+                window.setTimeout(pollLoop, 1000);
+            }
+        };
+        x.open("GET", "frontPageData", true);
+        x.send();
+    }
+    pollLoop();
+}
+
 var Display = React.createClass({displayName: "Display",
     getInitialState: function(){   
         return {
@@ -26702,24 +27243,6 @@ var Display = React.createClass({displayName: "Display",
         );
     }
 });
-
-function pollState(updateState) {
-    function pollLoop() {
-        var x = new XMLHttpRequest();
-        x.onreadystatechange = function() {
-            if (x.readyState == 4) {
-                if (x.status == 200) {
-                    var data = JSON.parse(x.responseText);
-                    updateState(data);
-                }
-                window.setTimeout(pollLoop, 1000);
-            }
-        };
-        x.open("GET", "frontPageData", true);
-        x.send();
-    }
-    pollLoop();
-}
 
 module.exports = Display;
 
@@ -26772,7 +27295,6 @@ var DisplayRow = React.createClass({displayName: "DisplayRow",
         var rows = [];
         if (this.props["DeviceData"] && (this.props["DeviceData"].length > 0)) {
             this.props["DeviceData"].forEach(function(device, i) {
-                // Retrieve the checked state here and pass it to ValueUuidSelected
                 rows.push(
                     React.createElement("tr", {className: "even gradeC", key: i}, 
                         React.createElement("td", {style: {textAlign: 'center', width: 15}}, 
@@ -27062,7 +27584,7 @@ var Summary = React.createClass({displayName: "Summary",
             var totalDlBytes = summaryData["TotalDlBytes"];
             var numExpectedMsgs = summaryData["NumExpectedMsgs"];
             return (
-                React.createElement("p", {className: "align-right"}, "Summary: ", React.createElement("b", null, devicesConnected), " device(s) connected (", React.createElement("b", null, devicesKnown), " known), last uplink ", React.createElement("b", null, lastUlTime), ", ", React.createElement("b", null, totalUlBytes), " uplink byte(s) since server start, ", React.createElement("b", null, totalDlBytes), " downlink byte(s) since server start, ", React.createElement("b", null, numExpectedMsgs), " confirm(s) outstanding.")
+                React.createElement("p", {className: "align-right"}, "Summary: ", React.createElement("b", null, devicesConnected), " device(s) connected (", React.createElement("b", null, devicesKnown), " known), last uplink ", React.createElement("b", null, lastUlTime), ", ", React.createElement("b", null, numExpectedMsgs), " confirmation(s) outstanding.")
             )
         } else {
             return (
@@ -27207,12 +27729,12 @@ var MakeLiUuidList = React.createClass({displayName: "MakeLiUuidList",
         if ((this.props.Items != null) && (this.props.Items.length > 0)) {            
             this.props.Items.forEach(function(item, i) {
                 list.push(
-                    React.createElement("li", {key: i}, React.createElement("a", {href: "#"}, " ", item, " "))
+                    React.createElement("li", {key: i}, React.createElement("a", {href: "#", className: "NoUnderline"}, " ", item, " "))
                 );
         });
         } else {
             list.push(
-                React.createElement("li", {key: Date.now()}, React.createElement("a", {href: "#"}, " Empty "))  // Date.now{} as a random key
+                React.createElement("li", {key: Date.now()}, React.createElement("a", {href: "#", className: "NoUnderline"}, " Empty "))  // Date.now{} as a random key
             );
         }
 
@@ -27251,12 +27773,13 @@ module.exports = MakeLiUuidList, Object.size;
 module.exports = {
     HEARTBEAT_DEFAULT: 900,
     HEARTBEAT_MAX: 3599,
-    HEARTBEAT_MIN: 1,
+    HEARTBEAT_MIN: 15,
+    HEARTBEAT_SNAP_TO_RTC_DEFAULT: false,
     REPORTING_INTERVAL_DEFAULT: 1,
     REPORTING_INTERVAL_MAX: 10,
     REPORTING_INTERVAL_MIN: 1,
     TT_DATAGRAMS_NUM_DEFAULT: 100,
-    TT_DATAGRAMS_NUM_MAX: 10000,
+    TT_DATAGRAMS_NUM_MAX: 1000,
     TT_DATAGRAMS_NUM_MIN: 0,
     TT_DATAGRAM_LEN_DEFAULT: 100,
     TT_DATAGRAM_LEN_MAX: 100,
@@ -27264,6 +27787,7 @@ module.exports = {
     TT_TIMEOUT_DEFAULT: 0,
     TT_TIMEOUT_MAX: 86400,
     TT_TIMEOUT_MIN: 0,
+    TT_NO_REPORTS_DURING_TEST_DEFAULT: false,
     TT_DL_INTERVAL_DEFAULT: 20,
     TT_DL_INTERVAL_MAX: 300,
     TT_DL_INTERVAL_MIN: 1,
@@ -27282,7 +27806,17 @@ module.exports = {
 
 module.exports = {
     STORE_SET_UUID_CHECKED: "STORE_SET_UUID_CHECKED",
-    STORE_SET_UUID_UNCHECKED: "STORE_SET_UUID_UNCHECKED"
+    STORE_SET_UUID_UNCHECKED: "STORE_SET_UUID_UNCHECKED",
+    STORE_HEARTBEAT_SECONDS: "STORE_HEARTBEAT_SECONDS",
+    STORE_HEARTBEAT_SNAP_TO_RTC: "STORE_HEARTBEAT_SNAP_TO_RTC",
+    STORE_REPORTING_INTERVAL: "STORE_REPORTING_INTERVAL",
+    STORE_TT_NUM_UL_DATAGRAMS: "STORE_TT_NUM_UL_DATAGRAMS",
+    STORE_TT_LEN_UL_DATAGRAM: "STORE_TT_LEN_UL_DATAGRAM",
+    STORE_TT_NUM_DL_DATAGRAMS: "STORE_TT_NUM_DL_DATAGRAMS",
+    STORE_TT_LEN_DL_DATAGRAM: "STORE_TT_LEN_DL_DATAGRAM",
+    STORE_TT_TIMEOUT_SECONDS: "STORE_TT_TIMEOUT_SECONDS",
+    STORE_TT_NO_REPORTS_DURING_TEST: "STORE_TT_NO_REPORTS_DURING_TEST",
+    STORE_TT_DL_INTERVAL_SECONDS: "STORE_TT_DL_INTERVAL_SECONDS"
 };
 },{}],224:[function(require,module,exports){
 /**
@@ -27354,8 +27888,11 @@ var EventEmitter = require('events').EventEmitter;
 
 var CHANGE_EVENT = 'change';
 
-//var _uuidsCheckedList = {"61d25940-5307-11e5-80a4-c549fb2d6313": "61d25940-5307-11e5-80a4-c549fb2d6313"}
 var _uuidsCheckedList = {};
+var _heartbeatSeconds;
+var _heartbeatSnapToRtc;
+var _reportingInterval;
+var _ttParameters = {};
 
 //------------------------------------------------------------
 // Private functions
@@ -27371,6 +27908,44 @@ function _setUuidUnchecked(uuid) {
     if (_uuidsCheckedList) {
    	    delete _uuidsCheckedList[uuid];
     }
+}
+
+// Store the heartbeat value
+function _storeHeartbeatSeconds(heartbeatSeconds) {
+	_heartbeatSeconds = heartbeatSeconds;
+}
+
+//Store the heartbeat snap-to-rtc value
+function _storeHeartbeatSnapToRtc(heartbeatSnapToRtc) {
+	_heartbeatSnapToRtc = heartbeatSnapToRtc;
+}
+
+//Store the reporting interval value
+function _storeReportingInterval(reportingInterval) {
+	_reportingInterval = reportingInterval;
+}
+
+//Store the traffic test parameters
+function _storeTtNumUlDatagrams(numUlDatagrams) {
+	_ttParameters["numUlDatagrams"] = numUlDatagrams;
+}
+function _storeTtLenUlDatagram(lenUlDatagram) {
+	_ttParameters["lenUlDatagram"] = lenUlDatagram;
+}
+function _storeTtNumDlDatagrams(numDlDatagrams) {
+	_ttParameters["numDlDatagrams"] = numDlDatagrams;
+}
+function _storeTtLenDlDatagram(lenDlDatagram) {
+	_ttParameters["lenDlDatagram"] = lenDlDatagram;
+}
+function _storeTtTimeoutSeconds(timeoutSeconds) {
+	_ttParameters["timeoutSeconds"] = timeoutSeconds;
+}
+function _storeTtNoReportsDuringTest(noReportsDuringTest) {
+	_ttParameters["noReportsDuringTest"] = noReportsDuringTest;
+}
+function _storeTtDlIntervalSeconds(dlIntervalSeconds) {
+	_ttParameters["dlIntervalSeconds"] = dlIntervalSeconds;
 }
 
 // TODO
@@ -27449,6 +28024,22 @@ var AppStore = assign(EventEmitter.prototype, {
     	return (_uuidsCheckedList[uuid] != null);
     },
 
+    getHeartbeatSeconds: function () {
+    	return _heartbeatSeconds;
+    },
+    
+    getHeartbeatSnapToRtc: function () {
+    	return _heartbeatSnapToRtc;
+    },
+    
+    getReportingInterval: function () {
+    	return _reportingInterval;
+    },
+    
+    getTtParameters: function () {
+    	return _ttParameters;
+    },
+    
     dispatcherIndex: AppDispatcher.register(function(payload) {
         var action = payload.action; // this is our action from handleViewAction
     
@@ -27461,6 +28052,36 @@ var AppStore = assign(EventEmitter.prototype, {
             break;
             case AppConstants.STORE_IS_UUID_CHECKED:
                 _isUuidUnchecked(action.uuid);
+            break;
+            case AppConstants.STORE_HEARTBEAT_SECONDS:
+                _storeHeartbeatSeconds(action.heartbeatSeconds);
+            break;
+            case AppConstants.STORE_HEARTBEAT_SNAP_TO_RTC:
+                _storeHeartbeatSnapToRtc(action.heartbeatSnapToRtc);
+            break;
+            case AppConstants.STORE_REPORTING_INTERVAL:
+                _storeReportingInterval(action.reportingInterval);
+            break;
+            case AppConstants.STORE_TT_NUM_UL_DATAGRAMS:
+                _storeTtNumUlDatagrams(action.numUlDatagrams);
+            break;
+            case AppConstants.STORE_TT_LEN_UL_DATAGRAM:
+                _storeTtLenUlDatagram(action.lenUlDatagram);
+            break;
+            case AppConstants.STORE_TT_NUM_DL_DATAGRAMS:
+                _storeTtNumDlDatagrams(action.numDlDatagrams);
+            break;
+            case AppConstants.STORE_TT_LEN_DL_DATAGRAM:
+                _storeTtLenDlDatagram(action.lenDlDatagram);
+            break;
+            case AppConstants.STORE_TT_TIMEOUT_SECONDS:
+                _storeTtTimeoutSeconds(action.timeoutSeconds);
+            break;
+            case AppConstants.STORE_TT_NO_REPORTS_DURING_TEST:
+                _storeTtNoReportsDuringTest(action.noReportsDuringTest);
+            break;
+            case AppConstants.STORE_TT_DL_INTERVAL_SECONDS:
+                _storeTtDlIntervalSeconds(action.dlIntervalSeconds);
             break;
              // Insert more things here
             default:

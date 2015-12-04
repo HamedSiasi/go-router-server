@@ -18,23 +18,54 @@
  */
 
 var React = require('react');
+var AppActions = require('../../actions/app_actions.js');
 var AppConstants = require ('../../constants/app_limits')
+var AppStore = require('../../stores/app_store.js');
 
 var ValueHeartbeat = React.createClass({
     getInitialState: function() {
+        AppActions.setHeartbeatSeconds(AppConstants.HEARTBEAT_DEFAULT);
+        // This shouldn't really be here but it need to go somewhere until I have a tick box
+        AppActions.setHeartbeatSnapToRtc(AppConstants.HEARTBEAT_SNAP_TO_RTC_DEFAULT);
         return {value: AppConstants.HEARTBEAT_DEFAULT};
     },
     
+    componentDidMount: function() {
+        AppStore.addChangeListener(this.onChange);
+    },
+
+    componentWillUnmount: function() {
+        AppStore.removeChangeListener(this.onChange);
+    },
+
+    onChange: function() {
+        this.setState({value: AppStore.getHeartbeatSeconds()});
+    },
+
     handleChange: function(newValue) {
-        if ((newValue.target.value >= AppConstants.HEARTBEAT_MIN) && (newValue.target.value <= AppConstants.HEARTBEAT_MAX)) {
-            this.setState ({value: newValue.target.value});
+        this.setState ({value: newValue.target.valueAsNumber});
+    },
+    
+    handleBlur: function(newValue) {
+    	var tmp = newValue.target.valueAsNumber;
+        if (!tmp) {
+        	tmp = AppConstants.HEARTBEAT_MIN;
         }
+        
+        if (tmp < AppConstants.HEARTBEAT_MIN) {
+        	tmp = AppConstants.HEARTBEAT_MIN;
+        }
+        if (tmp > AppConstants.HEARTBEAT_MAX) {
+        	tmp = AppConstants.HEARTBEAT_MAX;
+        }
+        
+        this.setState ({value: tmp});
+        AppActions.setHeartbeatSeconds(tmp);        	
     },
     
     render:function() {
-        var value = this.state.value;
         return (
-            <input className="form-control bfh-number" type="number" min={AppConstants.HEARTBEAT_MIN} max={AppConstants.HEARTBEAT_MAX} value={value} step={1} onChange={this.handleChange} style={{width: 145}} />
+            <input className="form-control bfh-number" type="number" value={this.state.value} step={10} onChange={this.handleChange} onClick={this.handleBlur} onBlur={this.handleBlur} style={{width: 145}} />
         );
     }
 });

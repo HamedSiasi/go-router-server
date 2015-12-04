@@ -61,7 +61,10 @@ const (
     CLIENT_SEND_MEASUREMENTS_CONTROL_GET
     CLIENT_SEND_MEASUREMENTS_CONTROL_DEFAULTS_SET
     CLIENT_SEND_TRAFFIC_REPORT_GET
-    CLIENT_SEND_TRAFFIC_TEST_MODE_PARAMETERS_SET
+    // This includes the downlink interval parameter
+    // as well as the others which the server intercepts and
+    // uses for itself
+    CLIENT_SEND_TRAFFIC_TEST_MODE_PARAMETERS_SERVER_SET
     CLIENT_SEND_TRAFFIC_TEST_MODE_PARAMETERS_GET
     CLIENT_SEND_TRAFFIC_TEST_MODE_REPORT_GET
     CLIENT_SEND_ACTIVITY_REPORT_GET
@@ -77,6 +80,19 @@ const (
     CLIENT_MODE_STANDARD_TRX
     CLIENT_MODE_TRAFFIC_TEST
 )
+
+// The traffic test mode parameter messages for the server
+// IMPORTANT if any changes are made here, match them
+// in the device version of the message over in messages.go
+type TrafficTestModeParametersServerSet struct {
+    NumUlDatagrams      uint32
+    LenUlDatagram       uint32
+    NumDlDatagrams      uint32
+    LenDlDatagram       uint32
+    TimeoutSeconds      uint32
+    NoReportsDuringTest bool
+    DlIntervalSeconds   uint32  // This is the extra bit for the server
+}
 
 //--------------------------------------------------------------------
 // Variables
@@ -98,7 +114,7 @@ var clientSendEnumString map[string]ClientSendEnum = map[string]ClientSendEnum {
     "SEND_MEASUREMENTS_CONTROL_GET":          CLIENT_SEND_MEASUREMENTS_CONTROL_GET,
     "SEND_MEASUREMENTS_CONTROL_DEFAULTS_SET": CLIENT_SEND_MEASUREMENTS_CONTROL_DEFAULTS_SET,
     "SEND_TRAFFIC_REPORT_GET":                CLIENT_SEND_TRAFFIC_REPORT_GET,
-    "SEND_TRAFFIC_TEST_MODE_PARAMETERS_SET":  CLIENT_SEND_TRAFFIC_TEST_MODE_PARAMETERS_SET,
+    "SEND_TRAFFIC_TEST_MODE_PARAMETERS_SERVER_SET":  CLIENT_SEND_TRAFFIC_TEST_MODE_PARAMETERS_SERVER_SET,
     "SEND_TRAFFIC_TEST_MODE_PARAMETERS_GET":  CLIENT_SEND_TRAFFIC_TEST_MODE_PARAMETERS_GET,
     "SEND_TRAFFIC_TEST_MODE_REPORT_GET":      CLIENT_SEND_TRAFFIC_TEST_MODE_REPORT_GET,
     "SEND_ACTIVITY_REPORT_GET":               CLIENT_SEND_ACTIVITY_REPORT_GET,
@@ -140,6 +156,8 @@ const lenUlDatagramTag string = "len_ul_datagram"
 const numDlDatagramsTag string = "num_dl_datagrams"
 const lenDlDatagramTag string = "len_dl_datagram"
 const timeoutSecondsTag string = "timeout_seconds"
+const noReportsDuringTestTag string = "no_reports_during_test"
+const dlIntervalSecondsTag string = "dl_interval_seconds"
 
 // TODO
 // type clientMeasurementControlSetReqFields
@@ -410,10 +428,12 @@ func (m *Msg) Send(uuid string) error {
                 msgCount++
             }
             
-        case CLIENT_SEND_TRAFFIC_TEST_MODE_PARAMETERS_SET:
+        case CLIENT_SEND_TRAFFIC_TEST_MODE_PARAMETERS_SERVER_SET:
             globals.Dbg.PrintfTrace ("%s [dl_msgs] --> send TrafficTestModeParametersSetReq.\n", globals.LogTag)                    
             msg := &TrafficTestModeParametersSetReqDlMsg {}
-
+            
+            var dlIntervalSeconds uint32
+            
             err, msg.NumUlDatagrams = GetValueUint32 (m.MsgBody, numUlDatagramsTag)
             if err == nil {
                 err, msg.LenUlDatagram = GetValueUint32 (m.MsgBody, lenUlDatagramTag)                
@@ -423,10 +443,20 @@ func (m *Msg) Send(uuid string) error {
                         err, msg.LenDlDatagram = GetValueUint32 (m.MsgBody, lenDlDatagramTag)                
                         if err == nil {
                             err, msg.TimeoutSeconds = GetValueUint32 (m.MsgBody, timeoutSecondsTag)                
+                            if err == nil {
+                                err, msg.NoReportsDuringTest = GetValueBool (m.MsgBody, noReportsDuringTestTag)                
+                                if err == nil {
+                                    err, dlIntervalSeconds = GetValueUint32 (m.MsgBody, dlIntervalSecondsTag)                
+                                }
+                            }
                         }
                     }
                 }
             }
+            
+            // TODO handle the server side parameter
+            globals.Dbg.PrintfTrace ("%s [dl_msgs] --> TODO handle dlIntervalSeconds (%d).\n", globals.LogTag, dlIntervalSeconds)                    
+
             if err == nil {
                 err, byteCount, responseId = encodeAndEnqueue (msg, uuid)
                 if err == nil {

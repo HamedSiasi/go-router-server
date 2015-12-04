@@ -19,13 +19,39 @@
 
 var React = require('react');
 var MakeLiNameList = require('../utilities/make_li_name_list.react')
+var AppStore = require('../../stores/app_store.js');
 
-var SetReporting = React.createClass({
+    var SetReporting = React.createClass({
+        sendAllMsg: function() {
+        var request = new XMLHttpRequest();
+        var uuidList = AppStore.getAllUuidsChecked();
+
+        for (var name in this.props.UuidMap) {
+            if ((this.props.UuidMap.hasOwnProperty(name)) && (uuidList [this.props.UuidMap[name]])) {
+                var reportingInterval = AppStore.getReportingInterval();
+                var postData = "{\"device_uuid\": \"" + this.props.UuidMap[name] +
+                        "\", \"type\": \"SEND_REPORTING_INTERVAL_SET\", \"body\": {\"reporting_interval\": \"" + reportingInterval + "\"} }";
+
+                // What to do when the server response comes back
+                // Note this is not the device response, just the server
+                // HTTP confirm.
+                request.onload = function () {
+                    // TODO something here?
+                }
+                request.open("POST", "sendMsg", true);
+                request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+                // Actually sends the request to the server.
+                request.send(postData);
+            }
+        }
+    },
+
     render:function(){
         return (
             <div className="btn-group">
-                <button type="button" className="btn btn-info" style={{width: 215}} >Set Reporting (heartbeats)</button>
-                <button type="button" className="btn btn-info dropdown-toggle" data-toggle="dropdown">
+                <button type="button" className="btn btn-info" onClick={this.sendAllMsg} style={{width: 215}} >Set Reporting (heartbeats)</button>
+                <button type="button" className="btn btn-info dropdown-toggle disabled" data-toggle="dropdown">
                     <span className="caret" />
                 </button>
                 <ul className="dropdown-menu" role="menu">

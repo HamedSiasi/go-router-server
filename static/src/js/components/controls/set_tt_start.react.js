@@ -19,13 +19,39 @@
 
 var React = require('react');
 var MakeLiNameList = require('../utilities/make_li_name_list.react')
+var AppStore = require('../../stores/app_store.js');
 
-var SetTTStart = React.createClass({
-      render: function() {
+var SetTtStart = React.createClass({
+
+    sendAllMsg: function() {
+        var request = new XMLHttpRequest();
+        var uuidList = AppStore.getAllUuidsChecked();
+        
+        for (var name in this.props.UuidMap) {
+            if ((this.props.UuidMap.hasOwnProperty(name)) && (uuidList [this.props.UuidMap[name]])) {
+                var postData = "{\"device_uuid\": \"" + this.props.UuidMap[name] +
+                        "\", \"type\": \"SEND_MODE_SET\", \"body\": {\"mode\": \"MODE_TRAFFIC_TEST\"} }";
+
+                // What to do when the server response comes back
+                // Note this is not the device response, just the server
+                // HTTP confirm.
+                request.onload = function () {
+                    // TODO something here?
+                }
+                request.open("POST", "sendMsg", true);
+                request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+                // Actually sends the request to the server.
+                request.send(postData);
+            }
+        }
+    },
+    
+	render: function() {
         return (
             <div className="btn-group">
-                <button type="button" className="btn btn-info" style={{width: 170, height: 30}}>Start Test</button>
-                <button type="button" className="btn btn-info dropdown-toggle" data-toggle="dropdown" style={{height: 30}} >
+                <button type="button" className="btn btn-info" onClick={this.sendAllMsg} style={{width: 170, height: 30}}>Start Test</button>
+                <button type="button" className="btn btn-info dropdown-toggle disabled" data-toggle="dropdown" style={{height: 30}} >
                     <span className="caret" />
                 </button>
                 <ul className="dropdown-menu" role="menu">
@@ -36,4 +62,4 @@ var SetTTStart = React.createClass({
       }
     });
 
-module.exports = SetTTStart;
+module.exports = SetTtStart;

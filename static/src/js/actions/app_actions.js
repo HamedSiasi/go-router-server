@@ -34,7 +34,68 @@ var AppActions = {
             actionType: AppConstants.STORE_SET_UUID_UNCHECKED,
             uuid: uuid
         })
+    },
+    setHeartbeatSeconds: function(hearbeatSeconds) {
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.STORE_HEARTBEAT_SECONDS,
+            heartbeatSeconds: hearbeatSeconds
+        })
+    },
+    setHeartbeatSnapToRtc: function(hearbeatSnapToRtc) {
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.STORE_HEARTBEAT_SNAP_TO_RTC,
+            heartbeatSnapToRtc: hearbeatSnapToRtc
+        })
+    },
+    setReportingInterval: function(reportingInterval) {
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.STORE_REPORTING_INTERVAL,
+            reportingInterval: reportingInterval
+        })
+    },
+    setTtNumUlDatagrams: function(value) {
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.STORE_TT_NUM_UL_DATAGRAMS,
+            numUlDatagrams: value
+        })
+    },
+    setTtLenUlDatagram: function(value) {
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.STORE_TT_LEN_UL_DATAGRAM,
+            lenUlDatagram: value
+        })
+    },
+    setTtNumDlDatagrams: function(value) {
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.STORE_TT_NUM_DL_DATAGRAMS,
+            numDlDatagrams: value
+        })
+    },
+    setTtLenDlDatagram: function(value) {
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.STORE_TT_LEN_DL_DATAGRAM,
+            lenDlDatagram: value
+         })
+    },
+    setTtTimeoutSeconds: function(value) {
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.STORE_TT_TIMEOUT_SECONDS,
+            timeoutSeconds: value
+         })
+    },
+    setTtDlIntervalSeconds: function(value) {
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.STORE_TT_DL_INTERVAL_SECONDS,
+            dlIntervalSeconds: value
+         })
+    },
+    setTtNoReportsDuringTest: function(value) {
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.STORE_TT_NO_REPORTS_DURING_TEST,
+            noReportsDuringTest: value
+        })
     }
+
 }
 
 module.exports = AppActions;

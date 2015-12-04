@@ -27607,12 +27607,15 @@ var Summary = React.createClass({displayName: "Summary",
             var summaryData = this.props["SummaryData"];
             var devicesConnected = summaryData["DevicesConnected"];
             var devicesKnown = summaryData["DevicesKnown"];
-            var lastUlTime = Moment.utc(Date.parse(summaryData["LastUlMsgTime"])).fromNow();
+            var lastUlTime = "";
             var totalUlBytes = summaryData["TotalUlBytes"];
             var totalDlBytes = summaryData["TotalDlBytes"];
             var numExpectedMsgs = summaryData["NumExpectedMsgs"];
+            if (summaryData["LastUlMsgTime"]) {
+            	lastUlTime = ", last uplink " + Moment.utc(Date.parse(summaryData["LastUlMsgTime"])).fromNow();
+            }
             return (
-                React.createElement("p", {className: "align-right"}, "Summary: ", React.createElement("b", null, devicesConnected), " device(s) connected (", React.createElement("b", null, devicesKnown), " known), last uplink ", React.createElement("b", null, lastUlTime), ", ", React.createElement("b", null, numExpectedMsgs), " confirmation(s) outstanding.")
+                React.createElement("p", {className: "align-right"}, "Summary: ", React.createElement("b", null, devicesConnected), " device(s) connected (", React.createElement("b", null, devicesKnown), " known)", lastUlTime, ", ", React.createElement("b", null, numExpectedMsgs), " confirmation(s) outstanding.")
             )
         } else {
             return (

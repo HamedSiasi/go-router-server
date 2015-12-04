@@ -141,10 +141,13 @@ func displayFrontPageData () *FrontPageData {
                     }    
                 }    
             }
+            deviceData.Rsrp = "---"
             deviceData.Rssi = "---"
             if deviceState.LatestSignalStrengthData != nil {
-                deviceData.Rsrp             = fmt.Sprintf("%.1f", deviceState.LatestSignalStrengthData.RsrpDbm)            
-                deviceData.RsrpTime         = deviceState.LatestSignalStrengthData.RsrpTimestamp
+                if deviceState.LatestSignalStrengthData.RsrpPresent {
+                    deviceData.Rsrp             = fmt.Sprintf("%.1f", deviceState.LatestSignalStrengthData.RsrpDbm)            
+                    deviceData.RsrpTime         = deviceState.LatestSignalStrengthData.RsrpTimestamp
+                }                    
                 if deviceState.LatestSignalStrengthData.RssiPresent {
                     deviceData.Rssi             = fmt.Sprintf("%.1f", deviceState.LatestSignalStrengthData.RssiDbm)
                     deviceData.RssiTime         = deviceState.LatestSignalStrengthData.RssiTimestamp

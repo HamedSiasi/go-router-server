@@ -27301,22 +27301,44 @@ var DisplayRow = React.createClass({displayName: "DisplayRow",
         
         if (this.props["DeviceData"] && (this.props["DeviceData"].length > 0)) {
             this.props["DeviceData"].forEach(function(device, i) {
-                if (device["CellIdTime"] && Moment.isDate(device["CellIdTime"])) {
-                	cellIdTime = Moment.utc(Date.parse(device["CellIdTime"])).fromNow();
-                }
-                if (device["RsrpTime"] && Moment.isDate(device["RsrpTime"])) {
-                	rsrpTime = "dBm " + Moment.utc(Date.parse(device["RsrpTime"])).fromNow();
-                }
-                if (device["RssiTime"] && Moment.isDate(device["RssiTime"])) {
-                	rssiTime = "dBm " + Moment.utc(Date.parse(device["RssiTime"])).fromNow();
-                }
-                if (device["TxPowerTime"] && Moment.isDate(device["TxPowerTime"])) {
-                	txPowerTime = "dBm "+ Moment.utc(Date.parse(device["TxPowerTime"])).fromNow();
-                }
-                if (device["CoverageClassTime"] && Moment.isDate(device["CoverageClassTime"])) {
-                	coverageClassTime = Moment.utc(Date.parse(device["coverageClassTime"])).fromNow();
-                }
-                
+            	
+            	if (device["CellIdTime"]) {
+                    cellIdTime = Moment.utc(Date.parse(device["CellIdTime"])).fromNow()
+                    if (cellIdTime == NaN) {
+                        celldTime = "";
+                    }			
+            	}
+            	if (device["RsrpTime"]) {
+            	    rsrpTime = Moment.utc(Date.parse(device["RsrpTime"])).fromNow();
+                    if (rsrpTime == NaN) {
+                	    rsrpTime = "dBm"; 
+                    } else {
+                 	    rsrpTime = "dBm " + rsrpTime; 
+                    }
+            	}    
+            	if (device["RssiTime"]) {                
+                    rssiTime = Moment.utc(Date.parse(device["RssiTime"])).fromNow();
+                    if (rssiTime == NaN) {
+                	    rssiTime = "dBm"; 
+                    } else {                	
+                	    rssiTime = "dBm " + rssiTime; 
+                    }
+            	}
+            	if (device["TxPowerTime"]) {                
+                    txPowerTime = Moment.utc(Date.parse(device["TxPowerTime"])).fromNow();
+                    if (txPowerTime == NaN) {
+                	    txPowerTime = "dBm"; 
+                    } else {
+                	    txPowerTime = "dBm " + txPowerTime; 
+                    }
+            	}                
+            	if (device["CoverageClassTime"]) {                
+                    coverageClassTime = Moment.isDate(device["CoverageClassTime"])
+                    if (coverageClassTime == NaN) {
+                    	coverageClassTime = "";
+                    }
+            	}
+            	
                 rows.push(
                     React.createElement("tr", {className: "even gradeC", key: i}, 
                         React.createElement("td", {style: {textAlign: 'center', width: 15}}, 

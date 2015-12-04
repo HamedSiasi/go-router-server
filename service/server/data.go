@@ -422,6 +422,7 @@ func makeTemperatureData(newData *MeasurementData, Time time.Time) *TemperatureD
 
 //  Storage for signal strength data
 type SignalStrengthData struct {
+    RsrpPresent       bool
     RsrpTimestamp     *time.Time
     RsrpDbm           float32
     Mcl               float32
@@ -438,6 +439,7 @@ func (value *SignalStrengthData) DeepCopy() *SignalStrengthData {
         return nil
     }
     result := &SignalStrengthData{
+        RsrpPresent:       value.RsrpPresent,
         RsrpTimestamp:     value.RsrpTimestamp,
         RsrpDbm:           value.RsrpDbm,
         Mcl:               value.Mcl,
@@ -458,13 +460,17 @@ func updateSignalStrengthData(newData *MeasurementData, oldData *SignalStrengthD
         data = &SignalStrengthData{}
     }
     
-    data.RsrpTimestamp = &newData.TimeMeasured
-    data.RsrpDbm       = float32 (newData.Rsrp.Value) / 10
-    // TODO: calculate the other answers
-     if newData.RssiPresent {
-        data.RssiPresent = true
+    if newData.RsrpPresent {
+        data.RsrpPresent  = true
+        data.RsrpTimestamp = &newData.TimeMeasured
+        data.RsrpDbm      = float32 (newData.Rsrp.Value) / 10
+        // TODO: calculate the other answers
+    }   
+
+    if newData.RssiPresent {
+        data.RssiPresent   = true
         data.RssiTimestamp = &newData.TimeMeasured
-        data.RssiDbm = float32 (newData.Rssi) / 10
+        data.RssiDbm       = float32 (newData.Rssi) / 10
         // TODO: calculate the other answers
     }
          

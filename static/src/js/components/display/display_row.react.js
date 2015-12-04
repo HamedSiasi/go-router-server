@@ -44,8 +44,30 @@ var DisplayRow = React.createClass({
     
     render: function() {
         var rows = [];
+        var cellIdTime;
+        var rsrpTime;
+        var rssiTime;
+        var txPowerTime;
+        var coverageClassTime;
+        
         if (this.props["DeviceData"] && (this.props["DeviceData"].length > 0)) {
             this.props["DeviceData"].forEach(function(device, i) {
+                if (device["CellIdTime"]) {
+                	cellIdTime = Moment.utc(Date.parse(device["CellIdTime"])).fromNow();
+                }
+                if (device["RsrpTime"]) {
+                	rsrpTime = "dBm " + Moment.utc(Date.parse(device["RsrpTime"])).fromNow();
+                }
+                if (device["RssiTime"]) {
+                	rssiTime = "dBm " + Moment.utc(Date.parse(device["RssiTime"])).fromNow();
+                }
+                if (device["TxPowerTime"]) {
+                	txPowerTime = "dBm "+ Moment.utc(Date.parse(device["TxPowerTime"])).fromNow();
+                }
+                if (device["CoverageClassTime"]) {
+                	coverageClassTime = Moment.utc(Date.parse(device["coverageClassTime"])).fromNow();
+                }
+                
                 rows.push(
                     <tr className="even gradeC" key={i}>
                         <td style={{textAlign: 'center', width: 15}}>
@@ -53,30 +75,36 @@ var DisplayRow = React.createClass({
                             <Connected IsConnected={device["Connected"]} />
                         </td>
                         <td style={{width: 250}}>
-                            <b>Name:</b> {device["DeviceName"]}<br />
-                            <b>UUID:</b> {device["Uuid"]}<br />
-                            <b>Mode:</b> {device["Mode"]}<br />
-                            <b>Reporting:</b> {device["Reporting"]}<br />
-                            <b>Heartbeat:</b> {device["Heartbeat"]}
+                            Name: <b>{device["DeviceName"]}</b><br />
+                            UUID: <b>{device["Uuid"]}</b><br />
+                            Mode: {device["Mode"]}<br />
+                            Reporting: <b>{device["Reporting"]}</b><br />
+                            Heartbeat: <b>{device["Heartbeat"]}</b><br />
                         </td>
                         <td style={{width: 170}}>
-                            <b>Msgs:</b> {device["TotalUlMsgs"]}<br />
-                            <b>Bytes:</b> {device["TotalUlBytes"]}<br />
-                            <b>Last Msg:</b> {Moment.utc(Date.parse(device["LastUlMsgTime"])).local().format("YYYY-MM-DD HH:mm:ss")}
+                            <i className="fa fa-arrow-up" /> Msgs: <b>{device["TotalUlMsgs"]}</b><br />
+                            <i className="fa fa-arrow-up" /> Bytes: <b>{device["TotalUlBytes"]}</b><br />
+                            <i className="fa fa-arrow-up" /> Last Msg: {Moment.utc(Date.parse(device["LastUlMsgTime"])).local().format("YYYY-MM-DD HH:mm:ss")}<br />
+                            <i className="fa fa-arrow-down" /> Msgs: <b>{device["TotalDlMsgs"]}</b><br />
+                            <i className="fa fa-arrow-down" /> Bytes: <b>{device["TotalDlBytes"]}</b><br />
+                            <i className="fa fa-arrow-down" /> Last Msg: {Moment.utc(Date.parse(device["LastDlMsgTime"])).local().format("YYYY-MM-DD HH:mm:ss")}
                         </td>
-                        <td style={{width: 170}}>
-                            <b>Msgs:</b> {device["TotalDlMsgs"]}<br />
-                            <b>Bytes:</b> {device["TotalDlBytes"]}<br />
-                            <b>Last Msg:</b> {Moment.utc(Date.parse(device["LastDlMsgTime"])).local().format("YYYY-MM-DD HH:mm:ss")}
+                        <td style={{width: 200}}>
+                            <i className="fa fa-rss" /> Cell: <b>{device["CellId"]}</b> {cellIdTime}<br />
+                            <i className="fa fa-signal" /> RSRP: <b>{device["Rsrp"]}</b> {rsrpTime}<br />
+                            <i className="fa fa-signal" /> RSSI: <b>{device["Rssi"]}</b> {rssiTime}<br />
+                            <i className="fa fa-bolt" /> Tx: <b>{device["TxPower"]}</b> {txPowerTime}<br />
+                            <i className="fa fa-globe" /> Coverage Class: <b>{device["CoverageClass"]}</b> {coverageClassTime}<br />
                         </td>
                         <td style={{width: 80}}>
-                            <i className="fa fa-signal" /> {device["Rsrp"]} dBm<br />
                             <i className="fa fa-floppy-o" /> {device["DiskSpaceLeft"]}<br />
                             <i className="fa fa-battery-full" /> {device["BatteryLevel"]}<br />
                             <i className="fa fa-clock-o" /> {device["UpDuration"]}<br />
+                            <i className="fa fa-arrow-up" /> {device["TxTime"]}<br />
+                            <i className="fa fa-arrow-down" /> {device["RxTime"]}<br />
                             <i className="fa fa-rotate-left" /> {device["NumExpectedMsgs"]}
                             </td> 
-                        <td className="center" style={{width: 200}}>
+                        <td className="center" style={{width: 170}}>
                         </td> 
                     </tr>
                 );
@@ -94,8 +122,8 @@ var DisplayRow = React.createClass({
                                         <tr className="info">
                                             <th style={{textAlign: 'center', width: 15}}><input type="checkbox" onChange={this.handleCheckAll} value="checkAll" defaultChecked={false} /></th>
                                             <th>Device</th>
-                                            <th>Uplink</th>
-                                            <th>Downlink</th>
+                                            <th>Traffic</th>
+                                            <th>Radio</th>
                                             <th>Status</th>
                                             <th>Test Results</th>
                                         </tr>

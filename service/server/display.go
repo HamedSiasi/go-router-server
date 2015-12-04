@@ -15,6 +15,7 @@ package server
 import (
     "time"
     "sort"
+    "fmt"
     "github.com/robmeades/utm/service/globals"
 )
 
@@ -47,12 +48,23 @@ type FrontPageDeviceData struct {
     TotalDlMsgs        int        `json:"TotalDlMsgs, omitempty"`
     TotalDlBytes       int        `json:"TotalDlBytes, omitempty"`
     LastDlMsgTime      *time.Time `json:"LastDlMsgTime, omitempty"`
-    Rsrp               float32    `json:"Rsrp, omitempty"`
     BatteryLevel       string     `json:"BatteryLevel, omitempty"`
     DiskSpaceLeft      string     `json:"DiskSpaceLeft, omitempty"`
     Reporting          string     `json:"Reporting, omitempty"`
     Heartbeat          string     `json:"Heartbeat, omitempty"`
     NumExpectedMsgs    int        `json:"NumExpectedMsgs, omitempty"`
+    Rsrp               string     `json:"Rsrp, omitempty"`
+    RsrpTime           *time.Time `json:"RsrpTime, omitempty"`
+    Rssi               string     `json:"Rssi, omitempty"`
+    RssiTime           *time.Time `json:"RssiTime, omitempty"`
+    CellId             string     `json:"CellId, omitempty"`
+    CellIdTime         *time.Time `json:"CellIdTime, omitempty"`
+    TxPower            string     `json:"TxPower, omitempty"`
+    TxPowerTime        *time.Time `json:"TxPowerTime, omitempty"`
+    CoverageClass      string     `json:"CoverageClass, omitempty"`
+    CoverageClassTime  *time.Time `json:"CoverageClassTime, omitempty"`
+    TxDuration         string     `json:"TxTime, omitempty"`
+    RxDuration         string     `json:"RxTime, omitempty"`
 }
 
 type FrontPageData struct {
@@ -129,8 +141,12 @@ func displayFrontPageData () *FrontPageData {
                     }    
                 }    
             }
+            deviceData.Rssi = "---"
             if deviceState.LatestSignalStrengthData != nil {
-                deviceData.Rsrp             = deviceState.LatestSignalStrengthData.RsrpDbm            
+                deviceData.Rsrp             = fmt.Sprintf("%.1f", deviceState.LatestSignalStrengthData.RsrpDbm)            
+                deviceData.RsrpTime         = deviceState.LatestSignalStrengthData.RsrpTimestamp
+                deviceData.Rssi             = fmt.Sprintf("%.1f", deviceState.LatestSignalStrengthData.RssiDbm)
+                deviceData.RssiTime         = deviceState.LatestSignalStrengthData.RssiTimestamp
             }
             if deviceState.LatestUtmStatusData != nil {
                 deviceData.BatteryLevel     = deviceState.LatestUtmStatusData.EnergyLeft
@@ -145,6 +161,36 @@ func displayFrontPageData () *FrontPageData {
                 deviceData.NumExpectedMsgs = len (*deviceState.LatestExpectedMsgData.ExpectedMsgList)
                 data.SummaryData.NumExpectedMsgs += deviceData.NumExpectedMsgs
             }
+            deviceData.CellId = "---"
+            if deviceState.LatestCellIdData != nil {
+                deviceData.CellId = fmt.Sprintf("%d", deviceState.LatestCellIdData.CellId)
+                deviceData.CellIdTime = &deviceState.LatestCellIdData.Timestamp
+            }
+            deviceData.TxPower = "---"
+            deviceData.CoverageClass = "---"
+            deviceData.TxDuration = "---"
+            deviceData.RxDuration = "---"
+            if deviceState.LatestActivityReportData != nil {
+                deviceData.TxDuration = makeNiceDurationStringFromMilliseconds (deviceState.LatestActivityReportData.TotalTransmitSeconds)
+                deviceData.RxDuration = makeNiceDurationStringFromMilliseconds (deviceState.LatestActivityReportData.TotalReceiveSeconds)
+                if deviceState.LatestActivityReportData.TxPowerPresent {
+                    deviceData.TxPower = fmt.Sprintf("%d", deviceState.LatestActivityReportData.TxPowerDbm)
+                    deviceData.TxPowerTime = &deviceState.LatestActivityReportData.TxPowerTimestamp
+                }
+                if deviceState.LatestActivityReportData.DlMcsPresent {
+                    deviceData.CoverageClassTime = &deviceState.LatestActivityReportData.DlMcsTimestamp
+                    if (deviceState.LatestActivityReportData.DlMcs == 5) {
+                        deviceData.CoverageClass = "0"
+                    } else {
+                        if (deviceState.LatestActivityReportData.DlMcs == 3) {
+                            deviceData.CoverageClass = "1"
+                        } else {
+                            deviceData.CoverageClass = "2"                            
+                        }
+                    }                                    
+                }
+            }
+            
             data.DeviceData = append (data.DeviceData, deviceData)
         }
     
@@ -227,6 +273,13 @@ func makeNiceDurationStringFromSeconds (seconds uint32) string {
     } else {
         return theTime.Format ("15:04:05")
     }
+}
+
+func makeNiceDurationStringFromMilliseconds (milliseconds float32) string {
+    var theTime time.Time
+
+    theTime = theTime.Add (time.Duration (milliseconds) * time.Millisecond)
+    return theTime.Format ("15:04:05.000")
 }
 
 /* End Of File */

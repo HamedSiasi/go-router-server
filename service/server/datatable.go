@@ -126,6 +126,14 @@ func operateDataTable() {
                             globals.Dbg.PrintfTrace("%s [datatable] --> device %s is no longer connected  (last heard from @ %s).\n", globals.LogTag, uuid, state.LastHeardFrom.String())
                         }   
                     }                
+                } else {
+                    // Don't have any intervals data so if we've heard nothing in an hour and
+                    // 10 minutes (so allowing for the snap-to case), drop it
+                    // That's probably reasonably in this trials situation
+                    if time.Now().After (state.LastHeardFrom.Add(time.Hour + time.Minute * 10)) {
+                        state.Connected = false
+                        globals.Dbg.PrintfTrace("%s [datatable] --> device %s is no longer connected (last heard from @ %s).\n", globals.LogTag, uuid, state.LastHeardFrom.String())
+                    }
                 }    
             }     
         }
@@ -188,12 +196,9 @@ func operateDataTable() {
                         deviceLatestStateList[value.DeviceUuid] = state;
                         state.DeviceUuid = value.DeviceUuid
                         state.LastHeardFrom = time.Now().UTC()
-                        if state.LatestInterest == nil {
-                            state.LatestInterest = &Interesting {}
-                        }    
+                        state.LatestInterest = &Interesting {}
                         state.LatestInterest.Set()
                         globals.Dbg.PrintfTrace("%s [datatable] --> heard from a new device, UUID %s.\n", globals.LogTag, value.DeviceUuid)
-                        // TODO: find a way to send a get intervals request for a new device, but not from here
                     }
                     
                     globals.Dbg.PrintfTrace("%s [datatable] --> storing data for UUID %s...\n", globals.LogTag, value.DeviceUuid)
@@ -293,7 +298,8 @@ func operateDataTable() {
                         case *MeasurementsIndUlMsg:
                             data := utmMsg.Measurements.DeepCopy()
                             if data != nil {
-                                state.LatestSignalStrengthData = makeSignalStrengthData(data, value.Timestamp)
+                                state.LatestSignalStrengthData = updateSignalStrengthData(data, state.LatestSignalStrengthData,
+                                     value.Timestamp)
                                 if (data.GnssPositionPresent) {
                                     state.LatestGnssData = makeGnssData(data, value.Timestamp)
                                 }
@@ -311,7 +317,8 @@ func operateDataTable() {
                         case *MeasurementsGetCnfUlMsg:
                             data := utmMsg.Measurements.DeepCopy()
                             if data != nil {
-                                state.LatestSignalStrengthData = makeSignalStrengthData(data, value.Timestamp)
+                                state.LatestSignalStrengthData = updateSignalStrengthData(data, state.LatestSignalStrengthData,
+                                    value.Timestamp)
                                 if (data.GnssPositionPresent) {
                                     state.LatestGnssData = makeGnssData(data, value.Timestamp)
                                 }
@@ -371,14 +378,16 @@ func operateDataTable() {
                         case *ActivityReportIndUlMsg:
                             data := utmMsg.DeepCopy()
                             if data != nil {
-                                state.LatestActivityReportData = makeActivityReportData0(data, value.Timestamp)
+                                state.LatestActivityReportData = updateActivityReportData0(data, state.LatestActivityReportData,
+                                     value.Timestamp)
                             }
             
                         case *ActivityReportGetCnfUlMsg:
                             state.LatestInterest.Set()
                             data := utmMsg.DeepCopy()
                             if data != nil {
-                                state.LatestActivityReportData = makeActivityReportData1(data, value.Timestamp)
+                                state.LatestActivityReportData = updateActivityReportData1(data, state.LatestActivityReportData,
+                                     value.Timestamp)
                             }
                     }
                     globals.Dbg.PrintfTrace("%s [datatable] --> storage completed.\n", globals.LogTag)
@@ -386,9 +395,9 @@ func operateDataTable() {
                 // Return the latest state for a given UUID 
                 case *DeviceLatestStateGet:
                     // Retrieve the device state
-                       latestState := deviceLatestStateList[value.DeviceUuid]
+                    latestState := deviceLatestStateList[value.DeviceUuid]
                        
-                       if latestState != nil {
+                    if latestState != nil {
                         // Duplicate the memory pointed to into a new LatestState struct,
                         // post it and close the channel
                         globals.Dbg.PrintfTrace("%s [datatable] --> fetching latest state for UUID %s.\n", globals.LogTag, value.DeviceUuid)
@@ -397,7 +406,7 @@ func operateDataTable() {
                         state.DeviceName = latestState.DeviceName
                         state.Connected = latestState.Connected
                         state.LastHeardFrom = latestState.LastHeardFrom
-                           state.LatestExpectedMsgData = latestState.LatestExpectedMsgData.DeepCopy()
+                        state.LatestExpectedMsgData = latestState.LatestExpectedMsgData.DeepCopy()
                         state.LatestInterest = latestState.LatestInterest.DeepCopy()
                         latestState.LatestInterest.UnSet() // Reseting interestingness after answering a specific query
                         state.LatestTrafficVolumeData = latestState.LatestTrafficVolumeData.DeepCopy()
@@ -425,7 +434,7 @@ func operateDataTable() {
                 // Return the latest state for all UUIDs 
                 case *chan []LatestState:
                 
-                       var allStates []LatestState
+                    var allStates []LatestState
                     for _, latestState := range deviceLatestStateList {
                         // Duplicate the memory pointed to into a new LatestState struct,
                         // post it and close the channel
@@ -434,7 +443,7 @@ func operateDataTable() {
                         state.DeviceName = latestState.DeviceName
                         state.Connected = latestState.Connected
                         state.LastHeardFrom = latestState.LastHeardFrom
-                           state.LatestExpectedMsgData = latestState.LatestExpectedMsgData.DeepCopy()
+                        state.LatestExpectedMsgData = latestState.LatestExpectedMsgData.DeepCopy()
                         state.LatestInterest = latestState.LatestInterest.DeepCopy()
                         state.LatestTrafficVolumeData = latestState.LatestTrafficVolumeData.DeepCopy()
                         state.LatestInitIndData = latestState.LatestInitIndData.DeepCopy()

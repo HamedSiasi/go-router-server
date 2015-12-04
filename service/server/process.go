@@ -66,7 +66,6 @@ var processMsgsChannel chan<- interface{}
 var totalsEncodeState TotalsState
 
 // Keep track of expected responses
-// Note: this is 
 var deviceExpectedMsgList map[string]*[]ExpectedMsg
 
 //--------------------------------------------------------------------

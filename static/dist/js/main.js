@@ -27293,8 +27293,30 @@ var DisplayRow = React.createClass({displayName: "DisplayRow",
     
     render: function() {
         var rows = [];
+        var cellIdTime;
+        var rsrpTime;
+        var rssiTime;
+        var txPowerTime;
+        var coverageClassTime;
+        
         if (this.props["DeviceData"] && (this.props["DeviceData"].length > 0)) {
             this.props["DeviceData"].forEach(function(device, i) {
+                if (device["CellIdTime"]) {
+                	cellIdTime = Moment.utc(Date.parse(device["CellIdTime"])).fromNow();
+                }
+                if (device["RsrpTime"]) {
+                	rsrpTime = "dBm " + Moment.utc(Date.parse(device["RsrpTime"])).fromNow();
+                }
+                if (device["RssiTime"]) {
+                	rssiTime = "dBm " + Moment.utc(Date.parse(device["RssiTime"])).fromNow();
+                }
+                if (device["TxPowerTime"]) {
+                	txPowerTime = "dBm "+ Moment.utc(Date.parse(device["TxPowerTime"])).fromNow();
+                }
+                if (device["CoverageClassTime"]) {
+                	coverageClassTime = Moment.utc(Date.parse(device["coverageClassTime"])).fromNow();
+                }
+                
                 rows.push(
                     React.createElement("tr", {className: "even gradeC", key: i}, 
                         React.createElement("td", {style: {textAlign: 'center', width: 15}}, 
@@ -27302,30 +27324,36 @@ var DisplayRow = React.createClass({displayName: "DisplayRow",
                             React.createElement(Connected, {IsConnected: device["Connected"]})
                         ), 
                         React.createElement("td", {style: {width: 250}}, 
-                            React.createElement("b", null, "Name:"), " ", device["DeviceName"], React.createElement("br", null), 
-                            React.createElement("b", null, "UUID:"), " ", device["Uuid"], React.createElement("br", null), 
-                            React.createElement("b", null, "Mode:"), " ", device["Mode"], React.createElement("br", null), 
-                            React.createElement("b", null, "Reporting:"), " ", device["Reporting"], React.createElement("br", null), 
-                            React.createElement("b", null, "Heartbeat:"), " ", device["Heartbeat"]
+                            "Name: ", React.createElement("b", null, device["DeviceName"]), React.createElement("br", null), 
+                            "UUID: ", React.createElement("b", null, device["Uuid"]), React.createElement("br", null), 
+                            "Mode: ", device["Mode"], React.createElement("br", null), 
+                            "Reporting: ", React.createElement("b", null, device["Reporting"]), React.createElement("br", null), 
+                            "Heartbeat: ", React.createElement("b", null, device["Heartbeat"]), React.createElement("br", null)
                         ), 
                         React.createElement("td", {style: {width: 170}}, 
-                            React.createElement("b", null, "Msgs:"), " ", device["TotalUlMsgs"], React.createElement("br", null), 
-                            React.createElement("b", null, "Bytes:"), " ", device["TotalUlBytes"], React.createElement("br", null), 
-                            React.createElement("b", null, "Last Msg:"), " ", Moment.utc(Date.parse(device["LastUlMsgTime"])).local().format("YYYY-MM-DD HH:mm:ss")
+                            React.createElement("i", {className: "fa fa-arrow-up"}), " Msgs: ", React.createElement("b", null, device["TotalUlMsgs"]), React.createElement("br", null), 
+                            React.createElement("i", {className: "fa fa-arrow-up"}), " Bytes: ", React.createElement("b", null, device["TotalUlBytes"]), React.createElement("br", null), 
+                            React.createElement("i", {className: "fa fa-arrow-up"}), " Last Msg: ", Moment.utc(Date.parse(device["LastUlMsgTime"])).local().format("YYYY-MM-DD HH:mm:ss"), React.createElement("br", null), 
+                            React.createElement("i", {className: "fa fa-arrow-down"}), " Msgs: ", React.createElement("b", null, device["TotalDlMsgs"]), React.createElement("br", null), 
+                            React.createElement("i", {className: "fa fa-arrow-down"}), " Bytes: ", React.createElement("b", null, device["TotalDlBytes"]), React.createElement("br", null), 
+                            React.createElement("i", {className: "fa fa-arrow-down"}), " Last Msg: ", Moment.utc(Date.parse(device["LastDlMsgTime"])).local().format("YYYY-MM-DD HH:mm:ss")
                         ), 
-                        React.createElement("td", {style: {width: 170}}, 
-                            React.createElement("b", null, "Msgs:"), " ", device["TotalDlMsgs"], React.createElement("br", null), 
-                            React.createElement("b", null, "Bytes:"), " ", device["TotalDlBytes"], React.createElement("br", null), 
-                            React.createElement("b", null, "Last Msg:"), " ", Moment.utc(Date.parse(device["LastDlMsgTime"])).local().format("YYYY-MM-DD HH:mm:ss")
+                        React.createElement("td", {style: {width: 200}}, 
+                            React.createElement("i", {className: "fa fa-rss"}), " Cell: ", React.createElement("b", null, device["CellId"]), " ", cellIdTime, React.createElement("br", null), 
+                            React.createElement("i", {className: "fa fa-signal"}), " RSRP: ", React.createElement("b", null, device["Rsrp"]), " ", rsrpTime, React.createElement("br", null), 
+                            React.createElement("i", {className: "fa fa-signal"}), " RSSI: ", React.createElement("b", null, device["Rssi"]), " ", rssiTime, React.createElement("br", null), 
+                            React.createElement("i", {className: "fa fa-bolt"}), " Tx: ", React.createElement("b", null, device["TxPower"]), " ", txPowerTime, React.createElement("br", null), 
+                            React.createElement("i", {className: "fa fa-globe"}), " Coverage Class: ", React.createElement("b", null, device["CoverageClass"]), " ", coverageClassTime, React.createElement("br", null)
                         ), 
                         React.createElement("td", {style: {width: 80}}, 
-                            React.createElement("i", {className: "fa fa-signal"}), " ", device["Rsrp"], " dBm", React.createElement("br", null), 
                             React.createElement("i", {className: "fa fa-floppy-o"}), " ", device["DiskSpaceLeft"], React.createElement("br", null), 
                             React.createElement("i", {className: "fa fa-battery-full"}), " ", device["BatteryLevel"], React.createElement("br", null), 
                             React.createElement("i", {className: "fa fa-clock-o"}), " ", device["UpDuration"], React.createElement("br", null), 
+                            React.createElement("i", {className: "fa fa-arrow-up"}), " ", device["TxTime"], React.createElement("br", null), 
+                            React.createElement("i", {className: "fa fa-arrow-down"}), " ", device["RxTime"], React.createElement("br", null), 
                             React.createElement("i", {className: "fa fa-rotate-left"}), " ", device["NumExpectedMsgs"]
                             ), 
-                        React.createElement("td", {className: "center", style: {width: 200}}
+                        React.createElement("td", {className: "center", style: {width: 170}}
                         )
                     )
                 );
@@ -27343,8 +27371,8 @@ var DisplayRow = React.createClass({displayName: "DisplayRow",
                                         React.createElement("tr", {className: "info"}, 
                                             React.createElement("th", {style: {textAlign: 'center', width: 15}}, React.createElement("input", {type: "checkbox", onChange: this.handleCheckAll, value: "checkAll", defaultChecked: false})), 
                                             React.createElement("th", null, "Device"), 
-                                            React.createElement("th", null, "Uplink"), 
-                                            React.createElement("th", null, "Downlink"), 
+                                            React.createElement("th", null, "Traffic"), 
+                                            React.createElement("th", null, "Radio"), 
                                             React.createElement("th", null, "Status"), 
                                             React.createElement("th", null, "Test Results")
                                         )

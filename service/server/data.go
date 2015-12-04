@@ -422,12 +422,13 @@ func makeTemperatureData(newData *MeasurementData, Time time.Time) *TemperatureD
 
 //  Storage for signal strength data
 type SignalStrengthData struct {
-    Timestamp         time.Time
+    RsrpTimestamp     *time.Time
     RsrpDbm           float32
     Mcl               float32
     HighestMcl        float32
     InsideGsmCoverage bool
-    RssiDbmPresent    bool
+    RssiPresent       bool
+    RssiTimestamp     *time.Time
     RssiDbm           float32
     SnrPresent        bool
     Snr               float32
@@ -437,29 +438,37 @@ func (value *SignalStrengthData) DeepCopy() *SignalStrengthData {
         return nil
     }
     result := &SignalStrengthData{
-        Timestamp:         value.Timestamp,
+        RsrpTimestamp:     value.RsrpTimestamp,
         RsrpDbm:           value.RsrpDbm,
         Mcl:               value.Mcl,
         HighestMcl:        value.HighestMcl,
         InsideGsmCoverage: value.InsideGsmCoverage,
-        RssiDbmPresent:    value.RssiDbmPresent,
+        RssiPresent:       value.RssiPresent,
+        RssiTimestamp:     value.RssiTimestamp,
         RssiDbm:           value.RssiDbm,
         SnrPresent:        value.SnrPresent,
         Snr:               value.Snr,
     }
     return result
 } 
-func makeSignalStrengthData(newData *MeasurementData, Time time.Time) *SignalStrengthData {
-    data := SignalStrengthData{
-        Timestamp:      Time,
-        RsrpDbm:        float32 (newData.Rsrp.Value) / 10,
-        RssiDbmPresent: newData.RssiPresent,
-        RssiDbm:        float32 (newData.Rssi) / 10,
+func updateSignalStrengthData(newData *MeasurementData, oldData *SignalStrengthData, Time time.Time) *SignalStrengthData {
+    data := oldData
+    
+    if data == nil {
+        data = &SignalStrengthData{}
     }
     
-    // TODO: calculate the answer
-
-    return &data
+    data.RsrpTimestamp = &newData.TimeMeasured
+    data.RsrpDbm       = float32 (newData.Rsrp.Value) / 10
+    // TODO: calculate the other answers
+     if newData.RssiPresent {
+        data.RssiPresent = true
+        data.RssiTimestamp = &newData.TimeMeasured
+        data.RssiDbm = float32 (newData.Rssi) / 10
+        // TODO: calculate the other answers
+    }
+         
+    return data
 }
 
 //  Storage for power/state data
@@ -657,12 +666,15 @@ type ActivityReportData struct {
     TotalTransmitSeconds        float32
     TotalReceiveSeconds         float32
     UpTimeSeconds               uint32
-    TxPowerDbmPresent           bool
+    TxPowerPresent              bool
     TxPowerDbm                  int8
+    TxPowerTimestamp            time.Time
     UlMcsPresent                bool
     UlMcs                       uint8
+    UlMcsTimestamp              time.Time
     DlMcsPresent                bool
     DlMcs                       uint8
+    DlMcsTimestamp              time.Time
 }
 func (value *ActivityReportData) DeepCopy() *ActivityReportData {
     if value == nil {
@@ -673,44 +685,77 @@ func (value *ActivityReportData) DeepCopy() *ActivityReportData {
         TotalTransmitSeconds:       value.TotalTransmitSeconds,
         TotalReceiveSeconds:        value.TotalReceiveSeconds,
         UpTimeSeconds:              value.UpTimeSeconds,
-        TxPowerDbmPresent:          value.TxPowerDbmPresent,
+        TxPowerPresent:             value.TxPowerPresent,
         TxPowerDbm:                 value.TxPowerDbm,
+        TxPowerTimestamp:           value.TxPowerTimestamp,
         UlMcsPresent:               value.UlMcsPresent,
         UlMcs:                      value.UlMcs,
+        UlMcsTimestamp:             value.UlMcsTimestamp,
         DlMcsPresent:               value.DlMcsPresent,
         DlMcs:                      value.DlMcs,
+        DlMcsTimestamp:             value.DlMcsTimestamp,
     }
     return result
 }
-func makeActivityReportData0(newData *ActivityReportIndUlMsg, Time time.Time) *ActivityReportData {
-    data := ActivityReportData {
-        Timestamp:                  Time,
-        TotalTransmitSeconds:       float32(newData.TotalTransmitMilliseconds) / 1000,
-        TotalReceiveSeconds:        float32(newData.TotalReceiveMilliseconds) / 1000,
-        UpTimeSeconds:              newData.UpTimeSeconds,
-        TxPowerDbmPresent:          newData.TxPowerDbmPresent,
-        TxPowerDbm:                 newData.TxPowerDbm,
-        UlMcsPresent:               newData.UlMcsPresent,
-        UlMcs:                      newData.UlMcs,
-        DlMcsPresent:               newData.DlMcsPresent,
-        DlMcs:                      newData.DlMcs,
+func updateActivityReportData0(newData *ActivityReportIndUlMsg, oldData *ActivityReportData, Time time.Time) *ActivityReportData {
+    data := oldData
+    
+    if oldData == nil {
+        data = &ActivityReportData{}
     }
-    return &data
+    
+    data.Timestamp            = Time
+    data.TotalTransmitSeconds = float32(newData.TotalTransmitMilliseconds) / 1000
+    data.TotalReceiveSeconds  = float32(newData.TotalReceiveMilliseconds) / 1000
+    data.UpTimeSeconds        = newData.UpTimeSeconds
+    
+    if newData.TxPowerPresent {
+        data.TxPowerPresent = true
+        data.TxPowerDbm = newData.TxPowerDbm
+        data.TxPowerTimestamp = Time
+    }
+    if (newData.UlMcsPresent) {
+        data.UlMcsPresent = true
+        data.UlMcs = newData.UlMcs
+        data.UlMcsTimestamp = Time
+    }
+    if (newData.DlMcsPresent) {
+        data.DlMcsPresent = true
+        data.DlMcs = newData.DlMcs
+        data.DlMcsTimestamp = Time
+    }
+        
+    return data
 }
-func makeActivityReportData1(newData *ActivityReportGetCnfUlMsg, Time time.Time) *ActivityReportData {
-    data := ActivityReportData {
-        Timestamp:                  Time,
-        TotalTransmitSeconds:       float32(newData.TotalTransmitMilliseconds) / 1000,
-        TotalReceiveSeconds:        float32(newData.TotalReceiveMilliseconds) / 1000,
-        UpTimeSeconds:              newData.UpTimeSeconds,
-        TxPowerDbmPresent:          newData.TxPowerDbmPresent,
-        TxPowerDbm:                 newData.TxPowerDbm,
-        UlMcsPresent:               newData.UlMcsPresent,
-        UlMcs:                      newData.UlMcs,
-        DlMcsPresent:               newData.DlMcsPresent,
-        DlMcs:                      newData.DlMcs,
+func updateActivityReportData1(newData *ActivityReportGetCnfUlMsg, oldData *ActivityReportData, Time time.Time) *ActivityReportData {
+    data := oldData
+    
+    if oldData == nil {
+        data = &ActivityReportData{}
     }
-    return &data
+    
+    data.Timestamp            = Time
+    data.TotalTransmitSeconds = float32(newData.TotalTransmitMilliseconds) / 1000
+    data.TotalReceiveSeconds  = float32(newData.TotalReceiveMilliseconds) / 1000
+    data.UpTimeSeconds        = newData.UpTimeSeconds
+    
+    if newData.TxPowerPresent {
+        data.TxPowerPresent = true
+        data.TxPowerDbm = newData.TxPowerDbm
+        data.TxPowerTimestamp = Time
+    }
+    if (newData.UlMcsPresent) {
+        data.UlMcsPresent = true
+        data.UlMcs = newData.UlMcs
+        data.UlMcsTimestamp = Time
+    }
+    if (newData.DlMcsPresent) {
+        data.DlMcsPresent = true
+        data.DlMcs = newData.DlMcs
+        data.DlMcsTimestamp = Time
+    }
+        
+    return data
 }
 
 /* End Of File */

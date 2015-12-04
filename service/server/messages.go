@@ -740,7 +740,7 @@ type ActivityReportIndUlMsg struct {
     TotalTransmitMilliseconds   uint32
     TotalReceiveMilliseconds    uint32
     UpTimeSeconds               uint32
-    TxPowerDbmPresent           bool
+    TxPowerPresent              bool
     TxPowerDbm                  int8
     UlMcsPresent                bool
     UlMcs                       uint8
@@ -755,7 +755,7 @@ func (value *ActivityReportIndUlMsg) DeepCopy() *ActivityReportIndUlMsg {
         TotalTransmitMilliseconds:  value.TotalTransmitMilliseconds,
         TotalReceiveMilliseconds:   value.TotalReceiveMilliseconds,
         UpTimeSeconds:              value.UpTimeSeconds,
-        TxPowerDbmPresent:          value.TxPowerDbmPresent,
+        TxPowerPresent:             value.TxPowerPresent,
         TxPowerDbm:                 value.TxPowerDbm,
         UlMcsPresent:               value.UlMcsPresent,
         UlMcs:                      value.UlMcs,
@@ -775,7 +775,7 @@ type ActivityReportGetCnfUlMsg struct {
     TotalTransmitMilliseconds   uint32
     TotalReceiveMilliseconds    uint32
     UpTimeSeconds               uint32
-    TxPowerDbmPresent           bool
+    TxPowerPresent              bool
     TxPowerDbm                  int8
     UlMcsPresent                bool
     UlMcs                       uint8
@@ -790,7 +790,7 @@ func (value *ActivityReportGetCnfUlMsg) DeepCopy() *ActivityReportGetCnfUlMsg {
         TotalTransmitMilliseconds:  value.TotalTransmitMilliseconds,
         TotalReceiveMilliseconds:   value.TotalReceiveMilliseconds,
         UpTimeSeconds:              value.UpTimeSeconds,
-        TxPowerDbmPresent:          value.TxPowerDbmPresent,
+        TxPowerPresent:             value.TxPowerPresent,
         TxPowerDbm:                 value.TxPowerDbm,
         UlMcsPresent:               value.UlMcsPresent,
         UlMcs:                      value.UlMcs,

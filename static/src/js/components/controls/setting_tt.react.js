@@ -18,10 +18,10 @@
  */
 
 var React = require('react');
-var ValueTtNumUlDatagrams = require('./value_tt_ul_num_datagrams.react');
-var ValueTtLenUlDatagram = require('./value_tt_ul_len_datagram.react');
-var ValueTtNumDlDatagrams = require('./value_tt_dl_num_datagrams.react');
-var ValueTtLenDlDatagram = require('./value_tt_dl_len_datagram.react');
+var ValueTtNumUlDatagrams = require('./value_tt_num_ul_datagrams.react');
+var ValueTtLenUlDatagram = require('./value_tt_len_ul_datagram.react');
+var ValueTtNumDlDatagrams = require('./value_tt_num_dl_datagrams.react');
+var ValueTtLenDlDatagram = require('./value_tt_len_dl_datagram.react');
 var ValueTtTimeout = require('./value_tt_timeout.react');
 var ValueTtDlInterval = require('./value_tt_dl_interval.react');
 var SetTtParameters = require('./set_tt_parameters.react');

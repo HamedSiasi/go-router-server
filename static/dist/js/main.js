@@ -26423,10 +26423,10 @@ module.exports = SettingStd;
  */
 
 var React = require('react');
-var ValueTtNumUlDatagrams = require('./value_tt_ul_num_datagrams.react');
-var ValueTtLenUlDatagram = require('./value_tt_ul_len_datagram.react');
-var ValueTtNumDlDatagrams = require('./value_tt_dl_num_datagrams.react');
-var ValueTtLenDlDatagram = require('./value_tt_dl_len_datagram.react');
+var ValueTtNumUlDatagrams = require('./value_tt_num_ul_datagrams.react');
+var ValueTtLenUlDatagram = require('./value_tt_len_ul_datagram.react');
+var ValueTtNumDlDatagrams = require('./value_tt_num_dl_datagrams.react');
+var ValueTtLenDlDatagram = require('./value_tt_len_dl_datagram.react');
 var ValueTtTimeout = require('./value_tt_timeout.react');
 var ValueTtDlInterval = require('./value_tt_dl_interval.react');
 var SetTtParameters = require('./set_tt_parameters.react');
@@ -26472,7 +26472,7 @@ var SettingTt = React.createClass({displayName: "SettingTt",
 
 module.exports = SettingTt;
 
-},{"./set_tt_parameters.react":198,"./set_tt_start.react":199,"./set_tt_stop.react":200,"./value_tt_dl_interval.react":206,"./value_tt_dl_len_datagram.react":207,"./value_tt_dl_num_datagrams.react":208,"./value_tt_timeout.react":209,"./value_tt_ul_len_datagram.react":210,"./value_tt_ul_num_datagrams.react":211,"react":189}],203:[function(require,module,exports){
+},{"./set_tt_parameters.react":198,"./set_tt_start.react":199,"./set_tt_stop.react":200,"./value_tt_dl_interval.react":206,"./value_tt_len_dl_datagram.react":207,"./value_tt_len_ul_datagram.react":208,"./value_tt_num_dl_datagrams.react":209,"./value_tt_num_ul_datagrams.react":210,"./value_tt_timeout.react":211,"react":189}],203:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26828,6 +26828,80 @@ module.exports = ValueTtLenDlDatagram;
  */
 
 var React = require('react');
+var AppActions = require('../../actions/app_actions.js');
+var AppConstants = require ('../../constants/app_limits')
+var AppStore = require('../../stores/app_store.js');
+
+var ValueTtLenUlDatagram = React.createClass({displayName: "ValueTtLenUlDatagram",
+    getInitialState: function() {
+        AppActions.setTtLenUlDatagram(AppConstants.TT_DATAGRAM_LEN_DEFAULT);
+        return {value: AppConstants.TT_DATAGRAM_LEN_DEFAULT};
+    },
+
+    componentDidMount: function() {
+        AppStore.addChangeListener(this.onChange);
+    },
+
+    componentWillUnmount: function() {
+        AppStore.removeChangeListener(this.onChange);
+    },
+
+    onChange: function() {
+        this.setState({value: AppStore.getTtParameters()["lenUlDatagram"]});
+    },
+
+    handleChange: function(newValue) {
+        this.setState ({value: newValue.target.valueAsNumber});
+    },
+
+    handleBlur: function(newValue) {
+	    var tmp = newValue.target.valueAsNumber;
+        if (!tmp) {
+    	    tmp = AppConstants.TT_DATAGRAM_LEN_MIN;
+        }
+    
+        if (tmp < AppConstants.TT_DATAGRAM_LEN_MIN) {
+            tmp = AppConstants.TT_DATAGRAM_LEN_MIN;
+        }
+        if (tmp > AppConstants.TT_DATAGRAM_LEN_MAX) {
+    	    tmp = AppConstants.TT_DATAGRAM_LEN_MAX;
+        }
+    
+        this.setState ({value: tmp});
+        AppActions.setTtLenUlDatagram(tmp);        	
+    },
+
+    render:function(){
+        var value = this.state.value;
+        return (
+            React.createElement("input", {className: "form-control bfh-number", type: "number", value: value, step: 5, onChange: this.handleChange, onClick: this.handleBlur, onBlur: this.handleBlur, style: {width: 80}})
+        );
+    }
+});
+
+module.exports = ValueTtLenUlDatagram;
+
+},{"../../actions/app_actions.js":190,"../../constants/app_limits":222,"../../stores/app_store.js":226,"react":189}],209:[function(require,module,exports){
+/**
+ * Copyright (C) u-blox Melbourn Ltd
+ * u-blox Melbourn Ltd, Melbourn, UK
+ * 
+ * All rights reserved.
+ *
+ * This source file is the sole property of u-blox Melbourn Ltd.
+ * Reproduction or utilization of this source in whole or part is
+ * forbidden without the written consent of u-blox Melbourn Ltd.
+ * 
+ * Parts of this file are written in JSX, not HTML.  If you want
+ * to put any content in here that should be generated as HTML,
+ * stuff it through:
+ * 
+ * https://facebook.github.io/react/html-jsx.html
+ * 
+ * ...to get your syntax correct.
+ */
+
+var React = require('react');
 var AppConstants = require ('../../constants/app_limits');
 var AppActions = require('../../actions/app_actions.js');
 var AppConstants = require ('../../constants/app_limits')
@@ -26882,7 +26956,82 @@ var ValueTtNumDlDatagrams = React.createClass({displayName: "ValueTtNumDlDatagra
 
 module.exports = ValueTtNumDlDatagrams;
 
-},{"../../actions/app_actions.js":190,"../../constants/app_limits":222,"../../stores/app_store.js":226,"react":189}],209:[function(require,module,exports){
+},{"../../actions/app_actions.js":190,"../../constants/app_limits":222,"../../stores/app_store.js":226,"react":189}],210:[function(require,module,exports){
+/**
+ * Copyright (C) u-blox Melbourn Ltd
+ * u-blox Melbourn Ltd, Melbourn, UK
+ * 
+ * All rights reserved.
+ *
+ * This source file is the sole property of u-blox Melbourn Ltd.
+ * Reproduction or utilization of this source in whole or part is
+ * forbidden without the written consent of u-blox Melbourn Ltd.
+ * 
+ * Parts of this file are written in JSX, not HTML.  If you want
+ * to put any content in here that should be generated as HTML,
+ * stuff it through:
+ * 
+ * https://facebook.github.io/react/html-jsx.html
+ * 
+ * ...to get your syntax correct.
+ */
+
+var React = require('react');
+var AppConstants = require ('../../constants/app_limits');
+var AppActions = require('../../actions/app_actions.js');
+var AppConstants = require ('../../constants/app_limits')
+var AppStore = require('../../stores/app_store.js');
+
+var ValueTtNumUlDatagrams = React.createClass({displayName: "ValueTtNumUlDatagrams",
+    getInitialState: function() {
+        AppActions.setTtNumUlDatagrams(AppConstants.TT_DATAGRAMS_NUM_DEFAULT);
+        return {value: AppConstants.TT_DATAGRAMS_NUM_DEFAULT};
+    },
+
+    componentDidMount: function() {
+        AppStore.addChangeListener(this.onChange);
+    },
+
+    componentWillUnmount: function() {
+        AppStore.removeChangeListener(this.onChange);
+    },
+
+    onChange: function() {
+        this.setState({value: AppStore.getTtParameters()["numUlDatagrams"]});
+    },
+
+    handleChange: function(newValue) {
+        this.setState ({value: newValue.target.valueAsNumber});
+    },
+
+    handleBlur: function(newValue) {
+	    var tmp = newValue.target.valueAsNumber;
+        if (!tmp) {
+    	    tmp = AppConstants.TT_DATAGRAMS_NUM_MIN;
+        }
+    
+        if (tmp < AppConstants.TT_DATAGRAMS_NUM_MIN) {
+            tmp = AppConstants.TT_DATAGRAMS_NUM_MIN;
+        }
+        if (tmp > AppConstants.TT_DATAGRAMS_NUM_MAX) {
+    	    tmp = AppConstants.TT_DATAGRAMS_NUM_MAX;
+        }
+    
+        this.setState ({value: tmp});
+        AppActions.setTtNumUlDatagrams(tmp);        	
+    },
+
+    render:function(){
+        var value = this.state.value;
+        return (
+            React.createElement("input", {className: "form-control bfh-number", type: "number", value: value, step: 5, onChange: this.handleChange, onClick: this.handleBlur, onBlur: this.handleBlur, style: {width: 80}})
+        );
+    }
+});
+
+module.exports = ValueTtNumUlDatagrams;
+
+},{"../../actions/app_actions.js":190,"../../constants/app_limits":222,"../../stores/app_store.js":226,"react":189}],211:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26958,155 +27107,6 @@ var ValueTtTimeout = React.createClass({displayName: "ValueTtTimeout",
 });
 
 module.exports = ValueTtTimeout;
-
-},{"../../actions/app_actions.js":190,"../../constants/app_limits":222,"../../stores/app_store.js":226,"react":189}],210:[function(require,module,exports){
-/**
- * Copyright (C) u-blox Melbourn Ltd
- * u-blox Melbourn Ltd, Melbourn, UK
- * 
- * All rights reserved.
- *
- * This source file is the sole property of u-blox Melbourn Ltd.
- * Reproduction or utilization of this source in whole or part is
- * forbidden without the written consent of u-blox Melbourn Ltd.
- * 
- * Parts of this file are written in JSX, not HTML.  If you want
- * to put any content in here that should be generated as HTML,
- * stuff it through:
- * 
- * https://facebook.github.io/react/html-jsx.html
- * 
- * ...to get your syntax correct.
- */
-
-var React = require('react');
-var AppActions = require('../../actions/app_actions.js');
-var AppConstants = require ('../../constants/app_limits')
-var AppStore = require('../../stores/app_store.js');
-
-var ValueTtLenUlDatagram = React.createClass({displayName: "ValueTtLenUlDatagram",
-    getInitialState: function() {
-        AppActions.setTtLenUlDatagram(AppConstants.TT_DATAGRAM_LEN_DEFAULT);
-        return {value: AppConstants.TT_DATAGRAM_LEN_DEFAULT};
-    },
-
-    componentDidMount: function() {
-        AppStore.addChangeListener(this.onChange);
-    },
-
-    componentWillUnmount: function() {
-        AppStore.removeChangeListener(this.onChange);
-    },
-
-    onChange: function() {
-        this.setState({value: AppStore.getTtParameters()["lenUlDatagram"]});
-    },
-
-    handleChange: function(newValue) {
-        this.setState ({value: newValue.target.valueAsNumber});
-    },
-
-    handleBlur: function(newValue) {
-	    var tmp = newValue.target.valueAsNumber;
-        if (!tmp) {
-    	    tmp = AppConstants.TT_DATAGRAM_LEN_MIN;
-        }
-    
-        if (tmp < AppConstants.TT_DATAGRAM_LEN_MIN) {
-            tmp = AppConstants.TT_DATAGRAM_LEN_MIN;
-        }
-        if (tmp > AppConstants.TT_DATAGRAM_LEN_MAX) {
-    	    tmp = AppConstants.TT_DATAGRAM_LEN_MAX;
-        }
-    
-        this.setState ({value: tmp});
-        AppActions.setTtLenUlDatagram(tmp);        	
-    },
-
-    render:function(){
-        var value = this.state.value;
-        return (
-            React.createElement("input", {className: "form-control bfh-number", type: "number", value: value, step: 5, onChange: this.handleChange, onClick: this.handleBlur, onBlur: this.handleBlur, style: {width: 80}})
-        );
-    }
-});
-
-module.exports = ValueTtLenUlDatagram;
-
-},{"../../actions/app_actions.js":190,"../../constants/app_limits":222,"../../stores/app_store.js":226,"react":189}],211:[function(require,module,exports){
-/**
- * Copyright (C) u-blox Melbourn Ltd
- * u-blox Melbourn Ltd, Melbourn, UK
- * 
- * All rights reserved.
- *
- * This source file is the sole property of u-blox Melbourn Ltd.
- * Reproduction or utilization of this source in whole or part is
- * forbidden without the written consent of u-blox Melbourn Ltd.
- * 
- * Parts of this file are written in JSX, not HTML.  If you want
- * to put any content in here that should be generated as HTML,
- * stuff it through:
- * 
- * https://facebook.github.io/react/html-jsx.html
- * 
- * ...to get your syntax correct.
- */
-
-var React = require('react');
-var AppConstants = require ('../../constants/app_limits');
-var AppActions = require('../../actions/app_actions.js');
-var AppConstants = require ('../../constants/app_limits')
-var AppStore = require('../../stores/app_store.js');
-
-var ValueTtNumUlDatagrams = React.createClass({displayName: "ValueTtNumUlDatagrams",
-    getInitialState: function() {
-        AppActions.setTtNumUlDatagrams(AppConstants.TT_DATAGRAMS_NUM_DEFAULT);
-        return {value: AppConstants.TT_DATAGRAMS_NUM_DEFAULT};
-    },
-
-    componentDidMount: function() {
-        AppStore.addChangeListener(this.onChange);
-    },
-
-    componentWillUnmount: function() {
-        AppStore.removeChangeListener(this.onChange);
-    },
-
-    onChange: function() {
-        this.setState({value: AppStore.getTtParameters()["numUlDatagrams"]});
-    },
-
-    handleChange: function(newValue) {
-        this.setState ({value: newValue.target.valueAsNumber});
-    },
-
-    handleBlur: function(newValue) {
-	    var tmp = newValue.target.valueAsNumber;
-        if (!tmp) {
-    	    tmp = AppConstants.TT_DATAGRAMS_NUM_MIN;
-        }
-    
-        if (tmp < AppConstants.TT_DATAGRAMS_NUM_MIN) {
-            tmp = AppConstants.TT_DATAGRAMS_NUM_MIN;
-        }
-        if (tmp > AppConstants.TT_DATAGRAMS_NUM_MAX) {
-    	    tmp = AppConstants.TT_DATAGRAMS_NUM_MAX;
-        }
-    
-        this.setState ({value: tmp});
-        AppActions.setTtNumUlDatagrams(tmp);        	
-    },
-
-    render:function(){
-        var value = this.state.value;
-        return (
-            React.createElement("input", {className: "form-control bfh-number", type: "number", value: value, step: 5, onChange: this.handleChange, onClick: this.handleBlur, onBlur: this.handleBlur, style: {width: 80}})
-        );
-    }
-});
-
-module.exports = ValueTtNumUlDatagrams;
 
 },{"../../actions/app_actions.js":190,"../../constants/app_limits":222,"../../stores/app_store.js":226,"react":189}],212:[function(require,module,exports){
 /**

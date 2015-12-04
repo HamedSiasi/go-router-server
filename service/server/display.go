@@ -145,8 +145,10 @@ func displayFrontPageData () *FrontPageData {
             if deviceState.LatestSignalStrengthData != nil {
                 deviceData.Rsrp             = fmt.Sprintf("%.1f", deviceState.LatestSignalStrengthData.RsrpDbm)            
                 deviceData.RsrpTime         = deviceState.LatestSignalStrengthData.RsrpTimestamp
-                deviceData.Rssi             = fmt.Sprintf("%.1f", deviceState.LatestSignalStrengthData.RssiDbm)
-                deviceData.RssiTime         = deviceState.LatestSignalStrengthData.RssiTimestamp
+                if deviceState.LatestSignalStrengthData.RssiPresent {
+                    deviceData.Rssi             = fmt.Sprintf("%.1f", deviceState.LatestSignalStrengthData.RssiDbm)
+                    deviceData.RssiTime         = deviceState.LatestSignalStrengthData.RssiTimestamp
+                }
             }
             if deviceState.LatestUtmStatusData != nil {
                 deviceData.BatteryLevel     = deviceState.LatestUtmStatusData.EnergyLeft

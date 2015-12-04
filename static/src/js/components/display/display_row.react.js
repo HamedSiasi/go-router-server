@@ -52,19 +52,19 @@ var DisplayRow = React.createClass({
         
         if (this.props["DeviceData"] && (this.props["DeviceData"].length > 0)) {
             this.props["DeviceData"].forEach(function(device, i) {
-                if (device["CellIdTime"]) {
+                if (device["CellIdTime"] && Moment.isDate(device["CellIdTime"])) {
                 	cellIdTime = Moment.utc(Date.parse(device["CellIdTime"])).fromNow();
                 }
-                if (device["RsrpTime"]) {
+                if (device["RsrpTime"] && Moment.isDate(device["RsrpTime"])) {
                 	rsrpTime = "dBm " + Moment.utc(Date.parse(device["RsrpTime"])).fromNow();
                 }
-                if (device["RssiTime"]) {
+                if (device["RssiTime"] && Moment.isDate(device["RssiTime"])) {
                 	rssiTime = "dBm " + Moment.utc(Date.parse(device["RssiTime"])).fromNow();
                 }
-                if (device["TxPowerTime"]) {
+                if (device["TxPowerTime"] && Moment.isDate(device["TxPowerTime"])) {
                 	txPowerTime = "dBm "+ Moment.utc(Date.parse(device["TxPowerTime"])).fromNow();
                 }
-                if (device["CoverageClassTime"]) {
+                if (device["CoverageClassTime"] && Moment.isDate(device["CoverageClassTime"])) {
                 	coverageClassTime = Moment.utc(Date.parse(device["coverageClassTime"])).fromNow();
                 }
                 
@@ -76,7 +76,7 @@ var DisplayRow = React.createClass({
                         </td>
                         <td style={{width: 250}}>
                             Name: <b>{device["DeviceName"]}</b><br />
-                            UUID: <b>{device["Uuid"]}</b><br />
+                            UUID: {device["Uuid"]}<br />
                             Mode: {device["Mode"]}<br />
                             Reporting: <b>{device["Reporting"]}</b><br />
                             Heartbeat: <b>{device["Heartbeat"]}</b><br />

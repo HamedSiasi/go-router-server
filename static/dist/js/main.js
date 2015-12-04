@@ -27333,7 +27333,7 @@ var DisplayRow = React.createClass({displayName: "DisplayRow",
                     }
             	}                
             	if (device["CoverageClassTime"]) {                
-                    coverageClassTime = Moment.isDate(device["CoverageClassTime"])
+                    coverageClassTime = Moment.utc(Date.parse(device["CoverageClassTime"])).fromNow();
                     if (coverageClassTime == NaN) {
                     	coverageClassTime = "";
                     }

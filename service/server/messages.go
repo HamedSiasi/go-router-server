@@ -658,6 +658,18 @@ func (value *TrafficTestModeRuleBreakerUlDatagram) DeepCopy() *TrafficTestModeRu
     return result
 }
 
+// A bad TrafficTestModeUlDatagram
+type BadTrafficTestModeRuleBreakerUlDatagram struct {
+    Fill       byte
+    Length     uint32
+}
+
+// An out of sequence rafficTestModeUlDatagram
+type OutOfSequenceTrafficTestModeRuleBreakerUlDatagram struct {
+    Fill       byte
+    Length     uint32
+}
+
 // TrafficTestModeRuleBreakerDlDatagram
 type TrafficTestModeRuleBreakerDlDatagram struct {
     Fill       byte

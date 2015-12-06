@@ -21,6 +21,10 @@ import (
     "errors"
 )
 
+//--------------------------------------------------------------------
+// Types
+//--------------------------------------------------------------------
+
 // Generic struct describing an AMQP message
 type AmqpMessage struct {
     DeviceUuid   string `bson:"device_uuid" json:"device_uuid"`
@@ -52,6 +56,10 @@ type Queue struct {
     DlAmqpMsgs   chan AmqpMessage
 }
 
+
+//--------------------------------------------------------------------
+// Functions
+//--------------------------------------------------------------------
 
 // Set up a channel to consume a queue
 func consumeQueue(channel *amqp.Channel, chanName string) (<-chan amqp.Delivery, error) {

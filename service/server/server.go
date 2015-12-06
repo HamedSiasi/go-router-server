@@ -80,7 +80,12 @@ var amqpRetryCount int
 // Keep track of the decode totals for all devices here
 var totalsDecodeState TotalsState
 
+// Keep track of the totals on the uplink for each device
 var deviceDecodeStateList map[string]*DeviceTotalsState        
+
+// Keep hold of the values needed on the uplink for traffic test mode
+var ulFill    byte
+var ulLength  uint32                            
 
 //--------------------------------------------------------------------
 // Functions
@@ -92,8 +97,7 @@ func processUlAmqpMsgs(q *Queue) {
 
     for {
         amqpMessageCount++
-        select {
-            
+        select {            
             case msg, isOpen := <-q.UlAmqpMsgs:
             {
                 if isOpen {
@@ -119,11 +123,13 @@ func processUlAmqpMsgs(q *Queue) {
                                 }
                                 
                                 // Decode the messages
-                                dlMsgs, byteCount := decode(value.Data, value.DeviceUuid)
+                                dlMsgs, byteCount := decode(value.Data, value.DeviceUuid, ulFill, ulLength)
             
                                 // Pass the messages to the data table for recording
                                 // and pass them to processing to see if any responses
-                                // are required, totalising as we go
+                                // are required, totalising as we go.
+                                // Also send them to the traffic test channel in case
+                                // there is anything to do there
                                 if dlMsgs != nil {
                                     decodeState.Timestamp = time.Now().UTC()
                                     decodeState.Bytes += byteCount
@@ -134,16 +140,38 @@ func processUlAmqpMsgs(q *Queue) {
                                         totalsDecodeState.Msgs++
                                         dataTableChannel <- dlMsg
                                         processMsgsChannel <- dlMsg
+                                        trafficTestChannel <- dlMsg
                                     }
                                 }
             
-                                // Ask the process loop for the encode status now
-                                get := &DeviceEncodeStateGet{
+                                // Ask the traffic test channel for the expected
+                                // UL fill value as we may need that for the next
+                                // decode, and in any case we should keep the 
+                                // datatable up to date with progress
+                                getTrafficTestContext := &DeviceTrafficTestContextGet{
                                     DeviceUuid: value.DeviceUuid,
                                 }
-                                get.State = make(chan DeviceTotalsState)
-                                processMsgsChannel <- get
-                                encodeState, isOpen := <- get.State
+                                getTrafficTestContext.Context = make(chan TrafficTestContext)
+                                trafficTestChannel <- getTrafficTestContext
+                                trafficTestContext, isOpen := <- getTrafficTestContext.Context
+                                if isOpen {
+                                    if trafficTestContext.Parameters != nil {
+                                        // The only things we need locally from this are the next
+                                        // expected uplink fill value and the uplink datagram length
+                                        ulFill = trafficTestContext.UlFill
+                                        ulLength = trafficTestContext.Parameters.DeviceParameters.LenUlDatagram
+                                    }
+                                    // Send it all off to the datatable
+                                    dataTableChannel <- &trafficTestContext
+                                }
+                                
+                                // Ask the process channel for the encode status now
+                                getEncodeState := &DeviceEncodeStateGet{
+                                    DeviceUuid: value.DeviceUuid,
+                                }
+                                getEncodeState.State = make(chan DeviceTotalsState)
+                                processMsgsChannel <- getEncodeState
+                                encodeState, isOpen := <- getEncodeState.State
                                 
                                 // Only do this if the channel wasn't closed prematurely
                                 // (e.g. due to an unknown UE being requested, which might
@@ -198,7 +226,7 @@ func processUlAmqpMsgs(q *Queue) {
                 }    
             } // case    
         } // select
-    }
+    } // for
 }
 
 // Handle all the AMQP queues
@@ -225,15 +253,13 @@ func doAmqp(username, amqpAddress string) {
             // If we get to here, the AMQP channel has been closed,
             // which we never want.  Try again.
             q.Close()
-
         } else {
             globals.Dbg.PrintfTrace("%s [server] --> error opening AMQP queue (%s).\n", globals.LogTag, err.Error())
         }
-
         amqpRetryCount++
         globals.Dbg.PrintfTrace("%s [server] --> waiting before trying again...\n", globals.LogTag)
         time.Sleep(time.Second * 10)
-    }
+    } // for
 }
 
 // Entry point
@@ -251,7 +277,8 @@ func Run() {
     port, err := host.GetString("port")
 
     // Set up the decode state list map
-    // Do this here so that if
+    // Do this here so that if we restart the AMQP queue the
+    // data is retained
     deviceDecodeStateList = make(map[string]*DeviceTotalsState)        
 
     // Handle all the Amqp messages

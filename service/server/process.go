@@ -142,10 +142,10 @@ func operateProcess() {
     go func() {
         for cmd := range channel {
             switch value := cmd.(type) {
-                
                 // Handle message containers holding somethings of interest,
                 // throw everything else away
                 case *MessageContainer:
+                {
                     var err error = nil
                     var byteCount int = 0
                     var msgCount int = 0
@@ -181,11 +181,12 @@ func operateProcess() {
                     globals.Dbg.PrintfTrace("%s [process] --> processing message from UUID %s...\n\n%s\n\n", globals.LogTag, value.DeviceUuid, spew.Sdump(cmd))
                     
                     switch utmMsg := value.Message.(type) {
-                        
                         case *TransparentUlDatagram:
+                        {
                             // Nothing to do here
-                        
+                        }
                         case *PingReqUlMsg:
+                        {
                             // Respond
                             var count int 
                             err, count, responseIdExpected = encodeAndEnqueue (&PingCnfDlMsg{}, value.DeviceUuid)
@@ -193,12 +194,14 @@ func operateProcess() {
                                 byteCount += count                           
                                 msgCount++
                             }    
-                        
+                        }
                         case *PingCnfUlMsg:
+                        {
                             // Nothing to do here
                             responseIdReceived = RESPONSE_PING_CNF
-
+                        }
                         case *InitIndUlMsg:
+                        {
                             if uint8(RevisionLevel) != utmMsg.RevisionLevel {
                                 globals.Dbg.PrintfInfo("%s [process] --> UUID %s has protocol revision %d, which is different to this server (%d)", globals.LogTag, value.DeviceUuid, utmMsg.RevisionLevel, RevisionLevel)
                             }    
@@ -209,8 +212,9 @@ func operateProcess() {
                                 byteCount += count                           
                                 msgCount++
                             }    
-                            
+                        }
                         case *DateTimeIndUlMsg:
+                        {
                             // Send DataTimeSetReqDlMsg if out of range
                             // First check if the time is OK but the date is absent
                             // (which could be the case if the time has been set by GNSS,
@@ -236,91 +240,120 @@ func operateProcess() {
                                     msgCount++
                                 }    
                             }
-                           
+                        }
                         case *DateTimeSetCnfUlMsg:
+                        {
                             // Nothing to do here
                             responseIdReceived = RESPONSE_DATE_TIME_SET_CNF
-                            
+                        }
                         case *DateTimeGetCnfUlMsg:
+                        {
                             // Nothing to do here
                             responseIdReceived = RESPONSE_DATE_TIME_GET_CNF
-                            
+                        }
                         case *ModeSetCnfUlMsg:
+                        {
                             // TODO start sending downlink datagrams if in a traffic test
                             responseIdReceived = RESPONSE_MODE_SET_CNF
-                            
+                        }
                         case *ModeGetCnfUlMsg:
+                        {
                             // Nothing to do here
                             responseIdReceived = RESPONSE_MODE_GET_CNF
-                            
+                        }
                         case *IntervalsGetCnfUlMsg:
+                        {
                             // Nothing to do here
                             responseIdReceived = RESPONSE_INTERVALS_GET_CNF
-                            
+                        }
                         case *ReportingIntervalSetCnfUlMsg:
+                        {
                             // Nothing to do here
                             responseIdReceived = RESPONSE_REPORTING_INTERVAL_SET_CNF
-                        
+                        }
                         case *HeartbeatSetCnfUlMsg:
+                        {
                             // Nothing to do here
                             responseIdReceived = RESPONSE_HEARTBEAT_SET_CNF
-
+                        }
                         case *PollIndUlMsg:
+                        {
                             // Nothing to do here
-                        
+                        }
                         case *MeasurementsIndUlMsg:
+                        {
                             // Nothing to do here
-                        
+                        }
                         case *MeasurementsGetCnfUlMsg:
+                        {
                             // Nothing to do here
                             responseIdReceived = RESPONSE_MEASUREMENTS_GET_CNF
-
+                        }
                         // case *MeasurementsControlIndUlMsg:
                         // case *MeasurementControlSetCnfUlMsg:
                         // case *MeasurementsControlGetCnfUlMsg:
                         // case *MeasurementsControlDefaultsSetCnfUlMsg:
                         // TODO
-
                         case *TrafficReportIndUlMsg:
+                        {
                             // Nothing to do here
-                        
+                        }
                         case *TrafficReportGetCnfUlMsg:
+                        {
                             // Nothing to do here
                             responseIdReceived = RESPONSE_TRAFFIC_REPORT_GET_CNF
-
+                        }
                         case *TrafficTestModeParametersSetCnfUlMsg:
+                        {
                             // TODO send ModeSetReqDlMsg if in a traffic test 
                             responseIdReceived = RESPONSE_TRAFFIC_TEST_MODE_PARAMETERS_SET_CNF
-                            
+                        }
                         case *TrafficTestModeParametersGetCnfUlMsg:
+                        {
                             // Nothing to do here
                             responseIdReceived = RESPONSE_TRAFFIC_TEST_MODE_PARAMETERS_GET_CNF
-                            
+                        }
                         case *TrafficTestModeRuleBreakerUlDatagram:
-                            // TODO
-                        
+                        {
+                            // Nothing to do here, the traffic test mode channel will deal with this
+                        }
+                        case *BadTrafficTestModeRuleBreakerUlDatagram:
+                        {
+                            // Nothing to do here, the traffic test mode channel will deal with this
+                        }
+                        case *OutOfSequenceTrafficTestModeRuleBreakerUlDatagram:
+                        {
+                            // Nothing to do here, the traffic test mode channel will deal with this
+                        }
                         case *TrafficTestModeReportIndUlMsg:
+                        {
                             // Nothing to do here
-                        
+                        }
                         case *TrafficTestModeReportGetCnfUlMsg:
+                        {
                             // Nothing to do here
                             responseIdReceived = RESPONSE_TRAFFIC_TEST_MODE_REPORT_GET_CNF
-
+                        }
                         case *ActivityReportIndUlMsg:
+                        {
                             // Nothing to do here
-                        
+                        }
                         case *ActivityReportGetCnfUlMsg:
+                        {
                             // Nothing to do here
                             responseIdReceived = RESPONSE_ACTIVITY_REPORT_GET_CNF
-
+                        }
                         case *DebugIndUlMsg:
+                        {
                             // Nothing to do here
-                            
+                        }
                         default:
+                        {
                             // Ignore any unknown UTM messages
                             globals.Dbg.PrintfTrace("%s [process] --> unrecognised UTM message, ignoring.\n", globals.LogTag)
                             globals.Dbg.PrintfInfo("%s [process] --> unrecognised UTM message was:\n\n%s\n", globals.LogTag, spew.Sdump(utmMsg))
-                    }
+                        } // case
+                    } // switch
                     
                     // Count up the downlink status for this devce
                     if msgCount > 0 {
@@ -337,31 +370,30 @@ func operateProcess() {
                     addResponse (responseIdExpected, value.DeviceUuid)
                     
                     globals.Dbg.PrintfTrace("%s [process] --> processing completed.\n", globals.LogTag)
-                    
+                } // case    
                 // Add to the encode state totals in here, useful if other things send messages
                 case *DeviceEncodeStateAdd:
+                {
                     // Retrieve the encode state
-                       encodeState := deviceEncodeStateList[value.DeviceUuid]
-                       // Add to it
-                       if encodeState != nil {
-                           encodeState.Timestamp = value.State.Timestamp
-                           encodeState.Msgs += value.State.Msgs
-                           encodeState.Bytes += value.State.Bytes
-                           if encodeState.Totals != nil {
+                    if encodeState, isPresent := deviceEncodeStateList[value.DeviceUuid]; isPresent {
+                        encodeState.Timestamp = value.State.Timestamp
+                        encodeState.Msgs += value.State.Msgs
+                        encodeState.Bytes += value.State.Bytes
+                        if encodeState.Totals != nil {
                             encodeState.Totals.Timestamp = value.State.Timestamp
-                               encodeState.Totals.Msgs += value.State.Msgs
-                               encodeState.Totals.Bytes += value.State.Bytes
-                           }
+                            encodeState.Totals.Msgs += value.State.Msgs
+                            encodeState.Totals.Bytes += value.State.Bytes
+                        }
                            
-                         // Add the response ID
-                         addResponse (value.ResponseId, value.DeviceUuid)
+                        // Add the response ID
+                        addResponse (value.ResponseId, value.DeviceUuid)
                     }
-                
+                }
                 // Return the encode state for a given UUID 
                 case *DeviceEncodeStateGet:
+                {
                     // Retrieve the encode state
-                       encodeState := deviceEncodeStateList[value.DeviceUuid]
-                       if encodeState != nil {
+                    if encodeState, isPresent := deviceEncodeStateList[value.DeviceUuid]; isPresent {
                         // Copy in the EncodeState data, post it and close the channel
                         globals.Dbg.PrintfTrace("%s [process] --> fetching encode state for UUID %s.\n", globals.LogTag, value.DeviceUuid)
                         totalsState := TotalsState {
@@ -376,8 +408,7 @@ func operateProcess() {
                             Bytes:      encodeState.Bytes,
                             Totals:     &totalsState,
                         }
-                        expectedMsgList := deviceExpectedMsgList[value.DeviceUuid]
-                        if expectedMsgList != nil {
+                        if expectedMsgList, hasExpectedMsgList := deviceExpectedMsgList[value.DeviceUuid]; hasExpectedMsgList {
                             tmp := make([]ExpectedMsg, 0)
                             state.ExpectedMsgList = &tmp
                             for _, expectedMsg := range *expectedMsgList {
@@ -390,13 +421,14 @@ func operateProcess() {
                         globals.Dbg.PrintfTrace("%s [process] --> asked for encode state for unknown UUID %s.\n", globals.LogTag, value.DeviceUuid)
                     }
                     close(value.State)
-                       
+                } // case       
                 default:
+                {
                     globals.Dbg.PrintfTrace("%s [process] --> unrecognised command, ignoring.\n", globals.LogTag)
                     globals.Dbg.PrintfInfo("%s [process] --> unrecognised command was:\n\n%s\n", globals.LogTag, spew.Sdump(cmd))
-            }
-        }
-
+                } // case
+            } // switch
+        } // for
         globals.Dbg.PrintfTrace("%s [process] --> command channel closed, stopping.\n", globals.LogTag)
     }()
 }

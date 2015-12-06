@@ -27,6 +27,18 @@ uint32_t pointerSub(const char *a, const char *b)
     return (uint32_t) (a - b);
 }
 
+void byteCopy(char *pDest, const char *pSrc, uint32_t size)
+{
+    uint32_t x;
+    
+    for (x = 0; x < size; x++)
+    {
+        *pDest = *pSrc;
+        pDest++;
+        pSrc++;
+    }
+}
+
 TransparentDatagram_t getTransparentDatagram(UlMsgUnion_t in)
 {
     return in.transparentDatagram;
@@ -269,6 +281,9 @@ const MaxDatagramSizeRaw uint32 = C.MAX_DATAGRAM_SIZE_RAW
 
 const RevisionLevel uint32 = C.REVISION_LEVEL
 
+const DlFillMinValue byte = C.MIN_TRAFFIC_TEST_MODE_FILL_DL
+const UlFillMinValue byte = C.MIN_TRAFFIC_TEST_MODE_FILL_UL
+
 var totalUlMsgs int
 var totalUlBytes int
 var lastUlMsgTime time.Time
@@ -319,7 +334,7 @@ var ulDecodeTypeDisplay map[int]string = map[int]string {
 
 // The decode function.  Returns an array of decoded
 // messages and a byte count
-func decode(data []byte, uuid string) ([]interface{}, int) {
+func decode(data []byte, uuid string, ulFill byte, ulLength uint32) ([]interface{}, int) {
 
     var bytesRemaining C.uint32_t = 1
     var returnedMsgs []interface{} = nil
@@ -335,6 +350,19 @@ func decode(data []byte, uuid string) ([]interface{}, int) {
     pNext := pStart
     ppNext := (**C.char)(unsafe.Pointer(&pNext))
 
+    // If the downlink datagram contains a TrafficTestModeRuleBreakerDatagram,
+    // which must occupy the whole datagram, then the decode function will check
+    // the contents against the ulFill and ulLength values in the buffer, so set
+    // that up here.
+    ulTrafficTestModeRuleBreakerDatagram := C.TrafficTestModeRuleBreakerDatagram_t {
+        fill:    (C.char) (ulFill),
+        length:  (C.uint32_t) (ulLength),
+    }
+    pSrc := (*C.char)(unsafe.Pointer(&ulTrafficTestModeRuleBreakerDatagram))
+    pDest := (*C.char)(unsafe.Pointer(pBuffer))
+    C.byteCopy(pDest, pSrc, (C.uint32_t) (unsafe.Sizeof (ulTrafficTestModeRuleBreakerDatagram)));
+
+    // Print out the data for info
     hexBuffer := hex.Dump(data)
     globals.Dbg.PrintfInfo("%s [decode] --> the whole input buffer:\n\n%s\n\n", globals.LogTag, hexBuffer)
 
@@ -368,29 +396,36 @@ func decode(data []byte, uuid string) ([]interface{}, int) {
             // Now decode the messages and pass them to the state table
             switch int(result) {
                 case C.DECODE_RESULT_TRANSPARENT_UL_DATAGRAM:
+                {
                     // TODO
+                }
                 case C.DECODE_RESULT_PING_REQ_UL_MSG:
+                {
                     // Empty message
                     returnedMsgs = append (returnedMsgs,
                         &MessageContainer {
                             DeviceUuid:        uuid,
-                            Timestamp:         time.Now(),
+                            Timestamp:         time.Now().UTC(),
                             Message: &PingReqUlMsg {},   
                         })
+                }
                 case C.DECODE_RESULT_PING_CNF_UL_MSG:
+                {
                     // Empty message
                     returnedMsgs = append (returnedMsgs,
                         &MessageContainer {
                             DeviceUuid:        uuid,
-                            Timestamp:         time.Now(),
+                            Timestamp:         time.Now().UTC(),
                             Message: &PingCnfUlMsg {},   
                         })
+                }
                 case C.DECODE_RESULT_INIT_IND_UL_MSG:
+                {
                     value := C.getInitIndUlMsg(inputBuffer)
                     returnedMsgs = append (returnedMsgs,
                         &MessageContainer {
                             DeviceUuid:        uuid,
-                            Timestamp:         time.Now(),
+                            Timestamp:         time.Now().UTC(),
                             Message: &InitIndUlMsg {
                                 WakeUpCode:        WakeUpEnum(value.wakeUpCode),
                                 RevisionLevel:     uint8(value.revisionLevel),
@@ -400,120 +435,130 @@ func decode(data []byte, uuid string) ([]interface{}, int) {
                                 DisableServerPing: bool(value.disableServerPing),
                             },
                         })
-                    
+                }
                 case C.DECODE_RESULT_DATE_TIME_IND_UL_MSG:
+                {
                     value := C.getDateTimeIndUlMsg(inputBuffer)
                     returnedMsgs = append (returnedMsgs,
                         &MessageContainer {
                             DeviceUuid:        uuid,
-                            Timestamp:         time.Now(),
+                            Timestamp:         time.Now().UTC(),
                             Message: &DateTimeIndUlMsg {
-                                UtmTime:        time.Unix(int64(value.time), 0).Local(),
-                                TimeSetBy:      TimeSetByEnum(value.setBy),
+                                UtmTime:           time.Unix(int64(value.time), 0).Local(),
+                                TimeSetBy:         TimeSetByEnum(value.setBy),
                             },
                         })
-                
+                }
                 case C.DECODE_RESULT_DATE_TIME_SET_CNF_UL_MSG:
+                {
                     value := C.getDateTimeSetCnfUlMsg(inputBuffer)
                     returnedMsgs = append (returnedMsgs,
                         &MessageContainer {
                             DeviceUuid:        uuid,
-                            Timestamp:         time.Now(),
+                            Timestamp:         time.Now().UTC(),
                             Message: &DateTimeSetCnfUlMsg {
-                                UtmTime:        time.Unix(int64(value.time), 0).Local(),
-                                TimeSetBy:      TimeSetByEnum(value.setBy),
+                                UtmTime:           time.Unix(int64(value.time), 0).Local(),
+                                TimeSetBy:         TimeSetByEnum(value.setBy),
                             },
                         })
-                    
+                }
                 case C.DECODE_RESULT_DATE_TIME_GET_CNF_UL_MSG:
+                {
                     value := C.getDateTimeGetCnfUlMsg(inputBuffer)
                     returnedMsgs = append (returnedMsgs,
                         &MessageContainer {
                             DeviceUuid:        uuid,
-                            Timestamp:         time.Now(),
+                            Timestamp:         time.Now().UTC(),
                             Message: &DateTimeGetCnfUlMsg {
-                                UtmTime:        time.Unix(int64(value.time), 0).Local(),
-                                TimeSetBy:      TimeSetByEnum(value.setBy),
+                                UtmTime:           time.Unix(int64(value.time), 0).Local(),
+                                TimeSetBy:         TimeSetByEnum(value.setBy),
                             },
                         })
-                    
+                }
                 case C.DECODE_RESULT_MODE_SET_CNF_UL_MSG:
+                {
                     value := C.getModeSetCnfUlMsg(inputBuffer)
                     returnedMsgs = append (returnedMsgs,
                         &MessageContainer {
                             DeviceUuid:        uuid,
-                            Timestamp:         time.Now(),
+                            Timestamp:         time.Now().UTC(),
                             Message: &ModeSetCnfUlMsg {
-                                Mode:           ModeEnum(value.mode),
+                                Mode:              ModeEnum(value.mode),
                             },   
                         })
-                    
+                }
                 case C.DECODE_RESULT_MODE_GET_CNF_UL_MSG:
+                {
                     value := C.getModeGetCnfUlMsg(inputBuffer)
                     returnedMsgs = append (returnedMsgs,
                         &MessageContainer {
                             DeviceUuid:        uuid,
-                            Timestamp:         time.Now(),
+                            Timestamp:         time.Now().UTC(),
                             Message: &ModeGetCnfUlMsg {
-                                Mode:           ModeEnum(value.mode),
+                                Mode:              ModeEnum(value.mode),
                             },   
                         })
-                    
+                }
                 case C.DECODE_RESULT_HEARTBEAT_SET_CNF_UL_MSG:
+                {
                     value := C.getHeartbeatSetCnfUlMsg(inputBuffer)
                     returnedMsgs = append (returnedMsgs,
                         &MessageContainer {
                             DeviceUuid:        uuid,
-                            Timestamp:         time.Now(),
+                            Timestamp:         time.Now().UTC(),
                             Message: &HeartbeatSetCnfUlMsg {
                                 HeartbeatSeconds:   uint32(value.heartbeatSeconds),
                                 HeartbeatSnapToRtc: bool(value.heartbeatSnapToRtc),
                             },   
                         })
-
+                }
                 case C.DECODE_RESULT_REPORTING_INTERVAL_SET_CNF_UL_MSG:
+                {
                     value := C.getReportingIntervalSetCnfUlMsg(inputBuffer)
                     returnedMsgs = append (returnedMsgs,
                         &MessageContainer {
                             DeviceUuid:        uuid,
-                            Timestamp:         time.Now(),
+                            Timestamp:         time.Now().UTC(),
                             Message: &ReportingIntervalSetCnfUlMsg {
                                 ReportingInterval:  uint32(value.reportingInterval),
                             },   
                         })
-                    
+                }
                 case C.DECODE_RESULT_INTERVALS_GET_CNF_UL_MSG:
+                {
                     value := C.getIntervalsGetCnfUlMsg(inputBuffer)
                     returnedMsgs = append (returnedMsgs,
                         &MessageContainer {
                             DeviceUuid:        uuid,
-                            Timestamp:         time.Now(),
+                            Timestamp:         time.Now().UTC(),
                             Message: &IntervalsGetCnfUlMsg {
                                 ReportingInterval:  uint32(value.reportingInterval),
                                 HeartbeatSeconds:   uint32(value.heartbeatSeconds),
                                 HeartbeatSnapToRtc: bool(value.heartbeatSnapToRtc),
                             },   
                         })
-    
+                }
                 case C.DECODE_RESULT_POLL_IND_UL_MSG:
+                {
                     value := C.getPollIndUlMsg(inputBuffer)
                     returnedMsgs = append (returnedMsgs,
                         &MessageContainer {
                             DeviceUuid:        uuid,
-                            Timestamp:         time.Now(),
+                            Timestamp:         time.Now().UTC(),
                             Message: &PollIndUlMsg {
                                 Mode:            ModeEnum(value.mode),
                                 EnergyLeft:      EnergyLeftEnum(value.energyLeft),
                                 DiskSpaceLeft:   DiskSpaceLeftEnum(value.diskSpaceLeft),
                             },   
                         })
-                    
+                }
                 case C.DECODE_RESULT_MEASUREMENTS_IND_UL_MSG:
+                {
                     value := C.getMeasurementsIndUlMsg(inputBuffer)
                     returnedMsgs = append (returnedMsgs,
                         &MessageContainer {
                             DeviceUuid:        uuid,
-                            Timestamp:         time.Now(),
+                            Timestamp:         time.Now().UTC(),
                             Message: &MeasurementsIndUlMsg {  // Structure initialisation is just horrible in this language
                                 Measurements: MeasurementData {
                                     TimeMeasured:         time.Unix(int64(value.measurements.time), 0).Local(),
@@ -543,13 +588,14 @@ func decode(data []byte, uuid string) ([]interface{}, int) {
                                 },
                             },    
                         })
-                    
+                }
                 case C.DECODE_RESULT_MEASUREMENTS_GET_CNF_UL_MSG:
+                {
                     value := C.getMeasurementsGetCnfUlMsg(inputBuffer)
                     returnedMsgs = append (returnedMsgs,
                         &MessageContainer {
                             DeviceUuid:        uuid,
-                            Timestamp:         time.Now(),
+                            Timestamp:         time.Now().UTC(),
                             Message: &MeasurementsIndUlMsg {  // Still horrible
                                 Measurements: MeasurementData {
                                     TimeMeasured:         time.Unix(int64(value.measurements.time), 0).Local(),
@@ -579,7 +625,7 @@ func decode(data []byte, uuid string) ([]interface{}, int) {
                                 },
                             },    
                         })
-                    
+                }
                 case C.DECODE_RESULT_MEASUREMENTS_CONTROL_IND_UL_MSG:
                 // TODO
                 case C.DECODE_RESULT_MEASUREMENT_CONTROL_SET_CNF_UL_MSG:
@@ -589,11 +635,12 @@ func decode(data []byte, uuid string) ([]interface{}, int) {
                 case C.DECODE_RESULT_MEASUREMENTS_CONTROL_DEFAULTS_SET_CNF_UL_MSG:
                 // TODO
                 case C.DECODE_RESULT_TRAFFIC_REPORT_IND_UL_MSG:
+                {
                     value := C.getTrafficReportIndUlMsg(inputBuffer)
                     returnedMsgs = append (returnedMsgs,
                         &MessageContainer {
                             DeviceUuid:        uuid,
-                            Timestamp:         time.Now(),
+                            Timestamp:         time.Now().UTC(),
                             Message: &TrafficReportIndUlMsg {
                                 NumDatagramsUl:             uint32(value.numDatagramsUl),
                                 NumBytesUl:                 uint32(value.numBytesUl),
@@ -602,13 +649,14 @@ func decode(data []byte, uuid string) ([]interface{}, int) {
                                 NumDatagramsDlBadChecksum:  uint32(value.numDatagramsDlBadChecksum),
                             },   
                         })
-                    
+                }
                 case C.DECODE_RESULT_TRAFFIC_REPORT_GET_CNF_UL_MSG:
+                {
                     value := C.getTrafficReportGetCnfUlMsg(inputBuffer)
                     returnedMsgs = append (returnedMsgs,
                         &MessageContainer {
                             DeviceUuid:        uuid,
-                            Timestamp:         time.Now(),
+                            Timestamp:         time.Now().UTC(),
                             Message: &TrafficReportGetCnfUlMsg {
                                 NumDatagramsUl:             uint32(value.numDatagramsUl),
                                 NumBytesUl:                 uint32(value.numBytesUl),
@@ -617,13 +665,14 @@ func decode(data []byte, uuid string) ([]interface{}, int) {
                                 NumDatagramsDlBadChecksum:  uint32(value.numDatagramsDlBadChecksum),
                             },   
                         })
-                    
+                }
                 case C.DECODE_RESULT_TRAFFIC_TEST_MODE_PARAMETERS_SET_CNF_UL_MSG:
+                {
                     value := C.getTrafficTestModeParametersSetCnfUlMsg(inputBuffer)
                     returnedMsgs = append (returnedMsgs,
                         &MessageContainer {
                             DeviceUuid:        uuid,
-                            Timestamp:         time.Now(),
+                            Timestamp:         time.Now().UTC(),
                             Message: &TrafficTestModeParametersSetCnfUlMsg {
                                 NumUlDatagrams:      uint32(value.numUlDatagrams),
                                 LenUlDatagram:       uint32(value.lenUlDatagram),
@@ -631,13 +680,14 @@ func decode(data []byte, uuid string) ([]interface{}, int) {
                                 LenDlDatagram:       uint32(value.lenDlDatagram),
                             },   
                         })
-                    
+                }
                 case C.DECODE_RESULT_TRAFFIC_TEST_MODE_PARAMETERS_GET_CNF_UL_MSG:
+                {
                     value := C.getTrafficTestModeParametersGetCnfUlMsg(inputBuffer)
                     returnedMsgs = append (returnedMsgs,
                         &MessageContainer {
                             DeviceUuid:        uuid,
-                            Timestamp:         time.Now(),
+                            Timestamp:         time.Now().UTC(),
                             Message: &TrafficTestModeParametersGetCnfUlMsg {
                                 NumUlDatagrams:      uint32(value.numUlDatagrams),
                                 LenUlDatagram:       uint32(value.lenUlDatagram),
@@ -645,16 +695,30 @@ func decode(data []byte, uuid string) ([]interface{}, int) {
                                 LenDlDatagram:       uint32(value.lenDlDatagram),
                             },   
                         })
-                    
+                }
                 case C.DECODE_RESULT_TRAFFIC_TEST_MODE_RULE_BREAKER_UL_DATAGRAM:
-                // TODO
-                
+                {
+                    value := C.getTrafficTestModeRuleBreakerDatagram(inputBuffer)
+                    returnedMsgs = append (returnedMsgs,
+                        &MessageContainer {
+                            DeviceUuid:   uuid,
+                            Timestamp:    time.Now().UTC(),
+                            Message:      &TrafficTestModeRuleBreakerUlDatagram{
+                                Fill:   byte(value.fill),
+                                Length: uint32 (value.length),
+                                },
+                        })
+                    // This message takes up the whole datagram so set bytesRemaining
+                    // to zero
+                    bytesRemaining = 0
+                }
                 case C.DECODE_RESULT_TRAFFIC_TEST_MODE_REPORT_IND_UL_MSG:
+                {
                     value := C.getTrafficTestModeReportIndUlMsg(inputBuffer)
                     returnedMsgs = append (returnedMsgs,
                         &MessageContainer {
                             DeviceUuid:        uuid,
-                            Timestamp:         time.Now(),
+                            Timestamp:         time.Now().UTC(),
                             Message: &TrafficTestModeReportIndUlMsg {
                                 NumTrafficTestDatagramsUl:           uint32(value.numTrafficTestDatagramsUl),
                                 NumTrafficTestBytesUl:               uint32(value.numTrafficTestBytesUl),
@@ -666,13 +730,14 @@ func decode(data []byte, uuid string) ([]interface{}, int) {
                                 TimedOut:                            bool(value.timedOut),
                             },   
                         })
-                    
+                }
                 case C.DECODE_RESULT_TRAFFIC_TEST_MODE_REPORT_GET_CNF_UL_MSG:
+                {
                     value := C.getTrafficTestModeReportGetCnfUlMsg(inputBuffer)
                     returnedMsgs = append (returnedMsgs,
                         &MessageContainer {
                             DeviceUuid:        uuid,
-                            Timestamp:         time.Now(),
+                            Timestamp:         time.Now().UTC(),
                             Message: &TrafficTestModeReportGetCnfUlMsg {
                                 NumTrafficTestDatagramsUl:           uint32(value.numTrafficTestDatagramsUl),
                                 NumTrafficTestBytesUl:               uint32(value.numTrafficTestBytesUl),
@@ -684,13 +749,14 @@ func decode(data []byte, uuid string) ([]interface{}, int) {
                                 TimedOut:                            bool(value.timedOut),
                             },   
                         })
-                    
+                }
                 case C.DECODE_RESULT_ACTIVITY_REPORT_IND_UL_MSG:
+                {
                     value := C.getActivityReportIndUlMsg(inputBuffer)
                     returnedMsgs = append (returnedMsgs,
                         &MessageContainer {
                             DeviceUuid:        uuid,
-                            Timestamp:         time.Now(),
+                            Timestamp:         time.Now().UTC(),
                             Message: &ActivityReportIndUlMsg {
                                 TotalTransmitMilliseconds:  uint32(value.totalTransmitMilliseconds),
                                 TotalReceiveMilliseconds:   uint32(value.totalReceiveMilliseconds),
@@ -703,13 +769,14 @@ func decode(data []byte, uuid string) ([]interface{}, int) {
                                 DlMcs:                      uint8(value.dlMcs),
                             },   
                         })
-                    
+                }
                 case C.DECODE_RESULT_ACTIVITY_REPORT_GET_CNF_UL_MSG:
+                {
                     value := C.getActivityReportGetCnfUlMsg(inputBuffer)
                     returnedMsgs = append (returnedMsgs,
                         &MessageContainer {
                             DeviceUuid:        uuid,
-                            Timestamp:         time.Now(),
+                            Timestamp:         time.Now().UTC(),
                             Message: &ActivityReportGetCnfUlMsg {
                                 TotalTransmitMilliseconds:  uint32(value.totalTransmitMilliseconds),
                                 TotalReceiveMilliseconds:   uint32(value.totalReceiveMilliseconds),
@@ -722,21 +789,51 @@ func decode(data []byte, uuid string) ([]interface{}, int) {
                                 DlMcs:                      uint8(value.dlMcs),
                             },   
                         })
-                    
+                }
                 case C.DECODE_RESULT_DEBUG_IND_UL_MSG:
-                // TODO
+                    // TODO
                 case C.DECODE_RESULT_FAILURE:
                 case C.DECODE_RESULT_INPUT_TOO_SHORT:
                 case C.DECODE_RESULT_OUTPUT_TOO_SHORT:
                 case C.DECODE_RESULT_UNKNOWN_MSG_ID:
                 case C.DECODE_RESULT_BAD_MSG_FORMAT:
                 case C.DECODE_RESULT_BAD_TRAFFIC_TEST_MODE_DATAGRAM:
-                // TODO
+                {
+                    // This will be handled later by the traffic test channel
+                    value := C.getTrafficTestModeRuleBreakerDatagram(inputBuffer)
+                    returnedMsgs = append (returnedMsgs,
+                        &MessageContainer {
+                            DeviceUuid:   uuid,
+                            Timestamp:    time.Now().UTC(),
+                            Message:      &BadTrafficTestModeRuleBreakerUlDatagram{
+                                Fill:   byte(value.fill),
+                                Length: uint32 (value.length),
+                                },
+                        })
+                    // This message takes up the whole datagram so set bytesRemaining
+                    // to zero
+                    bytesRemaining = 0
+                }
                 case C.DECODE_RESULT_OUT_OF_SEQUENCE_TRAFFIC_TEST_MODE_DATAGRAM:
-                // TODO
+                {
+                    // This will be handled later by the traffic test channel
+                    value := C.getTrafficTestModeRuleBreakerDatagram(inputBuffer)
+                    returnedMsgs = append (returnedMsgs,
+                        &MessageContainer {
+                            DeviceUuid:   uuid,
+                            Timestamp:    time.Now().UTC(),
+                            Message:      &OutOfSequenceTrafficTestModeRuleBreakerUlDatagram{
+                                Fill:   byte(value.fill),
+                                Length: uint32 (value.length),
+                                },
+                        })
+                    // This message takes up the whole datagram so set bytesRemaining
+                    // to zero
+                    bytesRemaining = 0
+                }
                 case C.DECODE_RESULT_BAD_CHECKSUM:
                 default:
-                // Can't decode the message, throw it away silently
+                    // Can't decode the message, throw it away silently
             }    
         }
     }

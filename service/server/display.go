@@ -40,6 +40,7 @@ type FrontPageDeviceData struct {
     DeviceName         string     `json:"DeviceName, omitempty"`
     Connected          bool       `json:"Connected, omitempty"`
     UpDuration         string     `json:"UpDuration, omitempty"`
+    DeviceTime         *time.Time `json:"DeviceTime, omitempty"`
     Interesting        *time.Time `json:"Interesting, omitempty"`
     Mode               string     `json:"Mode, omitempty"`
     TotalUlMsgs        int        `json:"TotalUlMsgs, omitempty"`
@@ -65,6 +66,17 @@ type FrontPageDeviceData struct {
     CoverageClassTime  *time.Time `json:"CoverageClassTime, omitempty"`
     TxDuration         string     `json:"TxTime, omitempty"`
     RxDuration         string     `json:"RxTime, omitempty"`
+    TtRunning          bool       `json:"TtRunning, omitempty"`
+    TtTimeStarted      *time.Time `json:"TtTimeStarted, omitempty"`
+    TtTimeStopped      *time.Time `json:"TtTimeStopped, omitempty"`
+    TtDlDatagrams       int       `json:"TtDlDatagrams, omitempty"`
+    TtDlDatagramsMissed int       `json:"TtDlDatagramsMissed, omitempty"`
+    TtDlBytes           int       `json:"TtDlBytes, omitempty"`
+    TtUlDatagrams       int       `json:"TtUlDatagrams, omitempty"`
+    TtUlDatagramsMissed int       `json:"TtUlDatagramsMissed, omitempty"`
+    TtUlBytes           int       `json:"TtUlBytes, omitempty"`
+    TtPassed            bool      `json:"TtPassed, omitempty"`
+    TtFailed            bool      `json:"TtFailed, omitempty"`
 }
 
 type FrontPageData struct {
@@ -200,20 +212,15 @@ func displayFrontPageData () *FrontPageData {
         }
     
         // And finally, sort the data by whether the device is connected or not and then by friendly name
-        sort.Sort(ByConnected(data.DeviceData))
-        sort.Sort(ByName(data.DeviceData))
-        globals.Dbg.PrintfTrace("%s [display] --> Displaying this:\n\n%+v\n\n", globals.LogTag, data)
+        sort.Sort(ByNameAndConnected(data.DeviceData))
+        globals.Dbg.PrintfInfo("%s [display] --> Displaying this:\n\n%+v\n\n", globals.LogTag, data)
     }
     
     return &data
 }
 
-// Sort by Connected
-type ByConnected []FrontPageDeviceData
-
-func (u ByConnected) Len() int           { return len(u) }
-func (u ByConnected) Swap(i, j int)      { u[i], u[j] = u[j], u[i] }
-func (u ByConnected) Less(i, j int) bool { return BToI(u[i].Connected) < BToI(u[j].Connected) }
+// Sort by name and connected
+type ByNameAndConnected []FrontPageDeviceData
 
 func BToI(b bool) int {
     if b {
@@ -222,12 +229,15 @@ func BToI(b bool) int {
     return 0
  }
 
-// Sort by name
-type ByName []FrontPageDeviceData
-
-func (u ByName) Len() int           { return len(u) }
-func (u ByName) Swap(i, j int)      { u[i], u[j] = u[j], u[i] }
-func (u ByName) Less(i, j int) bool { return u[i].DeviceName < u[j].DeviceName }
+func (u ByNameAndConnected) Len() int           { return len(u) }
+func (u ByNameAndConnected) Swap(i, j int)      { u[i], u[j] = u[j], u[i] }
+func (u ByNameAndConnected) Less(i, j int) bool {
+    if BToI(u[i].Connected) == BToI(u[j].Connected) {
+        return u[i].DeviceName < u[j].DeviceName
+    } else {
+        return BToI(u[i].Connected) > BToI(u[j].Connected)
+    }
+}
 
 // Return the reporting interval as a duration formed as a string
 func getReportingString (intervals *IntervalsData) string {

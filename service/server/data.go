@@ -169,7 +169,7 @@ func (value *InitIndData) DeepCopy() *InitIndData {
 func makeInitIndData(newData *InitIndUlMsg, Time time.Time) *InitIndData {
     data := InitIndData {
         Timestamp:         Time,
-        WakeUpCode:           WakeUpCodeLookUp[newData.WakeUpCode],
+        WakeUpCode:        WakeUpCodeLookUp[newData.WakeUpCode],
         RevisionLevel:     newData.RevisionLevel,
         SdCardNotRequired: newData.SdCardNotRequired,
         DisableModemDebug: newData.DisableModemDebug,

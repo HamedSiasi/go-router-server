@@ -193,6 +193,15 @@ func encodeAndEnqueue(msg interface{}, uuid string) (error, int, ResponseTypeEnu
                 globals.Dbg.PrintfTrace("%s [encode] --> encoded TrafficTestModeParametersGetReqDlMsg.\n", globals.LogTag)
                 responseId = RESPONSE_TRAFFIC_TEST_MODE_PARAMETERS_GET_CNF
                                 
+            case *TrafficTestModeRuleBreakerDlDatagram:
+                data := C.TrafficTestModeRuleBreakerDatagram_t {
+                    fill:    (C.char) (value.Fill),
+                    length:  (C.uint32_t) (value.Length),
+                }
+                dataPointer := (*C.TrafficTestModeRuleBreakerDatagram_t)(unsafe.Pointer(&data))
+                byteCount = C.encodeTrafficTestModeRuleBreakerDatagram(outputPointer, dataPointer, true, ppXmlBuffer, pXmlBufferLen)
+                globals.Dbg.PrintfTrace("%s [encode] --> encoded TrafficTestModeRuleBreakerDlDatagram.\n", globals.LogTag)
+                                
             case *TrafficTestModeReportGetReqDlMsg:
                 byteCount = C.encodeTrafficTestModeReportGetReqDlMsg(outputPointer, ppXmlBuffer, pXmlBufferLen)
                 globals.Dbg.PrintfTrace("%s [encode] --> encoded TrafficTestModeReportGetReqDlMsg.\n", globals.LogTag)

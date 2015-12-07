@@ -16,6 +16,7 @@
  * 
  * ...to get your syntax correct.
  */
+"use strict";
 
 var React = require('react');
 var Header = require('./header/header.react')

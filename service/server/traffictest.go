@@ -47,6 +47,7 @@ type TrafficTestModeParametersServerSet struct {
 type TrafficTestContext struct {
     DeviceUuid        string
     Parameters        *TrafficTestModeParametersServerSet
+    DeviceTrafficReport *TrafficTestModeReportIndUlMsg
     TimeStarted       time.Time
     DlTimeStopped     time.Time
     UlTimeStopped     time.Time
@@ -118,6 +119,8 @@ func (value *TrafficTestContext) DeepCopy() *TrafficTestContext {
         }
         result.Parameters.DeviceParameters = value.Parameters.DeviceParameters.DeepCopy()                            
     }
+    result.DeviceTrafficReport = value.DeviceTrafficReport.DeepCopy()                            
+
     return result
 }
 
@@ -260,8 +263,9 @@ func operateTrafficTest() {
                                 context.UlDatagramsBad = 0
                                 context.UlDatagramsOOS = 0
                                 context.TimeStarted = time.Now().UTC()
-                                context.DlState = TRAFFIC_TEST_RUNNING;
-                                context.UlState = TRAFFIC_TEST_RUNNING;
+                                context.DlState = TRAFFIC_TEST_RUNNING
+                                context.UlState = TRAFFIC_TEST_RUNNING
+                                context.DeviceTrafficReport = nil
                                 globals.Dbg.PrintfTrace("%s [traffic_test] --> started traffic test with device %s.\n", globals.LogTag, value.DeviceUuid)
                             }
                         }
@@ -269,26 +273,29 @@ func operateTrafficTest() {
                         {
                             globals.Dbg.PrintfTrace("%s [traffic_test] --> received report from %s, assessing DL state.\n",
                                  globals.LogTag, value.DeviceUuid)
+                            // First, store this
+                            context.DeviceTrafficReport = utmMsg.DeepCopy()
+
                             // Assess whether we're done in the downlink direction from the report
                             if context.DlState == TRAFFIC_TEST_TX_COMPLETE {
                                 if utmMsg.TimedOut {
                                     context.DlState = TRAFFIC_TEST_TIMEOUT
                                     context.DlTimeStopped = time.Now().UTC()
                                     globals.Dbg.PrintfTrace("%s [traffic_test] --> DL TIMEOUT on traffic test with device %s (%d datagrams missed).\n",
-                                        globals.LogTag, value.DeviceUuid, utmMsg.NumTrafficTestDlDatagramsMissed)
+                                        globals.LogTag, value.DeviceUuid, context.DeviceTrafficReport.NumTrafficTestDlDatagramsMissed)
                                 } else {
-                                    if utmMsg.NumTrafficTestDatagramsDl + utmMsg.NumTrafficTestDlDatagramsMissed >= context.DlDatagrams {
-                                        if utmMsg.NumTrafficTestDlDatagramsMissed == 0 {
+                                    if context.DeviceTrafficReport.NumTrafficTestDatagramsDl + context.DeviceTrafficReport.NumTrafficTestDlDatagramsMissed >= context.DlDatagrams {
+                                        if context.DeviceTrafficReport.NumTrafficTestDlDatagramsMissed == 0 {
                                             context.DlState = TRAFFIC_TEST_PASS
                                             context.DlTimeStopped = time.Now().UTC()
                                             globals.Dbg.PrintfTrace("%s [traffic_test] --> DL PASS on traffic test with device %s, %d datagrams received.\n",
-                                                globals.LogTag, value.DeviceUuid, utmMsg.NumTrafficTestDatagramsDl)
+                                                globals.LogTag, value.DeviceUuid, context.DeviceTrafficReport.NumTrafficTestDatagramsDl)
                                         } else {
                                             context.DlState = TRAFFIC_TEST_FAIL
                                             context.DlTimeStopped = time.Now().UTC()
                                             globals.Dbg.PrintfTrace("%s [traffic_test] --> DL FAIL on traffic test with device %s (%d datagrams missed out of %d).\n",
-                                                globals.LogTag, value.DeviceUuid, utmMsg.NumTrafficTestDlDatagramsMissed,
-                                                utmMsg.NumTrafficTestDlDatagramsMissed +  utmMsg.NumTrafficTestDatagramsDl)
+                                                globals.LogTag, value.DeviceUuid, context.DeviceTrafficReport.NumTrafficTestDlDatagramsMissed,
+                                                context.DeviceTrafficReport.NumTrafficTestDlDatagramsMissed +  context.DeviceTrafficReport.NumTrafficTestDatagramsDl)
                                         }
                                     }
                                 }

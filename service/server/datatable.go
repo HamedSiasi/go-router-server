@@ -45,6 +45,10 @@ type LatestState struct {
     LatestPowerStateData                 *PowerStateData                `json:"LatestPowerStateData, omitempty"`
     LatestTrafficReportData              *TrafficReportData             `json:"LatestTrafficReportData, omitempty"`
     LatestTrafficTestModeParametersData  *TrafficTestModeParametersData `json:"LatestTrafficTestModeParametersData, omitempty"`
+    // NOTE: even though we store this, traffictest.go keeps its own copy also. This is because, when
+    // a new test is started it can be quite confusing to the user to display the results of the old
+    // test, which will happen until the next report comes in from the device.  The version that traffictest.go
+    // keeps can be reset when a new test begins 
     LatestTrafficTestModeReportData      *TrafficTestModeReportData     `json:"LatestTrafficTestModeReportData, omitempty"`
     LatestActivityReportData             *ActivityReportData            `json:"LatestActivityReportData, omitempty"`
     LatestTrafficTestContext             *TrafficTestContext            `json:"LatestTrafficTestContext, omitempty"`

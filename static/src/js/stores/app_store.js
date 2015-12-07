@@ -12,6 +12,7 @@
  * 
  * https://facebook.github.io/flux/docs/todo-list.html#content
  */
+"use strict";
 
 var AppDispatcher = require('../dispatchers/app_dispatcher');
 var AppConstants = require('../constants/app_store_types');
@@ -133,10 +134,12 @@ if (!Array.prototype.indexOf)
     };
 }
 
-
 // The store itself
 var AppStore = assign(EventEmitter.prototype, {
-    emitChange: function() {
+    // This is vital: I create lots of listeners, so need to remove the limit of 11
+	_maxListeners: 0,
+	
+	emitChange: function() {
         this.emit(CHANGE_EVENT)
     },
 

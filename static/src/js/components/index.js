@@ -16,9 +16,9 @@
  * 
  * ...to get your syntax correct.
  */
+"use strict";
 
 var React = require('react');
-
 
 var Index = React.createClass({
     render:function(){

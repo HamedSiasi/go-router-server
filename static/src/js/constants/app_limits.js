@@ -8,6 +8,7 @@
  * Reproduction or utilization of this source in whole or part is
  * forbidden without the written consent of u-blox Melbourn Ltd.
  */
+"use strict";
 
 module.exports = {
     HEARTBEAT_DEFAULT: 900,
@@ -17,7 +18,7 @@ module.exports = {
     REPORTING_INTERVAL_DEFAULT: 1,
     REPORTING_INTERVAL_MAX: 10,
     REPORTING_INTERVAL_MIN: 1,
-    TT_DATAGRAMS_NUM_DEFAULT: 100,
+    TT_DATAGRAMS_NUM_DEFAULT: 50,
     TT_DATAGRAMS_NUM_MAX: 1000,
     TT_DATAGRAMS_NUM_MIN: 0,
     TT_DATAGRAM_LEN_DEFAULT: 100,

@@ -12,6 +12,7 @@
  * 
  * https://facebook.github.io/flux/docs/todo-list.html#content
  */
+"use strict";
 
 var Dispatcher = require('flux').Dispatcher;
 var assign = require('react/lib/Object.assign');

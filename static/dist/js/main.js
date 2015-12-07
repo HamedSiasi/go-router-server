@@ -25722,6 +25722,7 @@ module.exports = AppActions;
  * 
  * ...to get your syntax correct.
  */
+"use strict";
 
 var React = require('react');
 var Template = require('./app_template.js');
@@ -25770,6 +25771,7 @@ module.exports = App;
  * 
  * ...to get your syntax correct.
  */
+"use strict";
 
 var React = require('react');
 var Header = require('./header/header.react')
@@ -25806,6 +25808,7 @@ module.exports = Template;
  * 
  * ...to get your syntax correct.
  */
+"use strict";
 
 var React = require('react');
 var MakeLiNameList = require('../utilities/make_li_name_list.react')
@@ -25814,11 +25817,11 @@ var AppStore = require('../../stores/app_store.js');
 var GetIntervals = React.createClass({displayName: "GetIntervals",
 
 	sendAllMsg: function() {
-        var request = new XMLHttpRequest();
         var uuidList = AppStore.getAllUuidsChecked();
         
         for (var name in this.props.UuidMap) {
             if ((this.props.UuidMap.hasOwnProperty(name)) && (uuidList [this.props.UuidMap[name]])) {
+                var request = new XMLHttpRequest();
     	        var postData = "{\"device_uuid\": \"" + this.props.UuidMap[name] + "\", \"type\": \"SEND_INTERVALS_GET\", \"body\": {} }";
 
                 // What to do when the server response comes back
@@ -25874,6 +25877,7 @@ module.exports = GetIntervals;
  * 
  * ...to get your syntax correct.
  */
+"use strict";
 
 var React = require('react');
 var MakeLiNameList = require('../utilities/make_li_name_list.react')
@@ -25882,11 +25886,11 @@ var AppStore = require('../../stores/app_store.js');
 var GetPing = React.createClass({displayName: "GetPing",
 
     sendAllMsg: function() {
-        var request = new XMLHttpRequest();        
         var uuidList = AppStore.getAllUuidsChecked();
         
         for (var name in this.props.UuidMap) {
             if ((this.props.UuidMap.hasOwnProperty(name)) && (uuidList [this.props.UuidMap[name]])) {
+                var request = new XMLHttpRequest();
                 var postData = "{\"device_uuid\": \"" + this.props.UuidMap[name] +
                 		"\", \"type\": \"SEND_PING\", \"body\": {} }";
 
@@ -25943,6 +25947,7 @@ module.exports = GetPing;
  * 
  * ...to get your syntax correct.
  */
+"use strict";
 
 var React = require('react');
 var MakeLiNameList = require('../utilities/make_li_name_list.react')
@@ -25951,11 +25956,11 @@ var AppStore = require('../../stores/app_store.js');
 var GetTime = React.createClass({displayName: "GetTime",
 
     sendAllMsg: function() {
-        var request = new XMLHttpRequest();
         var uuidList = AppStore.getAllUuidsChecked();
         
         for (var name in this.props.UuidMap) {
             if ((this.props.UuidMap.hasOwnProperty(name)) && (uuidList [this.props.UuidMap[name]])) {
+                var request = new XMLHttpRequest();
                 var postData = "{\"device_uuid\": \"" + this.props.UuidMap[name] +
                 		"\", \"type\": \"SEND_DATE_TIME_GET\", \"body\": {} }";
 
@@ -26012,6 +26017,7 @@ module.exports = GetTime;
  * 
  * ...to get your syntax correct.
  */
+"use strict";
 
 var React = require('react');
 var MakeLiNameList = require('../utilities/make_li_name_list.react')
@@ -26020,11 +26026,11 @@ var AppStore = require('../../stores/app_store.js');
 var SetHeartBeat = React.createClass({displayName: "SetHeartBeat",
     
     sendAllMsg: function() {
-        var request = new XMLHttpRequest();
         var uuidList = AppStore.getAllUuidsChecked();
         
         for (var name in this.props.UuidMap) {
             if ((this.props.UuidMap.hasOwnProperty(name)) && (uuidList [this.props.UuidMap[name]])) {
+                var request = new XMLHttpRequest();
             	var heartbeatSeconds = AppStore.getHeartbeatSeconds();
             	var heartbeatSnapToRtc = AppStore.getHeartbeatSnapToRtc();
                 var postData = "{\"device_uuid\": \"" + this.props.UuidMap[name] +
@@ -26082,6 +26088,7 @@ module.exports = SetHeartBeat;
  * 
  * ...to get your syntax correct.
  */
+"use strict";
 
 var React = require('react');
 var MakeLiNameList = require('../utilities/make_li_name_list.react')
@@ -26089,11 +26096,11 @@ var AppStore = require('../../stores/app_store.js');
 
     var SetReporting = React.createClass({displayName: "SetReporting",
         sendAllMsg: function() {
-        var request = new XMLHttpRequest();
         var uuidList = AppStore.getAllUuidsChecked();
 
         for (var name in this.props.UuidMap) {
             if ((this.props.UuidMap.hasOwnProperty(name)) && (uuidList [this.props.UuidMap[name]])) {
+                var request = new XMLHttpRequest();
                 var reportingInterval = AppStore.getReportingInterval();
                 var postData = "{\"device_uuid\": \"" + this.props.UuidMap[name] +
                         "\", \"type\": \"SEND_REPORTING_INTERVAL_SET\", \"body\": {\"reporting_interval\": \"" + reportingInterval + "\"} }";
@@ -26149,6 +26156,7 @@ module.exports = SetReporting;
  * 
  * ...to get your syntax correct.
  */
+"use strict";
 
 var React = require('react');
 var MakeLiNameList = require('../utilities/make_li_name_list.react')
@@ -26157,11 +26165,11 @@ var AppStore = require('../../stores/app_store.js');
 var SetTTParameters = React.createClass({displayName: "SetTTParameters",
 
 	sendAllMsg: function() {
-        var request = new XMLHttpRequest();
         var uuidList = AppStore.getAllUuidsChecked();
 
         for (var name in this.props.UuidMap) {
             if ((this.props.UuidMap.hasOwnProperty(name)) && (uuidList [this.props.UuidMap[name]])) {
+                var request = new XMLHttpRequest();
                 var ttParameters = AppStore.getTtParameters();
                 var postData = "{\"device_uuid\": \"" + this.props.UuidMap[name] +
                 		"\", \"type\": \"SEND_TRAFFIC_TEST_MODE_PARAMETERS_SERVER_SET\", \"body\": {\"num_ul_datagrams\": \"" + ttParameters["numUlDatagrams"] +
@@ -26223,6 +26231,7 @@ module.exports = SetTTParameters;
  * 
  * ...to get your syntax correct.
  */
+"use strict";
 
 var React = require('react');
 var MakeLiNameList = require('../utilities/make_li_name_list.react')
@@ -26231,11 +26240,11 @@ var AppStore = require('../../stores/app_store.js');
 var SetTtStart = React.createClass({displayName: "SetTtStart",
 
     sendAllMsg: function() {
-        var request = new XMLHttpRequest();
         var uuidList = AppStore.getAllUuidsChecked();
         
         for (var name in this.props.UuidMap) {
             if ((this.props.UuidMap.hasOwnProperty(name)) && (uuidList [this.props.UuidMap[name]])) {
+                var request = new XMLHttpRequest();
                 var postData = "{\"device_uuid\": \"" + this.props.UuidMap[name] +
                         "\", \"type\": \"SEND_MODE_SET\", \"body\": {\"mode\": \"MODE_TRAFFIC_TEST\"} }";
 
@@ -26290,6 +26299,7 @@ module.exports = SetTtStart;
  * 
  * ...to get your syntax correct.
  */
+"use strict";
 
 var React = require('react');
 var MakeLiNameList = require('../utilities/make_li_name_list.react')
@@ -26298,11 +26308,11 @@ var AppStore = require('../../stores/app_store.js');
 var SetTtStop = React.createClass({displayName: "SetTtStop",
 
     sendAllMsg: function() {
-        var request = new XMLHttpRequest();
         var uuidList = AppStore.getAllUuidsChecked();
         
         for (var name in this.props.UuidMap) {
             if ((this.props.UuidMap.hasOwnProperty(name)) && (uuidList [this.props.UuidMap[name]])) {
+                var request = new XMLHttpRequest();
                 var postData = "{\"device_uuid\": \"" + this.props.UuidMap[name] +
                         "\", \"type\": \"SEND_MODE_SET\", \"body\": {\"mode\": \"MODE_STANDARD_TRX\"} }";
 
@@ -26357,6 +26367,7 @@ module.exports = SetTtStop;
  * 
  * ...to get your syntax correct.
  */
+"use strict";
 
 var React = require('react');
 var SetHeartbeat = require('./set_heartbeat.react');
@@ -26421,6 +26432,7 @@ module.exports = SettingStd;
  * 
  * ...to get your syntax correct.
  */
+"use strict";
 
 var React = require('react');
 var ValueTtNumUlDatagrams = require('./value_tt_num_ul_datagrams.react');
@@ -26491,6 +26503,7 @@ module.exports = SettingTt;
  * 
  * ...to get your syntax correct.
  */
+"use strict";
 
 var React = require('react');
 
@@ -26529,6 +26542,7 @@ module.exports = Connected;
  * 
  * ...to get your syntax correct.
  */
+"use strict";
 
 var React = require('react');
 var AppActions = require('../../actions/app_actions.js');
@@ -26604,6 +26618,7 @@ module.exports = ValueHeartbeat;
  * 
  * ...to get your syntax correct.
  */
+"use strict";
 
 var React = require('react');
 var AppActions = require('../../actions/app_actions.js');
@@ -26722,6 +26737,7 @@ module.exports = TtConfig;
  * 
  * ...to get your syntax correct.
  */
+"use strict";
 
 var React = require('react');
 var AppActions = require('../../actions/app_actions.js');
@@ -26796,6 +26812,7 @@ module.exports = ValueTTDlInterval;
  * 
  * ...to get your syntax correct.
  */
+"use strict";
 
 var React = require('react');
 var AppActions = require('../../actions/app_actions.js');
@@ -26870,6 +26887,7 @@ module.exports = ValueTtLenDlDatagram;
  * 
  * ...to get your syntax correct.
  */
+"use strict";
 
 var React = require('react');
 var AppActions = require('../../actions/app_actions.js');
@@ -26944,6 +26962,7 @@ module.exports = ValueTtLenUlDatagram;
  * 
  * ...to get your syntax correct.
  */
+"use strict";
 
 var React = require('react');
 var AppConstants = require ('../../constants/app_limits');
@@ -27019,6 +27038,7 @@ module.exports = ValueTtNumDlDatagrams;
  * 
  * ...to get your syntax correct.
  */
+"use strict";
 
 var React = require('react');
 var AppConstants = require ('../../constants/app_limits');
@@ -27109,10 +27129,6 @@ var TtNumbers = React.createClass({displayName: "TtNumbers",
         	rx = tx;
         }
         
-        if (missed > tx) {
-        	missed = tx;
-        }
-        
         if (this.props.Target) {
             percentComplete = ((rx / this.props.Target) * 100).toFixed(0);
             if (percentComplete > 100) {
@@ -27159,6 +27175,7 @@ module.exports = TtNumbers;
  * 
  * ...to get your syntax correct.
  */
+"use strict";
 
 var React = require('react');
 
@@ -27219,6 +27236,7 @@ module.exports = TtState;
  * 
  * ...to get your syntax correct.
  */
+"use strict";
 
 var React = require('react');
 var AppConstants = require ('../../constants/app_limits');
@@ -27296,6 +27314,7 @@ module.exports = ValueTtTimeout;
  * 
  * ...to get your syntax correct.
  */
+"use strict";
 
 var React = require('react');
 var AppActions = require('../../actions/app_actions.js');
@@ -27354,6 +27373,7 @@ module.exports = ValueUuidSelected;
  * 
  * ...to get your syntax correct.
  */
+"use strict";
 
 var React = require('react');
 var Settings = require('../panels/settings.react')
@@ -27434,6 +27454,7 @@ module.exports = Display;
  * 
  * ...to get your syntax correct.
  */
+"use strict";
 
 var React = require('react');
 var ValueUuidSelected = require('../controls/value_uuid_selected.react');
@@ -27644,6 +27665,7 @@ module.exports = DisplayRow;
  * 
  * ...to get your syntax correct.
  */
+"use strict";
 
 var React = require('react');
 var Link = require('react-router-component').Link;
@@ -27726,9 +27748,9 @@ module.exports = Header;
  * 
  * ...to get your syntax correct.
  */
+"use strict";
 
 var React = require('react');
-
 
 var Index = React.createClass({displayName: "Index",
     render:function(){
@@ -27773,6 +27795,7 @@ module.exports = Index;
  * 
  * ...to get your syntax correct.
  */
+"use strict";
 
 var React = require('react');
 var SettingStd = require('../controls/setting_std.react');
@@ -27830,6 +27853,7 @@ module.exports = Settings;
  * 
  * ...to get your syntax correct.
  */
+"use strict";
 
 var React = require('react');
 var Moment = require('moment');
@@ -27984,6 +28008,7 @@ module.exports = Register;
  * Reproduction or utilization of this source in whole or part is
  * forbidden without the written consent of u-blox Melbourn Ltd.
  */
+"use strict";
 
 var React = require('react');
 
@@ -28033,6 +28058,7 @@ module.exports = MakeLiUuidList, Object.size;
  * Reproduction or utilization of this source in whole or part is
  * forbidden without the written consent of u-blox Melbourn Ltd.
  */
+"use strict";
 
 module.exports = {
     HEARTBEAT_DEFAULT: 900,
@@ -28042,7 +28068,7 @@ module.exports = {
     REPORTING_INTERVAL_DEFAULT: 1,
     REPORTING_INTERVAL_MAX: 10,
     REPORTING_INTERVAL_MIN: 1,
-    TT_DATAGRAMS_NUM_DEFAULT: 100,
+    TT_DATAGRAMS_NUM_DEFAULT: 50,
     TT_DATAGRAMS_NUM_MAX: 1000,
     TT_DATAGRAMS_NUM_MIN: 0,
     TT_DATAGRAM_LEN_DEFAULT: 100,
@@ -28067,6 +28093,7 @@ module.exports = {
  * Reproduction or utilization of this source in whole or part is
  * forbidden without the written consent of u-blox Melbourn Ltd.
  */
+"use strict";
 
 module.exports = {
     STORE_SET_UUID_CHECKED: "STORE_SET_UUID_CHECKED",
@@ -28097,6 +28124,7 @@ module.exports = {
  * 
  * https://facebook.github.io/flux/docs/todo-list.html#content
  */
+"use strict";
 
 var Dispatcher = require('flux').Dispatcher;
 var assign = require('react/lib/Object.assign');
@@ -28124,6 +28152,7 @@ module.exports = AppDispatcher;
  * Reproduction or utilization of this source in whole or part is
  * forbidden without the written consent of u-blox Melbourn Ltd.
  */
+"use strict";
 
 var App = require('./components/app');
 var React = require('react');
@@ -28144,6 +28173,7 @@ React.render(React.createElement(App, null), document.getElementById('main'));
  * 
  * https://facebook.github.io/flux/docs/todo-list.html#content
  */
+"use strict";
 
 var AppDispatcher = require('../dispatchers/app_dispatcher');
 var AppConstants = require('../constants/app_store_types');
@@ -28265,10 +28295,12 @@ if (!Array.prototype.indexOf)
     };
 }
 
-
 // The store itself
 var AppStore = assign(EventEmitter.prototype, {
-    emitChange: function() {
+    // This is vital: I create lots of listeners, so need to remove the limit of 11
+	_maxListeners: 0,
+	
+	emitChange: function() {
         this.emit(CHANGE_EVENT)
     },
 

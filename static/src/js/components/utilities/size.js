@@ -8,6 +8,7 @@
  * Reproduction or utilization of this source in whole or part is
  * forbidden without the written consent of u-blox Melbourn Ltd.
  */
+"use strict";
 
 // Get the actual size of an object (e.g. an array) out of Java
 Size = function(obj) {

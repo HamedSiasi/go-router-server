@@ -16,6 +16,7 @@
  * 
  * ...to get your syntax correct.
  */
+"use strict";
 
 var React = require('react');
 var MakeLiNameList = require('../utilities/make_li_name_list.react')
@@ -24,11 +25,11 @@ var AppStore = require('../../stores/app_store.js');
 var GetPing = React.createClass({
 
     sendAllMsg: function() {
-        var request = new XMLHttpRequest();        
         var uuidList = AppStore.getAllUuidsChecked();
         
         for (var name in this.props.UuidMap) {
             if ((this.props.UuidMap.hasOwnProperty(name)) && (uuidList [this.props.UuidMap[name]])) {
+                var request = new XMLHttpRequest();
                 var postData = "{\"device_uuid\": \"" + this.props.UuidMap[name] +
                 		"\", \"type\": \"SEND_PING\", \"body\": {} }";
 

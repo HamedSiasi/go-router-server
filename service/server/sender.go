@@ -380,7 +380,7 @@ func (m *Msg) Send(uuid string) error {
         }
         case CLIENT_SEND_HEARTBEAT_SET:
         {
-            globals.Dbg.PrintfTrace ("%s [sender] --> send HeartbeatSetReq [TODO].\n", globals.LogTag)
+            globals.Dbg.PrintfTrace ("%s [sender] --> send HeartbeatSetReq.\n", globals.LogTag)
             // Retrieve the values from the map that JSON has created for the message body
             msg := &HeartbeatSetReqDlMsg {}
             err, msg.HeartbeatSeconds = GetValueUint32 (m.MsgBody, heartbeatSecondsTag)

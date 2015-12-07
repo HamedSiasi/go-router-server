@@ -8,6 +8,7 @@
  * Reproduction or utilization of this source in whole or part is
  * forbidden without the written consent of u-blox Melbourn Ltd.
  */
+"use strict";
 
 module.exports = {
     STORE_SET_UUID_CHECKED: "STORE_SET_UUID_CHECKED",

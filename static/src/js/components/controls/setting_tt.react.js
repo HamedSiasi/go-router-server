@@ -16,6 +16,7 @@
  * 
  * ...to get your syntax correct.
  */
+"use strict";
 
 var React = require('react');
 var ValueTtNumUlDatagrams = require('./value_tt_num_ul_datagrams.react');

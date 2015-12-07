@@ -244,11 +244,11 @@ func displayFrontPageData () *FrontPageData {
                 }
                 deviceData.TtTimeStarted = &deviceState.LatestTrafficTestContext.TimeStarted 
                 deviceData.TtDlDatagramsTx = int(deviceState.LatestTrafficTestContext.DlDatagrams)
-                if deviceState.LatestTrafficTestModeReportData != nil {
-                    deviceData.TtDlDatagramsRx = int(deviceState.LatestTrafficTestModeReportData.NumTrafficTestDatagramsDl)
-                    deviceData.TtDlDatagramsMissed = int(deviceState.LatestTrafficTestModeReportData.NumTrafficTestDlDatagramsMissed)
-                    deviceData.TtDlBytesRx = int(deviceState.LatestTrafficTestModeReportData.NumTrafficTestBytesDl)
-                    deviceData.TtUlDatagramsTx = int(deviceState.LatestTrafficTestModeReportData.NumTrafficTestDatagramsUl)
+                if deviceState.LatestTrafficTestContext.DeviceTrafficReport != nil {
+                    deviceData.TtDlDatagramsRx = int(deviceState.LatestTrafficTestContext.DeviceTrafficReport.NumTrafficTestDatagramsDl)
+                    deviceData.TtDlDatagramsMissed = int(deviceState.LatestTrafficTestContext.DeviceTrafficReport.NumTrafficTestDlDatagramsMissed)
+                    deviceData.TtDlBytesRx = int(deviceState.LatestTrafficTestContext.DeviceTrafficReport.NumTrafficTestBytesDl)
+                    deviceData.TtUlDatagramsTx = int(deviceState.LatestTrafficTestContext.DeviceTrafficReport.NumTrafficTestDatagramsUl)
                 }
                 deviceData.TtUlDatagramsRx = int(deviceState.LatestTrafficTestContext.UlDatagrams)
                 deviceData.TtUlDatagramsMissed = int(deviceState.LatestTrafficTestContext.UlDatagramsMissed)

@@ -31,10 +31,6 @@ var TtNumbers = React.createClass({
         	rx = tx;
         }
         
-        if (missed > tx) {
-        	missed = tx;
-        }
-        
         if (this.props.Target) {
             percentComplete = ((rx / this.props.Target) * 100).toFixed(0);
             if (percentComplete > 100) {

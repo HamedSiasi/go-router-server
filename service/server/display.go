@@ -66,17 +66,26 @@ type FrontPageDeviceData struct {
     CoverageClassTime  *time.Time `json:"CoverageClassTime, omitempty"`
     TxDuration         string     `json:"TxTime, omitempty"`
     RxDuration         string     `json:"RxTime, omitempty"`
+    TtUlExpected       int        `json:"TtUlExpected, omitempty"`
+    TtUlLength         int        `json:"TtUlLength, omitempty"`
+    TtDlExpected       int        `json:"TtDlExpected, omitempty"`
+    TtDlInterval       int        `json:"TtDlInterval, omitempty"`
+    TtDlLength         int        `json:"TtDlLength, omitempty"`
+    TtTimeout          int        `json:"TtTimeout, omitempty"`
     TtRunning          bool       `json:"TtRunning, omitempty"`
     TtTimeStarted      *time.Time `json:"TtTimeStarted, omitempty"`
     TtTimeStopped      *time.Time `json:"TtTimeStopped, omitempty"`
-    TtDlDatagrams       int       `json:"TtDlDatagrams, omitempty"`
+    TtDlDatagramsTx     int       `json:"TtDlDatagramsTx, omitempty"`
+    TtDlDatagramsRx     int       `json:"TtDlDatagramsRx, omitempty"`
     TtDlDatagramsMissed int       `json:"TtDlDatagramsMissed, omitempty"`
-    TtDlBytes           int       `json:"TtDlBytes, omitempty"`
-    TtUlDatagrams       int       `json:"TtUlDatagrams, omitempty"`
+    TtDlBytesRx         int       `json:"TtDlBytes, omitempty"`
+    TtUlDatagramsTx     int       `json:"TtUlDatagramsTx, omitempty"`
+    TtUlDatagramsRx     int       `json:"TtUlDatagramsRx, omitempty"`
     TtUlDatagramsMissed int       `json:"TtUlDatagramsMissed, omitempty"`
-    TtUlBytes           int       `json:"TtUlBytes, omitempty"`
+    TtUlBytesRx         int       `json:"TtUlBytes, omitempty"`
     TtPassed            bool      `json:"TtPassed, omitempty"`
     TtFailed            bool      `json:"TtFailed, omitempty"`
+    TtTimedOut          bool      `json:"TtTimedOut, omitempty"`
 }
 
 type FrontPageData struct {
@@ -111,8 +120,12 @@ func displayFrontPageData () *FrontPageData {
                 data.SummaryData.DevicesConnected++
             }    
             if deviceState.LatestActivityReportData != nil {
-                deviceData.UpDuration       = makeNiceDurationStringFromSeconds(deviceState.LatestActivityReportData.UpTimeSeconds)
-            }    
+                deviceData.UpDuration = makeNiceDurationStringFromSeconds(deviceState.LatestActivityReportData.UpTimeSeconds)
+            } // Put the time in if it has been reported recently
+            if (deviceState.LatestDateTimeData != nil) && time.Now().UTC().Before(deviceState.LatestDateTimeData.Timestamp.Add(time.Minute)) {
+                deviceTime := deviceState.LatestDateTimeData.UtmTime.UTC().Add(time.Now().UTC().Sub(deviceState.LatestDateTimeData.Timestamp))
+                deviceData.DeviceTime = &deviceTime
+            }  
             if deviceState.LatestInterest != nil {
                 deviceData.Interesting = &deviceState.LatestInterest.Timestamp
             }
@@ -122,10 +135,10 @@ func displayFrontPageData () *FrontPageData {
             if deviceState.LatestTrafficVolumeData != nil {
                 deviceData.TotalUlMsgs      = deviceState.LatestTrafficVolumeData.UlMsgs
                 deviceData.TotalUlBytes     = deviceState.LatestTrafficVolumeData.UlBytes
-                deviceData.LastUlMsgTime = &deviceState.LatestTrafficVolumeData.LastUlMsgTime
+                deviceData.LastUlMsgTime    = &deviceState.LatestTrafficVolumeData.LastUlMsgTime
                 deviceData.TotalDlMsgs      = deviceState.LatestTrafficVolumeData.DlMsgs
                 deviceData.TotalDlBytes     = deviceState.LatestTrafficVolumeData.DlBytes
-                deviceData.LastDlMsgTime = &deviceState.LatestTrafficVolumeData.LastDlMsgTime
+                deviceData.LastDlMsgTime    = &deviceState.LatestTrafficVolumeData.LastDlMsgTime
                 if deviceState.LatestTrafficVolumeData.UlTotals != nil {
                     data.SummaryData.TotalUlMsgs = deviceState.LatestTrafficVolumeData.UlTotals.Msgs
                     data.SummaryData.TotalUlBytes = deviceState.LatestTrafficVolumeData.UlTotals.Bytes
@@ -207,13 +220,62 @@ func displayFrontPageData () *FrontPageData {
                     }                                    
                 }
             }
+            if deviceState.LatestTrafficTestModeParametersData != nil {
+                deviceData.TtTimeout = int (deviceState.LatestTrafficTestModeParametersData.TimeoutSeconds)
+                deviceData.TtUlExpected = int(deviceState.LatestTrafficTestModeParametersData.NumUlDatagrams)
+                deviceData.TtUlLength = int(deviceState.LatestTrafficTestModeParametersData.LenUlDatagram)
+                deviceData.TtDlExpected = int(deviceState.LatestTrafficTestModeParametersData.NumDlDatagrams)
+                deviceData.TtDlLength = int(deviceState.LatestTrafficTestModeParametersData.LenDlDatagram)
+            }
+            if deviceState.LatestTrafficTestContext != nil {
+                if deviceState.LatestTrafficTestContext.Parameters != nil {
+                    deviceData.TtDlInterval = int(deviceState.LatestTrafficTestContext.Parameters.DlIntervalSeconds)
+                }
+                timeStopped := deviceState.LatestTrafficTestContext.UlTimeStopped
+                if deviceState.LatestTrafficTestContext.DlTimeStopped.After(timeStopped) {
+                    timeStopped = deviceState.LatestTrafficTestContext.DlTimeStopped
+                }
+                if ((deviceState.LatestTrafficTestContext.DlState == TRAFFIC_TEST_RUNNING) ||
+                    (deviceState.LatestTrafficTestContext.DlState == TRAFFIC_TEST_TX_COMPLETE)) &&
+                   (deviceState.LatestTrafficTestContext.UlState == TRAFFIC_TEST_RUNNING) {
+                       deviceData.TtRunning = true
+                } else {
+                    deviceData.TtTimeStopped = &timeStopped
+                }
+                deviceData.TtTimeStarted = &deviceState.LatestTrafficTestContext.TimeStarted 
+                deviceData.TtDlDatagramsTx = int(deviceState.LatestTrafficTestContext.DlDatagrams)
+                if deviceState.LatestTrafficTestModeReportData != nil {
+                    deviceData.TtDlDatagramsRx = int(deviceState.LatestTrafficTestModeReportData.NumTrafficTestDatagramsDl)
+                    deviceData.TtDlDatagramsMissed = int(deviceState.LatestTrafficTestModeReportData.NumTrafficTestDlDatagramsMissed)
+                    deviceData.TtDlBytesRx = int(deviceState.LatestTrafficTestModeReportData.NumTrafficTestBytesDl)
+                    deviceData.TtUlDatagramsTx = int(deviceState.LatestTrafficTestModeReportData.NumTrafficTestDatagramsUl)
+                }
+                deviceData.TtUlDatagramsRx = int(deviceState.LatestTrafficTestContext.UlDatagrams)
+                deviceData.TtUlDatagramsMissed = int(deviceState.LatestTrafficTestContext.UlDatagramsMissed)
+                deviceData.TtUlBytesRx = int(deviceState.LatestTrafficTestContext.UlBytes)
+                // Need to establish an overall state from the separate UL and DL states.
+                // Here's the logic:
+                // If UL & DL are passed, it's a pass
+                // if one of UL or DL are failed, it's a fail
+                // if one of UL or DL are timed-out, it's a timeout
+                if (deviceState.LatestTrafficTestContext.DlState == TRAFFIC_TEST_PASS) &&
+                   (deviceState.LatestTrafficTestContext.UlState == TRAFFIC_TEST_PASS) {
+                    deviceData.TtPassed = true
+                } else if (deviceState.LatestTrafficTestContext.DlState == TRAFFIC_TEST_FAIL) ||
+                          (deviceState.LatestTrafficTestContext.UlState == TRAFFIC_TEST_FAIL) {
+                    deviceData.TtFailed = true
+                } else if (deviceState.LatestTrafficTestContext.DlState == TRAFFIC_TEST_TIMEOUT) ||
+                          (deviceState.LatestTrafficTestContext.UlState == TRAFFIC_TEST_TIMEOUT) {
+                    deviceData.TtTimedOut = true
+                }
+           }
             
             data.DeviceData = append (data.DeviceData, deviceData)
         }
     
         // And finally, sort the data by whether the device is connected or not and then by friendly name
         sort.Sort(ByNameAndConnected(data.DeviceData))
-        globals.Dbg.PrintfInfo("%s [display] --> Displaying this:\n\n%+v\n\n", globals.LogTag, data)
+        globals.Dbg.PrintfTrace("%s [display] --> Displaying this:\n\n%+v\n\n", globals.LogTag, data)
     }
     
     return &data

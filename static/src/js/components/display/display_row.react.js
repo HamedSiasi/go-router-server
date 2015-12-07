@@ -20,6 +20,9 @@
 var React = require('react');
 var ValueUuidSelected = require('../controls/value_uuid_selected.react');
 var Connected = require('../controls/value_connected.react');
+var TtState = require('../controls/value_tt_state.react');
+var TtNumbers = require('../controls/value_tt_numbers.react');
+var TtConfig = require('../controls/value_tt_config.react');
 var AppActions = require('../../actions/app_actions.js');
 var Moment = require('moment');
 var Link = require('react-router-component').Link;
@@ -44,23 +47,34 @@ var DisplayRow = React.createClass({
     
     render: function() {
         var rows = [];
+        var deviceTime;
         var cellIdTime;
         var rsrpTime;
         var rssiTime;
         var txPowerTime;
         var coverageClassTime;
+        var ttTimeStarted;
+        var ttTimeUpdated;
+        var ttTimeStopped;
+        var ttDuration;
         
         if (this.props["DeviceData"] && (this.props["DeviceData"].length > 0)) {
             this.props["DeviceData"].forEach(function(device, i) {
             	
+            	if (device["DeviceTime"]) {
+            		deviceTime = Moment(Date.parse(device["DeviceTime"])).format("YYYY-MM-DD HH:mm:ss");
+                    if (deviceTime == NaN) {
+                    	deviceTime = "";
+                    }			
+            	}
             	if (device["CellIdTime"]) {
-                    cellIdTime = Moment.utc(Date.parse(device["CellIdTime"])).fromNow()
+                    cellIdTime = Moment(Date.parse(device["CellIdTime"])).fromNow()
                     if (cellIdTime == NaN) {
                         celldTime = "";
                     }			
             	}
             	if (device["RsrpTime"]) {
-            	    rsrpTime = Moment.utc(Date.parse(device["RsrpTime"])).fromNow();
+            	    rsrpTime = Moment(Date.parse(device["RsrpTime"])).fromNow();
                     if (rsrpTime == NaN) {
                 	    rsrpTime = "dBm"; 
                     } else {
@@ -68,7 +82,7 @@ var DisplayRow = React.createClass({
                     }
             	}    
             	if (device["RssiTime"]) {                
-                    rssiTime = Moment.utc(Date.parse(device["RssiTime"])).fromNow();
+                    rssiTime = Moment(Date.parse(device["RssiTime"])).fromNow();
                     if (rssiTime == NaN) {
                 	    rssiTime = "dBm"; 
                     } else {                	
@@ -76,7 +90,7 @@ var DisplayRow = React.createClass({
                     }
             	}
             	if (device["TxPowerTime"]) {                
-                    txPowerTime = Moment.utc(Date.parse(device["TxPowerTime"])).fromNow();
+                    txPowerTime = Moment(Date.parse(device["TxPowerTime"])).fromNow();
                     if (txPowerTime == NaN) {
                 	    txPowerTime = "dBm"; 
                     } else {
@@ -84,10 +98,32 @@ var DisplayRow = React.createClass({
                     }
             	}                
             	if (device["CoverageClassTime"]) {                
-                    coverageClassTime = Moment.utc(Date.parse(device["CoverageClassTime"])).fromNow();
+                    coverageClassTime = Moment(Date.parse(device["CoverageClassTime"])).fromNow();
                     if (coverageClassTime == NaN) {
                     	coverageClassTime = "";
                     }
+            	}
+            	
+            	if (device["TtTimeStarted"]) {
+            		ttTimeStarted = Moment(Date.parse(device["TtTimeStarted"]));
+            		if (Moment(ttTimeStarted).isAfter('2014-01-01', 'year')) {
+                    	if (device["TtTimeStopped"]) {
+                    		ttTimeStopped = Moment(Date.parse(device["TtTimeStopped"]));
+                    		if (Moment(ttTimeStopped).isAfter('2014-01-01', 'year')) {
+                                ttDuration = Moment(Moment(ttTimeStopped).diff(Moment(ttTimeStarted))).format("HH:mm:ss");
+                                ttTimeUpdated = ttTimeStopped;
+                    	    } else {
+                    	    	ttTimeStopped = ""
+                    	    }
+                    	} else {
+	                        if (device["TtRunning"]) { 
+	                            ttDuration = Moment(Moment(Date.now()).diff(Moment(ttTimeStarted))).format("HH:mm:ss");
+	                        }
+                    	}
+	                    ttTimeUpdated = Moment(ttTimeUpdated).fromNow() + " (" + Moment(ttTimeUpdated).format("HH:mm:ss") + ")";
+            	    } else {
+            	    	ttTimeStarted = ""
+            	    }
             	}
             	
                 rows.push(
@@ -102,14 +138,15 @@ var DisplayRow = React.createClass({
                             Mode: {device["Mode"]}<br />
                             Reporting: <b>{device["Reporting"]}</b><br />
                             Heartbeat: <b>{device["Heartbeat"]}</b><br />
+                            Time: {deviceTime}
                         </td>
                         <td style={{width: 170}}>
                             <i className="fa fa-arrow-up" /> Msgs: <b>{device["TotalUlMsgs"]}</b><br />
                             <i className="fa fa-arrow-up" /> Bytes: <b>{device["TotalUlBytes"]}</b><br />
-                            <i className="fa fa-arrow-up" /> Last Msg: {Moment.utc(Date.parse(device["LastUlMsgTime"])).local().format("YYYY-MM-DD HH:mm:ss")}<br />
+                            <i className="fa fa-arrow-up" /> Last Msg: {Moment(Date.parse(device["LastUlMsgTime"])).format("YYYY-MM-DD HH:mm:ss")}<br />
                             <i className="fa fa-arrow-down" /> Msgs: <b>{device["TotalDlMsgs"]}</b><br />
                             <i className="fa fa-arrow-down" /> Bytes: <b>{device["TotalDlBytes"]}</b><br />
-                            <i className="fa fa-arrow-down" /> Last Msg: {Moment.utc(Date.parse(device["LastDlMsgTime"])).local().format("YYYY-MM-DD HH:mm:ss")}
+                            <i className="fa fa-arrow-down" /> Last Msg: {Moment(Date.parse(device["LastDlMsgTime"])).format("YYYY-MM-DD HH:mm:ss")}
                         </td>
                         <td style={{width: 200}}>
                             <i className="fa fa-rss" /> Cell: <b>{device["CellId"]}</b> {cellIdTime}<br />
@@ -126,7 +163,12 @@ var DisplayRow = React.createClass({
                             <i className="fa fa-arrow-down" /> {device["RxTime"]}<br />
                             <i className="fa fa-rotate-left" /> {device["NumExpectedMsgs"]}
                             </td> 
-                        <td className="center" style={{width: 170}}>
+                        <td className="center" style={{width: 200}}>
+                            <TtConfig UlDatagrams={device["TtUlExpected"]} UlLength={device["TtUlExpected"]} DlDatagrams={device["TtDlExpected"]} DlLength={device["TtDlExpected"]} DlInterval={device["TtDlInterval"]} Timeout={device["TtTimeout"]}/>
+                            <TtState IsRunning={device["TtRunning"]} IsPassed={device["TtPassed"]} IsFailed={device["TtFailed"]} IsTimedOut={device["TtTimedOut"]} TimeUpdated={ttTimeUpdated} />
+                            <TtNumbers IsUplink={true} Tx={device["TtUlDatagramsTx"]} Rx={device["TtUlDatagramsRx"]} Missed={device["TtUlDatagramsMissed"]} Target={device["TtUlExpected"]}/>
+                            <TtNumbers IsUplink={false} Tx={device["TtDlDatagramsTx"]} Rx={device["TtDlDatagramsRx"]} Missed={device["TtDlDatagramsMissed"]} Target={device["TtDlExpected"]}/>
+                            <i className="fa fa-clock-o" /> {ttDuration}
                         </td> 
                     </tr>
                 );
@@ -144,10 +186,10 @@ var DisplayRow = React.createClass({
                                         <tr className="info">
                                             <th style={{textAlign: 'center', width: 15}}><input type="checkbox" onChange={this.handleCheckAll} value="checkAll" defaultChecked={false} /></th>
                                             <th>Device</th>
-                                            <th>Traffic</th>
+                                            <th>Normal Traffic</th>
                                             <th>Radio</th>
                                             <th>Status</th>
-                                            <th>Test Results</th>
+                                            <th>Test Traffic</th>
                                         </tr>
                                     </thead>
                                     <tbody style={{fontSize: 12}}>

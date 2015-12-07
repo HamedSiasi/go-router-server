@@ -25703,7 +25703,7 @@ var AppActions = {
 
 module.exports = AppActions;
 
-},{"../constants/app_store_types":223,"../dispatchers/app_dispatcher":224}],191:[function(require,module,exports){
+},{"../constants/app_store_types":226,"../dispatchers/app_dispatcher":227}],191:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -25751,7 +25751,7 @@ var App = React.createClass({displayName: "App",
 
 module.exports = App;
 
-},{"./app_template.js":192,"./display/display.react":213,"./index":216,"./user/login.react":219,"./user/register.react":220,"react":189,"react-router-component":9}],192:[function(require,module,exports){
+},{"./app_template.js":192,"./display/display.react":216,"./index":219,"./user/login.react":222,"./user/register.react":223,"react":189,"react-router-component":9}],192:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -25787,7 +25787,7 @@ var Template = React.createClass({displayName: "Template",
 
 module.exports = Template;
 
-},{"./header/header.react":215,"react":189}],193:[function(require,module,exports){
+},{"./header/header.react":218,"react":189}],193:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -25855,7 +25855,7 @@ var GetIntervals = React.createClass({displayName: "GetIntervals",
 
 module.exports = GetIntervals;
 
-},{"../../stores/app_store.js":226,"../utilities/make_li_name_list.react":221,"react":189}],194:[function(require,module,exports){
+},{"../../stores/app_store.js":229,"../utilities/make_li_name_list.react":224,"react":189}],194:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -25924,7 +25924,7 @@ var GetPing = React.createClass({displayName: "GetPing",
 
 module.exports = GetPing;
 
-},{"../../stores/app_store.js":226,"../utilities/make_li_name_list.react":221,"react":189}],195:[function(require,module,exports){
+},{"../../stores/app_store.js":229,"../utilities/make_li_name_list.react":224,"react":189}],195:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -25993,7 +25993,7 @@ var GetTime = React.createClass({displayName: "GetTime",
 
 module.exports = GetTime;
 
-},{"../../stores/app_store.js":226,"../utilities/make_li_name_list.react":221,"react":189}],196:[function(require,module,exports){
+},{"../../stores/app_store.js":229,"../utilities/make_li_name_list.react":224,"react":189}],196:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26063,7 +26063,7 @@ var SetHeartBeat = React.createClass({displayName: "SetHeartBeat",
 
 module.exports = SetHeartBeat;
 
-},{"../../stores/app_store.js":226,"../utilities/make_li_name_list.react":221,"react":189}],197:[function(require,module,exports){
+},{"../../stores/app_store.js":229,"../utilities/make_li_name_list.react":224,"react":189}],197:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26130,7 +26130,7 @@ var AppStore = require('../../stores/app_store.js');
 
 module.exports = SetReporting;
 
-},{"../../stores/app_store.js":226,"../utilities/make_li_name_list.react":221,"react":189}],198:[function(require,module,exports){
+},{"../../stores/app_store.js":229,"../utilities/make_li_name_list.react":224,"react":189}],198:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26204,7 +26204,7 @@ var SetTTParameters = React.createClass({displayName: "SetTTParameters",
 
 module.exports = SetTTParameters;
 
-},{"../../stores/app_store.js":226,"../utilities/make_li_name_list.react":221,"react":189}],199:[function(require,module,exports){
+},{"../../stores/app_store.js":229,"../utilities/make_li_name_list.react":224,"react":189}],199:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26271,7 +26271,7 @@ var SetTtStart = React.createClass({displayName: "SetTtStart",
 
 module.exports = SetTtStart;
 
-},{"../../stores/app_store.js":226,"../utilities/make_li_name_list.react":221,"react":189}],200:[function(require,module,exports){
+},{"../../stores/app_store.js":229,"../utilities/make_li_name_list.react":224,"react":189}],200:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26338,7 +26338,7 @@ var SetTtStop = React.createClass({displayName: "SetTtStop",
 
 module.exports = SetTtStop;
 
-},{"../../stores/app_store.js":226,"../utilities/make_li_name_list.react":221,"react":189}],201:[function(require,module,exports){
+},{"../../stores/app_store.js":229,"../utilities/make_li_name_list.react":224,"react":189}],201:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26472,7 +26472,7 @@ var SettingTt = React.createClass({displayName: "SettingTt",
 
 module.exports = SettingTt;
 
-},{"./set_tt_parameters.react":198,"./set_tt_start.react":199,"./set_tt_stop.react":200,"./value_tt_dl_interval.react":206,"./value_tt_len_dl_datagram.react":207,"./value_tt_len_ul_datagram.react":208,"./value_tt_num_dl_datagrams.react":209,"./value_tt_num_ul_datagrams.react":210,"./value_tt_timeout.react":211,"react":189}],203:[function(require,module,exports){
+},{"./set_tt_parameters.react":198,"./set_tt_start.react":199,"./set_tt_stop.react":200,"./value_tt_dl_interval.react":207,"./value_tt_len_dl_datagram.react":208,"./value_tt_len_ul_datagram.react":209,"./value_tt_num_dl_datagrams.react":210,"./value_tt_num_ul_datagrams.react":211,"./value_tt_timeout.react":214,"react":189}],203:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26585,7 +26585,7 @@ var ValueHeartbeat = React.createClass({displayName: "ValueHeartbeat",
 
 module.exports = ValueHeartbeat;
 
-},{"../../actions/app_actions.js":190,"../../constants/app_limits":222,"../../stores/app_store.js":226,"react":189}],205:[function(require,module,exports){
+},{"../../actions/app_actions.js":190,"../../constants/app_limits":225,"../../stores/app_store.js":229,"react":189}],205:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26659,7 +26659,51 @@ var ValueReporting = React.createClass({displayName: "ValueReporting",
 
 module.exports = ValueReporting;
 
-},{"../../actions/app_actions.js":190,"../../constants/app_limits":222,"../../stores/app_store.js":226,"react":189}],206:[function(require,module,exports){
+},{"../../actions/app_actions.js":190,"../../constants/app_limits":225,"../../stores/app_store.js":229,"react":189}],206:[function(require,module,exports){
+/**
+ * Copyright (C) u-blox Melbourn Ltd
+ * u-blox Melbourn Ltd, Melbourn, UK
+ * 
+ * All rights reserved.
+ *
+ * This source file is the sole property of u-blox Melbourn Ltd.
+ * Reproduction or utilization of this source in whole or part is
+ * forbidden without the written consent of u-blox Melbourn Ltd.
+ * 
+ * Parts of this file are written in JSX, not HTML.  If you want
+ * to put any content in here that should be generated as HTML,
+ * stuff it through:
+ * 
+ * https://facebook.github.io/react/html-jsx.html
+ * 
+ * ...to get your syntax correct.
+ */
+"use strict";
+
+var React = require('react');
+
+var TtConfig = React.createClass({displayName: "TtConfig",
+    render:function() {
+	    if ((this.props.UlLength > 0) || (this.props.DlLength > 0)) {
+            //<i className="fa fa-cog" /> <i className="fa fa-arrow-up" /> N:{this.props.UlDatagrams}/L:{this.props.UlLength} <i className="fa fa-arrow-down" /> N:{this.props.DlDatagrams}/L:{this.props.DlLength}/G:{this.props.DlInterval} T:{this.props.Timeout}
+            return (
+                React.createElement("div", null, 
+                    React.createElement("i", {className: "fa fa-cog"}), " ", React.createElement("i", {className: "fa fa-arrow-up"}), " N:", this.props.UlDatagrams, "/L:", this.props.UlLength, " ", React.createElement("i", {className: "fa fa-arrow-down"}), " N:", this.props.DlDatagrams, "/L:", this.props.DlLength, "/G:", this.props.DlInterval
+                )
+            );
+        } else {
+            return (
+                React.createElement("div", null, 
+                    React.createElement("i", {className: "fa fa-cog"})
+        	    )
+	    	);
+	    }
+    }
+});
+
+module.exports = TtConfig;
+
+},{"react":189}],207:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26733,7 +26777,7 @@ var ValueTTDlInterval = React.createClass({displayName: "ValueTTDlInterval",
 
 module.exports = ValueTTDlInterval;
 
-},{"../../actions/app_actions.js":190,"../../constants/app_limits":222,"../../stores/app_store.js":226,"react":189}],207:[function(require,module,exports){
+},{"../../actions/app_actions.js":190,"../../constants/app_limits":225,"../../stores/app_store.js":229,"react":189}],208:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26807,7 +26851,7 @@ var ValueTtLenDlDatagram = React.createClass({displayName: "ValueTtLenDlDatagram
 
 module.exports = ValueTtLenDlDatagram;
 
-},{"../../actions/app_actions.js":190,"../../constants/app_limits":222,"../../stores/app_store.js":226,"react":189}],208:[function(require,module,exports){
+},{"../../actions/app_actions.js":190,"../../constants/app_limits":225,"../../stores/app_store.js":229,"react":189}],209:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26881,7 +26925,7 @@ var ValueTtLenUlDatagram = React.createClass({displayName: "ValueTtLenUlDatagram
 
 module.exports = ValueTtLenUlDatagram;
 
-},{"../../actions/app_actions.js":190,"../../constants/app_limits":222,"../../stores/app_store.js":226,"react":189}],209:[function(require,module,exports){
+},{"../../actions/app_actions.js":190,"../../constants/app_limits":225,"../../stores/app_store.js":229,"react":189}],210:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26956,7 +27000,7 @@ var ValueTtNumDlDatagrams = React.createClass({displayName: "ValueTtNumDlDatagra
 
 module.exports = ValueTtNumDlDatagrams;
 
-},{"../../actions/app_actions.js":190,"../../constants/app_limits":222,"../../stores/app_store.js":226,"react":189}],210:[function(require,module,exports){
+},{"../../actions/app_actions.js":190,"../../constants/app_limits":225,"../../stores/app_store.js":229,"react":189}],211:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -27031,7 +27075,132 @@ var ValueTtNumUlDatagrams = React.createClass({displayName: "ValueTtNumUlDatagra
 
 module.exports = ValueTtNumUlDatagrams;
 
-},{"../../actions/app_actions.js":190,"../../constants/app_limits":222,"../../stores/app_store.js":226,"react":189}],211:[function(require,module,exports){
+},{"../../actions/app_actions.js":190,"../../constants/app_limits":225,"../../stores/app_store.js":229,"react":189}],212:[function(require,module,exports){
+/**
+ * Copyright (C) u-blox Melbourn Ltd
+ * u-blox Melbourn Ltd, Melbourn, UK
+ * 
+ * All rights reserved.
+ *
+ * This source file is the sole property of u-blox Melbourn Ltd.
+ * Reproduction or utilization of this source in whole or part is
+ * forbidden without the written consent of u-blox Melbourn Ltd.
+ * 
+ * Parts of this file are written in JSX, not HTML.  If you want
+ * to put any content in here that should be generated as HTML,
+ * stuff it through:
+ * 
+ * https://facebook.github.io/react/html-jsx.html
+ * 
+ * ...to get your syntax correct.
+ */
+"use strict";
+
+var React = require('react');
+
+var TtNumbers = React.createClass({displayName: "TtNumbers",
+    render:function() {
+        var percentComplete;
+        var tx = this.props.Tx;
+        var rx = this.props.Rx
+        var missed = this.props.Missed;
+        
+        if (rx > tx) {
+        	rx = tx;
+        }
+        
+        if (missed > tx) {
+        	missed = tx;
+        }
+        
+        if (this.props.Target) {
+            percentComplete = ((rx / this.props.Target) * 100).toFixed(0);
+            if (percentComplete > 100) {
+            	percentComplete = 100;
+            }	
+        } else {
+        	percentComplete = 0;
+        }
+
+        if (this.props.IsUplink) {
+            return (
+                React.createElement("div", null, 
+                React.createElement("i", {className: "fa fa-arrow-up"}), " ", React.createElement("b", null, rx), " out of ", React.createElement("b", null, tx), " (", React.createElement("b", null, percentComplete, "%"), ", ", React.createElement("b", null, missed), " missed)"
+                )
+            );
+        } else {
+            return (
+                React.createElement("div", null, 
+                React.createElement("i", {className: "fa fa-arrow-down"}), " ", React.createElement("b", null, rx), " out of ", React.createElement("b", null, tx), " (", React.createElement("b", null, percentComplete, "%"), ", ", React.createElement("b", null, missed), " missed)"
+                )
+            );
+        }
+    }
+});
+
+module.exports = TtNumbers;
+
+},{"react":189}],213:[function(require,module,exports){
+/**
+ * Copyright (C) u-blox Melbourn Ltd
+ * u-blox Melbourn Ltd, Melbourn, UK
+ * 
+ * All rights reserved.
+ *
+ * This source file is the sole property of u-blox Melbourn Ltd.
+ * Reproduction or utilization of this source in whole or part is
+ * forbidden without the written consent of u-blox Melbourn Ltd.
+ * 
+ * Parts of this file are written in JSX, not HTML.  If you want
+ * to put any content in here that should be generated as HTML,
+ * stuff it through:
+ * 
+ * https://facebook.github.io/react/html-jsx.html
+ * 
+ * ...to get your syntax correct.
+ */
+
+var React = require('react');
+
+var TtState = React.createClass({displayName: "TtState",
+    render:function() {
+        if (this.props.IsRunning) {
+            return (
+                React.createElement("div", null, 
+                    React.createElement("img", {src: "static/dist/assets/images/amber.png", style: {maxWidth: 12}}), " ", this.props.TimeUpdated
+                )
+            );
+        } else if (this.props.IsPassed) {
+            return (
+                React.createElement("div", null, 
+                    React.createElement("img", {src: "static/dist/assets/images/green.png", style: {maxWidth: 12}}), " ", this.props.TimeUpdated
+                )
+            );
+        } else if (this.props.IsFailed) {
+            return (
+                React.createElement("div", null, 
+                    React.createElement("img", {src: "static/dist/assets/images/red.png", style: {maxWidth: 12}}), " ", this.props.TimeUpdated
+                )
+            );
+        } else if (this.props.IsTimedOut) {
+            return (
+                React.createElement("div", null, 
+                    React.createElement("img", {src: "static/dist/assets/images/red1.png", style: {maxWidth: 12}}), " ", this.props.TimeUpdated
+                )
+            );
+        } else {
+            return (
+                React.createElement("div", null, 
+                    React.createElement("img", {src: "static/dist/assets/images/black.png", style: {maxWidth: 12}}), " ", this.props.TimeUpdated
+                )
+            );
+        }
+    }
+});
+
+module.exports = TtState;
+
+},{"react":189}],214:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -27108,7 +27277,7 @@ var ValueTtTimeout = React.createClass({displayName: "ValueTtTimeout",
 
 module.exports = ValueTtTimeout;
 
-},{"../../actions/app_actions.js":190,"../../constants/app_limits":222,"../../stores/app_store.js":226,"react":189}],212:[function(require,module,exports){
+},{"../../actions/app_actions.js":190,"../../constants/app_limits":225,"../../stores/app_store.js":229,"react":189}],215:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -27166,7 +27335,7 @@ var ValueUuidSelected = React.createClass({displayName: "ValueUuidSelected",
 
 module.exports = ValueUuidSelected;
 
-},{"../../actions/app_actions.js":190,"../../stores/app_store.js":226,"react":189}],213:[function(require,module,exports){
+},{"../../actions/app_actions.js":190,"../../stores/app_store.js":229,"react":189}],216:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -27246,7 +27415,7 @@ var Display = React.createClass({displayName: "Display",
 
 module.exports = Display;
 
-},{"../panels/settings.react":217,"../panels/summary.react":218,"./display_row.react":214,"react":189,"react-router-component":9}],214:[function(require,module,exports){
+},{"../panels/settings.react":220,"../panels/summary.react":221,"./display_row.react":217,"react":189,"react-router-component":9}],217:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -27269,6 +27438,9 @@ module.exports = Display;
 var React = require('react');
 var ValueUuidSelected = require('../controls/value_uuid_selected.react');
 var Connected = require('../controls/value_connected.react');
+var TtState = require('../controls/value_tt_state.react');
+var TtNumbers = require('../controls/value_tt_numbers.react');
+var TtConfig = require('../controls/value_tt_config.react');
 var AppActions = require('../../actions/app_actions.js');
 var Moment = require('moment');
 var Link = require('react-router-component').Link;
@@ -27293,23 +27465,34 @@ var DisplayRow = React.createClass({displayName: "DisplayRow",
     
     render: function() {
         var rows = [];
+        var deviceTime;
         var cellIdTime;
         var rsrpTime;
         var rssiTime;
         var txPowerTime;
         var coverageClassTime;
+        var ttTimeStarted;
+        var ttTimeUpdated;
+        var ttTimeStopped;
+        var ttDuration;
         
         if (this.props["DeviceData"] && (this.props["DeviceData"].length > 0)) {
             this.props["DeviceData"].forEach(function(device, i) {
             	
+            	if (device["DeviceTime"]) {
+            		deviceTime = Moment(Date.parse(device["DeviceTime"])).format("YYYY-MM-DD HH:mm:ss");
+                    if (deviceTime == NaN) {
+                    	deviceTime = "";
+                    }			
+            	}
             	if (device["CellIdTime"]) {
-                    cellIdTime = Moment.utc(Date.parse(device["CellIdTime"])).fromNow()
+                    cellIdTime = Moment(Date.parse(device["CellIdTime"])).fromNow()
                     if (cellIdTime == NaN) {
                         celldTime = "";
                     }			
             	}
             	if (device["RsrpTime"]) {
-            	    rsrpTime = Moment.utc(Date.parse(device["RsrpTime"])).fromNow();
+            	    rsrpTime = Moment(Date.parse(device["RsrpTime"])).fromNow();
                     if (rsrpTime == NaN) {
                 	    rsrpTime = "dBm"; 
                     } else {
@@ -27317,7 +27500,7 @@ var DisplayRow = React.createClass({displayName: "DisplayRow",
                     }
             	}    
             	if (device["RssiTime"]) {                
-                    rssiTime = Moment.utc(Date.parse(device["RssiTime"])).fromNow();
+                    rssiTime = Moment(Date.parse(device["RssiTime"])).fromNow();
                     if (rssiTime == NaN) {
                 	    rssiTime = "dBm"; 
                     } else {                	
@@ -27325,7 +27508,7 @@ var DisplayRow = React.createClass({displayName: "DisplayRow",
                     }
             	}
             	if (device["TxPowerTime"]) {                
-                    txPowerTime = Moment.utc(Date.parse(device["TxPowerTime"])).fromNow();
+                    txPowerTime = Moment(Date.parse(device["TxPowerTime"])).fromNow();
                     if (txPowerTime == NaN) {
                 	    txPowerTime = "dBm"; 
                     } else {
@@ -27333,10 +27516,32 @@ var DisplayRow = React.createClass({displayName: "DisplayRow",
                     }
             	}                
             	if (device["CoverageClassTime"]) {                
-                    coverageClassTime = Moment.utc(Date.parse(device["CoverageClassTime"])).fromNow();
+                    coverageClassTime = Moment(Date.parse(device["CoverageClassTime"])).fromNow();
                     if (coverageClassTime == NaN) {
                     	coverageClassTime = "";
                     }
+            	}
+            	
+            	if (device["TtTimeStarted"]) {
+            		ttTimeStarted = Moment(Date.parse(device["TtTimeStarted"]));
+            		if (Moment(ttTimeStarted).isAfter('2014-01-01', 'year')) {
+                    	if (device["TtTimeStopped"]) {
+                    		ttTimeStopped = Moment(Date.parse(device["TtTimeStopped"]));
+                    		if (Moment(ttTimeStopped).isAfter('2014-01-01', 'year')) {
+                                ttDuration = Moment(Moment(ttTimeStopped).diff(Moment(ttTimeStarted))).format("HH:mm:ss");
+                                ttTimeUpdated = ttTimeStopped;
+                    	    } else {
+                    	    	ttTimeStopped = ""
+                    	    }
+                    	} else {
+	                        if (device["TtRunning"]) { 
+	                            ttDuration = Moment(Moment(Date.now()).diff(Moment(ttTimeStarted))).format("HH:mm:ss");
+	                        }
+                    	}
+	                    ttTimeUpdated = Moment(ttTimeUpdated).fromNow() + " (" + Moment(ttTimeUpdated).format("HH:mm:ss") + ")";
+            	    } else {
+            	    	ttTimeStarted = ""
+            	    }
             	}
             	
                 rows.push(
@@ -27350,15 +27555,16 @@ var DisplayRow = React.createClass({displayName: "DisplayRow",
                             "UUID: ", device["Uuid"], React.createElement("br", null), 
                             "Mode: ", device["Mode"], React.createElement("br", null), 
                             "Reporting: ", React.createElement("b", null, device["Reporting"]), React.createElement("br", null), 
-                            "Heartbeat: ", React.createElement("b", null, device["Heartbeat"]), React.createElement("br", null)
+                            "Heartbeat: ", React.createElement("b", null, device["Heartbeat"]), React.createElement("br", null), 
+                            "Time: ", deviceTime
                         ), 
                         React.createElement("td", {style: {width: 170}}, 
                             React.createElement("i", {className: "fa fa-arrow-up"}), " Msgs: ", React.createElement("b", null, device["TotalUlMsgs"]), React.createElement("br", null), 
                             React.createElement("i", {className: "fa fa-arrow-up"}), " Bytes: ", React.createElement("b", null, device["TotalUlBytes"]), React.createElement("br", null), 
-                            React.createElement("i", {className: "fa fa-arrow-up"}), " Last Msg: ", Moment.utc(Date.parse(device["LastUlMsgTime"])).local().format("YYYY-MM-DD HH:mm:ss"), React.createElement("br", null), 
+                            React.createElement("i", {className: "fa fa-arrow-up"}), " Last Msg: ", Moment(Date.parse(device["LastUlMsgTime"])).format("YYYY-MM-DD HH:mm:ss"), React.createElement("br", null), 
                             React.createElement("i", {className: "fa fa-arrow-down"}), " Msgs: ", React.createElement("b", null, device["TotalDlMsgs"]), React.createElement("br", null), 
                             React.createElement("i", {className: "fa fa-arrow-down"}), " Bytes: ", React.createElement("b", null, device["TotalDlBytes"]), React.createElement("br", null), 
-                            React.createElement("i", {className: "fa fa-arrow-down"}), " Last Msg: ", Moment.utc(Date.parse(device["LastDlMsgTime"])).local().format("YYYY-MM-DD HH:mm:ss")
+                            React.createElement("i", {className: "fa fa-arrow-down"}), " Last Msg: ", Moment(Date.parse(device["LastDlMsgTime"])).format("YYYY-MM-DD HH:mm:ss")
                         ), 
                         React.createElement("td", {style: {width: 200}}, 
                             React.createElement("i", {className: "fa fa-rss"}), " Cell: ", React.createElement("b", null, device["CellId"]), " ", cellIdTime, React.createElement("br", null), 
@@ -27375,7 +27581,12 @@ var DisplayRow = React.createClass({displayName: "DisplayRow",
                             React.createElement("i", {className: "fa fa-arrow-down"}), " ", device["RxTime"], React.createElement("br", null), 
                             React.createElement("i", {className: "fa fa-rotate-left"}), " ", device["NumExpectedMsgs"]
                             ), 
-                        React.createElement("td", {className: "center", style: {width: 170}}
+                        React.createElement("td", {className: "center", style: {width: 200}}, 
+                            React.createElement(TtConfig, {UlDatagrams: device["TtUlExpected"], UlLength: device["TtUlExpected"], DlDatagrams: device["TtDlExpected"], DlLength: device["TtDlExpected"], DlInterval: device["TtDlInterval"], Timeout: device["TtTimeout"]}), 
+                            React.createElement(TtState, {IsRunning: device["TtRunning"], IsPassed: device["TtPassed"], IsFailed: device["TtFailed"], IsTimedOut: device["TtTimedOut"], TimeUpdated: ttTimeUpdated}), 
+                            React.createElement(TtNumbers, {IsUplink: true, Tx: device["TtUlDatagramsTx"], Rx: device["TtUlDatagramsRx"], Missed: device["TtUlDatagramsMissed"], Target: device["TtUlExpected"]}), 
+                            React.createElement(TtNumbers, {IsUplink: false, Tx: device["TtDlDatagramsTx"], Rx: device["TtDlDatagramsRx"], Missed: device["TtDlDatagramsMissed"], Target: device["TtDlExpected"]}), 
+                            React.createElement("i", {className: "fa fa-clock-o"}), " ", ttDuration
                         )
                     )
                 );
@@ -27393,10 +27604,10 @@ var DisplayRow = React.createClass({displayName: "DisplayRow",
                                         React.createElement("tr", {className: "info"}, 
                                             React.createElement("th", {style: {textAlign: 'center', width: 15}}, React.createElement("input", {type: "checkbox", onChange: this.handleCheckAll, value: "checkAll", defaultChecked: false})), 
                                             React.createElement("th", null, "Device"), 
-                                            React.createElement("th", null, "Traffic"), 
+                                            React.createElement("th", null, "Normal Traffic"), 
                                             React.createElement("th", null, "Radio"), 
                                             React.createElement("th", null, "Status"), 
-                                            React.createElement("th", null, "Test Results")
+                                            React.createElement("th", null, "Test Traffic")
                                         )
                                     ), 
                                     React.createElement("tbody", {style: {fontSize: 12}}, 
@@ -27414,7 +27625,7 @@ var DisplayRow = React.createClass({displayName: "DisplayRow",
 
 module.exports = DisplayRow;
 
-},{"../../actions/app_actions.js":190,"../controls/value_connected.react":203,"../controls/value_uuid_selected.react":212,"moment":6,"react":189,"react-router-component":9}],215:[function(require,module,exports){
+},{"../../actions/app_actions.js":190,"../controls/value_connected.react":203,"../controls/value_tt_config.react":206,"../controls/value_tt_numbers.react":212,"../controls/value_tt_state.react":213,"../controls/value_uuid_selected.react":215,"moment":6,"react":189,"react-router-component":9}],218:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -27496,7 +27707,7 @@ var Header = React.createClass({displayName: "Header",
 
 module.exports = Header;
 
-},{"react":189,"react-router-component":9}],216:[function(require,module,exports){
+},{"react":189,"react-router-component":9}],219:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -27543,7 +27754,7 @@ var Index = React.createClass({displayName: "Index",
 
 module.exports = Index;
 
-},{"react":189}],217:[function(require,module,exports){
+},{"react":189}],220:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -27600,7 +27811,7 @@ var Settings = React.createClass({displayName: "Settings",
 
 module.exports = Settings;
 
-},{"../controls/setting_std.react":201,"../controls/setting_tt.react":202,"react":189}],218:[function(require,module,exports){
+},{"../controls/setting_std.react":201,"../controls/setting_tt.react":202,"react":189}],221:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -27651,7 +27862,7 @@ var Summary = React.createClass({displayName: "Summary",
 
 module.exports = Summary;
 
-},{"moment":6,"react":189}],219:[function(require,module,exports){
+},{"moment":6,"react":189}],222:[function(require,module,exports){
 var React = require('react');
 var Link = require('react-router-component').Link;
 
@@ -27685,7 +27896,7 @@ var Login = React.createClass({displayName: "Login",
 
 module.exports = Login;
 
-},{"react":189,"react-router-component":9}],220:[function(require,module,exports){
+},{"react":189,"react-router-component":9}],223:[function(require,module,exports){
 var React = require('react');
 var Link = require('react-router-component').Link;
 
@@ -27762,7 +27973,7 @@ var Register = React.createClass({displayName: "Register",
 
 module.exports = Register;
 
-},{"react":189,"react-router-component":9}],221:[function(require,module,exports){
+},{"react":189,"react-router-component":9}],224:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -27811,7 +28022,7 @@ Object.size = function(obj) {
 
 module.exports = MakeLiUuidList, Object.size;
 
-},{"react":189}],222:[function(require,module,exports){
+},{"react":189}],225:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -27845,7 +28056,7 @@ module.exports = {
     TT_DL_INTERVAL_MAX: 300,
     TT_DL_INTERVAL_MIN: 1,
 };
-},{}],223:[function(require,module,exports){
+},{}],226:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -27871,7 +28082,7 @@ module.exports = {
     STORE_TT_NO_REPORTS_DURING_TEST: "STORE_TT_NO_REPORTS_DURING_TEST",
     STORE_TT_DL_INTERVAL_SECONDS: "STORE_TT_DL_INTERVAL_SECONDS"
 };
-},{}],224:[function(require,module,exports){
+},{}],227:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -27902,7 +28113,7 @@ var AppDispatcher = assign(new Dispatcher(), {
 
 module.exports = AppDispatcher;
 
-},{"flux":3,"react/lib/Object.assign":57}],225:[function(require,module,exports){
+},{"flux":3,"react/lib/Object.assign":57}],228:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -27918,7 +28129,7 @@ var App = require('./components/app');
 var React = require('react');
 
 React.render(React.createElement(App, null), document.getElementById('main'));
-},{"./components/app":191,"react":189}],226:[function(require,module,exports){
+},{"./components/app":191,"react":189}],229:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -28149,4 +28360,4 @@ var AppStore = assign(EventEmitter.prototype, {
 })
 
 module.exports = AppStore;
-},{"../constants/app_store_types":223,"../dispatchers/app_dispatcher":224,"events":1,"react/lib/Object.assign":57}]},{},[225]);
+},{"../constants/app_store_types":226,"../dispatchers/app_dispatcher":227,"events":1,"react/lib/Object.assign":57}]},{},[228]);

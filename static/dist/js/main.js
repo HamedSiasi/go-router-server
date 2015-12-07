@@ -27334,20 +27334,20 @@ var ValueUuidSelected = React.createClass({displayName: "ValueUuidSelected",
     },
 
     onChange: function() {
-        this.setState({checked: AppStore.isUuidChecked(this.state.value)});
+        this.setState({checked: AppStore.isUuidChecked(this.props.Uuid)});
     },
     
     handleChange: function(newValue) {
     	if (newValue.target.checked == true) {
-            AppActions.setUuidChecked(this.state.value);
+            AppActions.setUuidChecked(this.props.Uuid);
         } else {
-            AppActions.setUuidUnchecked(this.state.value);
+            AppActions.setUuidUnchecked(this.props.Uuid);
         }
     },
 
     render:function(){
         return (
-            React.createElement("input", {type: "checkbox", value: this.state.value, checked: this.state.checked, onChange: this.handleChange, style: {width: 15}})
+            React.createElement("input", {type: "checkbox", value: this.props.Uuid, checked: this.state.checked, onChange: this.handleChange, style: {width: 15}})
         );
     }
 });
@@ -27473,7 +27473,7 @@ var DisplayRow = React.createClass({displayName: "DisplayRow",
     
     handleCheckAll: function(checkAll) {
         if (this.props["DeviceData"] && (this.props["DeviceData"].length > 0)) {
-        	for (i = 0; i < this.props["DeviceData"].length; i++) {
+        	for (var i = 0; i < this.props["DeviceData"].length; i++) {
             	uuid = this.props["DeviceData"][i]["Uuid"];
                 if (checkAll.target.checked == true) {
                     AppActions.setUuidChecked(uuid);
@@ -27486,19 +27486,20 @@ var DisplayRow = React.createClass({displayName: "DisplayRow",
     
     render: function() {
         var rows = [];
-        var deviceTime;
-        var cellIdTime;
-        var rsrpTime;
-        var rssiTime;
-        var txPowerTime;
-        var coverageClassTime;
-        var ttTimeStarted;
-        var ttTimeUpdated;
-        var ttTimeStopped;
-        var ttDuration;
         
         if (this.props["DeviceData"] && (this.props["DeviceData"].length > 0)) {
-            this.props["DeviceData"].forEach(function(device, i) {
+            
+        	this.props["DeviceData"].forEach(function(device, i) {
+                var deviceTime;
+                var cellIdTime;
+                var rsrpTime;
+                var rssiTime;
+                var txPowerTime;
+                var coverageClassTime;
+                var ttTimeStarted;
+                var ttTimeUpdated;
+                var ttTimeStopped;
+                var ttDuration;
             	
             	if (device["DeviceTime"]) {
             		deviceTime = Moment(Date.parse(device["DeviceTime"])).format("YYYY-MM-DD HH:mm:ss");

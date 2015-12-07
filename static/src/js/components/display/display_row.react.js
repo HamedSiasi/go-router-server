@@ -35,7 +35,7 @@ var DisplayRow = React.createClass({
     
     handleCheckAll: function(checkAll) {
         if (this.props["DeviceData"] && (this.props["DeviceData"].length > 0)) {
-        	for (i = 0; i < this.props["DeviceData"].length; i++) {
+        	for (var i = 0; i < this.props["DeviceData"].length; i++) {
             	uuid = this.props["DeviceData"][i]["Uuid"];
                 if (checkAll.target.checked == true) {
                     AppActions.setUuidChecked(uuid);
@@ -48,19 +48,20 @@ var DisplayRow = React.createClass({
     
     render: function() {
         var rows = [];
-        var deviceTime;
-        var cellIdTime;
-        var rsrpTime;
-        var rssiTime;
-        var txPowerTime;
-        var coverageClassTime;
-        var ttTimeStarted;
-        var ttTimeUpdated;
-        var ttTimeStopped;
-        var ttDuration;
         
         if (this.props["DeviceData"] && (this.props["DeviceData"].length > 0)) {
-            this.props["DeviceData"].forEach(function(device, i) {
+            
+        	this.props["DeviceData"].forEach(function(device, i) {
+                var deviceTime;
+                var cellIdTime;
+                var rsrpTime;
+                var rssiTime;
+                var txPowerTime;
+                var coverageClassTime;
+                var ttTimeStarted;
+                var ttTimeUpdated;
+                var ttTimeStopped;
+                var ttDuration;
             	
             	if (device["DeviceTime"]) {
             		deviceTime = Moment(Date.parse(device["DeviceTime"])).format("YYYY-MM-DD HH:mm:ss");

@@ -36,20 +36,20 @@ var ValueUuidSelected = React.createClass({
     },
 
     onChange: function() {
-        this.setState({checked: AppStore.isUuidChecked(this.state.value)});
+        this.setState({checked: AppStore.isUuidChecked(this.props.Uuid)});
     },
     
     handleChange: function(newValue) {
     	if (newValue.target.checked == true) {
-            AppActions.setUuidChecked(this.state.value);
+            AppActions.setUuidChecked(this.props.Uuid);
         } else {
-            AppActions.setUuidUnchecked(this.state.value);
+            AppActions.setUuidUnchecked(this.props.Uuid);
         }
     },
 
     render:function(){
         return (
-            <input type="checkbox" value={this.state.value} checked={this.state.checked} onChange={this.handleChange} style={{width: 15}} />
+            <input type="checkbox" value={this.props.Uuid} checked={this.state.checked} onChange={this.handleChange} style={{width: 15}} />
         );
     }
 });

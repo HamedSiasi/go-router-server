@@ -99,7 +99,6 @@ type FrontPageData struct {
 
 func displayFrontPageData () *FrontPageData {
     var data FrontPageData
-    var deviceData FrontPageDeviceData
     
     // Get the latest state for all devices
     // This is very "go" syntax.  It means, create a channel called "get".  Pass the address
@@ -112,7 +111,9 @@ func displayFrontPageData () *FrontPageData {
     if isOpen {        
         for _, deviceState := range allDevicesState {
             
-            data.SummaryData.DevicesKnown++;
+            var deviceData FrontPageDeviceData
+            
+            data.SummaryData.DevicesKnown++
             deviceData.Uuid             = deviceState.DeviceUuid
             deviceData.DeviceName       = deviceState.DeviceName
             deviceData.Connected        = deviceState.Connected

@@ -678,6 +678,8 @@ func decode(data []byte, uuid string, ulFill byte, ulLength uint32) ([]interface
                                 LenUlDatagram:       uint32(value.lenUlDatagram),
                                 NumDlDatagrams:      uint32(value.numDlDatagrams),
                                 LenDlDatagram:       uint32(value.lenDlDatagram),
+                                TimeoutSeconds:      uint32(value.timeoutSeconds),
+                                NoReportsDuringTest: bool(value.noReportsDuringTest),
                             },   
                         })
                 }
@@ -693,6 +695,8 @@ func decode(data []byte, uuid string, ulFill byte, ulLength uint32) ([]interface
                                 LenUlDatagram:       uint32(value.lenUlDatagram),
                                 NumDlDatagrams:      uint32(value.numDlDatagrams),
                                 LenDlDatagram:       uint32(value.lenDlDatagram),
+                                TimeoutSeconds:      uint32(value.timeoutSeconds),
+                                NoReportsDuringTest: bool(value.noReportsDuringTest),
                             },   
                         })
                 }

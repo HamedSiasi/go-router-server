@@ -27582,7 +27582,7 @@ var DisplayRow = React.createClass({displayName: "DisplayRow",
                             React.createElement("i", {className: "fa fa-rotate-left"}), " ", device["NumExpectedMsgs"]
                             ), 
                         React.createElement("td", {className: "center", style: {width: 200}}, 
-                            React.createElement(TtConfig, {UlDatagrams: device["TtUlExpected"], UlLength: device["TtUlExpected"], DlDatagrams: device["TtDlExpected"], DlLength: device["TtDlExpected"], DlInterval: device["TtDlInterval"], Timeout: device["TtTimeout"]}), 
+                            React.createElement(TtConfig, {UlDatagrams: device["TtUlExpected"], UlLength: device["TtUlLength"], DlDatagrams: device["TtDlExpected"], DlLength: device["TtDlLength"], DlInterval: device["TtDlInterval"], Timeout: device["TtTimeout"]}), 
                             React.createElement(TtState, {IsRunning: device["TtRunning"], IsPassed: device["TtPassed"], IsFailed: device["TtFailed"], IsTimedOut: device["TtTimedOut"], TimeUpdated: ttTimeUpdated}), 
                             React.createElement(TtNumbers, {IsUplink: true, Tx: device["TtUlDatagramsTx"], Rx: device["TtUlDatagramsRx"], Missed: device["TtUlDatagramsMissed"], Target: device["TtUlExpected"]}), 
                             React.createElement(TtNumbers, {IsUplink: false, Tx: device["TtDlDatagramsTx"], Rx: device["TtDlDatagramsRx"], Missed: device["TtDlDatagramsMissed"], Target: device["TtDlExpected"]}), 

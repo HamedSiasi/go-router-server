@@ -164,7 +164,7 @@ var DisplayRow = React.createClass({
                             <i className="fa fa-rotate-left" /> {device["NumExpectedMsgs"]}
                             </td> 
                         <td className="center" style={{width: 200}}>
-                            <TtConfig UlDatagrams={device["TtUlExpected"]} UlLength={device["TtUlExpected"]} DlDatagrams={device["TtDlExpected"]} DlLength={device["TtDlExpected"]} DlInterval={device["TtDlInterval"]} Timeout={device["TtTimeout"]}/>
+                            <TtConfig UlDatagrams={device["TtUlExpected"]} UlLength={device["TtUlLength"]} DlDatagrams={device["TtDlExpected"]} DlLength={device["TtDlLength"]} DlInterval={device["TtDlInterval"]} Timeout={device["TtTimeout"]}/>
                             <TtState IsRunning={device["TtRunning"]} IsPassed={device["TtPassed"]} IsFailed={device["TtFailed"]} IsTimedOut={device["TtTimedOut"]} TimeUpdated={ttTimeUpdated} />
                             <TtNumbers IsUplink={true} Tx={device["TtUlDatagramsTx"]} Rx={device["TtUlDatagramsRx"]} Missed={device["TtUlDatagramsMissed"]} Target={device["TtUlExpected"]}/>
                             <TtNumbers IsUplink={false} Tx={device["TtDlDatagramsTx"]} Rx={device["TtDlDatagramsRx"]} Missed={device["TtDlDatagramsMissed"]} Target={device["TtDlExpected"]}/>

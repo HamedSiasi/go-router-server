@@ -50,6 +50,14 @@ type TotalsState struct {
     Bytes        int    
 }
 
+// A struct to hold some parameters
+// needed to track traffic test
+type TtValues struct {
+    DeviceUuid  string  `bson:"DeviceUuid" json:"DeviceUuid"`
+    UlFill      byte
+    UlLength    uint32
+}
+
 // Conection details for a device
 type Connection struct {
     DeviceUuid      string  `bson:"DeviceUuid" json:"DeviceUuid"`
@@ -84,8 +92,8 @@ var totalsDecodeState TotalsState
 var deviceDecodeStateList map[string]*DeviceTotalsState        
 
 // Keep hold of the values needed on the uplink for traffic test mode
-var ulFill    byte
-var ulLength  uint32                            
+// and the number of traffic test bytes encoded
+var deviceTtValuesList map[string]*TtValues        
 
 //--------------------------------------------------------------------
 // Functions
@@ -105,6 +113,10 @@ func processUlAmqpMsgs(q *Queue) {
                     switch value := msg.(type) {
                         case *AmqpResponseMessage:
                         {
+                            var ttDlBytes uint32
+                            var ttDlDatagrams uint32
+                            var ttTimeLastDl time.Time
+                            
                             globals.Dbg.PrintfTrace("%s [server] --> decoded AMQP JSON msg:\n\n%+v\n\n", globals.LogTag, msg)
                             if value.Command == "UART_data" {
                                 // UART data from the UTM-API which needs to be decoded                            
@@ -122,8 +134,20 @@ func processUlAmqpMsgs(q *Queue) {
                                     deviceDecodeStateList[value.DeviceUuid] = decodeState
                                 }
                                 
+                                // Similarly, for the traffic test values we need to pass from
+                                // the traffic test channel back to the decoder
+                                ttValues := deviceTtValuesList[value.DeviceUuid]
+                                if ttValues == nil {
+                                    ttValues = &TtValues {
+                                        DeviceUuid:  value.DeviceUuid,
+                                        UlFill:      0,
+                                        UlLength:    0,
+                                    }
+                                    deviceTtValuesList[value.DeviceUuid] = ttValues
+                                }
+                                
                                 // Decode the messages
-                                dlMsgs, byteCount := decode(value.Data, value.DeviceUuid, ulFill, ulLength)
+                                dlMsgs, byteCount := decode(value.Data, value.DeviceUuid, ttValues.UlFill, ttValues.UlLength)
             
                                 // Pass the messages to the data table for recording
                                 // and pass them to processing to see if any responses
@@ -158,9 +182,14 @@ func processUlAmqpMsgs(q *Queue) {
                                     if trafficTestContext.Parameters != nil {
                                         // The only things we need locally from this are the next
                                         // expected uplink fill value and the uplink datagram length
-                                        ulFill = trafficTestContext.UlFill
-                                        ulLength = trafficTestContext.Parameters.DeviceParameters.LenUlDatagram
+                                        ttValues.UlFill = trafficTestContext.UlFill
+                                        ttValues.UlLength = trafficTestContext.Parameters.DeviceParameters.LenUlDatagram
                                     }
+                                    // Also keep track of the downlink encode additions so that we can
+                                    // add them to the totals
+                                    ttDlBytes = trafficTestContext.DlBytesTotal 
+                                    ttDlDatagrams = trafficTestContext.DlDatagramsTotal
+                                    ttTimeLastDl = trafficTestContext.TimeLastDl
                                     // Send it all off to the datatable
                                     dataTableChannel <- &trafficTestContext
                                 }
@@ -178,6 +207,16 @@ func processUlAmqpMsgs(q *Queue) {
                                 // happen if it's sending rubbish and so no messages
                                 // will have been decoded)
                                 if isOpen {
+                                    // Add in the traffic test encoded stuff, if there is
+                                    // any (the decode counts for the traffic test stuff
+                                    // is already taken into account by the decoder) 
+                                    if ttTimeLastDl.After (encodeState.Timestamp) {
+                                        encodeState.Timestamp = ttTimeLastDl
+                                    }
+                                    encodeState.Totals.Msgs += int(ttDlDatagrams)
+                                    encodeState.Msgs += int(ttDlDatagrams)
+                                    encodeState.Totals.Bytes += int(ttDlBytes)
+                                    encodeState.Bytes += int(ttDlBytes)
                                     // Send the datatable a message with connection
                                     // data for this device plus the totals for all
                                     ulTotals := TotalsState {
@@ -190,6 +229,7 @@ func processUlAmqpMsgs(q *Queue) {
                                         Msgs:         encodeState.Totals.Msgs,
                                         Bytes:        encodeState.Totals.Bytes,
                                     }
+                                    // Send it off
                                     dataTableChannel <- &Connection {
                                         DeviceUuid:    value.DeviceUuid,
                                         DeviceName:    value.DeviceName,
@@ -276,10 +316,10 @@ func Run() {
     host, err := settings.GetSection("host")
     port, err := host.GetString("port")
 
-    // Set up the decode state list map
-    // Do this here so that if we restart the AMQP queue the
-    // data is retained
+    // Set up the maps here. Do this here so that if we restart
+    // the AMQP queue the data is retained
     deviceDecodeStateList = make(map[string]*DeviceTotalsState)        
+    deviceTtValuesList = make(map[string]*TtValues)        
 
     // Handle all the Amqp messages
     go doAmqp(username, amqpAddress)

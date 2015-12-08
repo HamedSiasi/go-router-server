@@ -121,12 +121,12 @@ func operateDataTable() {
                 if state.LatestIntervalsData != nil &&
                    state.LatestIntervalsData.ReportingInterval > 0 {
                     if state.LatestIntervalsData.HeartbeatSnapToRtc {
-                        if time.Now().After (state.LastHeardFrom.Add(time.Hour + time.Minute * 10)) {
+                        if time.Now().After (state.LastHeardFrom.Add(time.Hour * 4 + time.Minute * 10)) {
                             state.Connected = false
                             globals.Dbg.PrintfTrace("%s [datatable] --> device %s is no longer connected (last heard from @ %s).\n", globals.LogTag, uuid, state.LastHeardFrom.String())
                         }
                     } else {
-                        if time.Now().After (state.LastHeardFrom.Add(time.Duration(state.LatestIntervalsData.HeartbeatSeconds * (state.LatestIntervalsData.ReportingInterval + 2)) * time.Second)) {                   
+                        if time.Now().After (state.LastHeardFrom.Add(time.Duration(state.LatestIntervalsData.HeartbeatSeconds * (state.LatestIntervalsData.ReportingInterval + 4)) * time.Second)) {                   
                             state.Connected = false
                             globals.Dbg.PrintfTrace("%s [datatable] --> device %s is no longer connected  (last heard from @ %s).\n", globals.LogTag, uuid, state.LastHeardFrom.String())
                         }   

@@ -72,7 +72,6 @@ type FrontPageDeviceData struct {
     TtDlInterval       int        `json:"TtDlInterval, omitempty"`
     TtDlLength         int        `json:"TtDlLength, omitempty"`
     TtTimeout          int        `json:"TtTimeout, omitempty"`
-    TtRunning          bool       `json:"TtRunning, omitempty"`
     TtTimeStarted      *time.Time `json:"TtTimeStarted, omitempty"`
     TtTimeStopped      *time.Time `json:"TtTimeStopped, omitempty"`
     TtDlDatagramsTx     int       `json:"TtDlDatagramsTx, omitempty"`
@@ -83,9 +82,8 @@ type FrontPageDeviceData struct {
     TtUlDatagramsRx     int       `json:"TtUlDatagramsRx, omitempty"`
     TtUlDatagramsMissed int       `json:"TtUlDatagramsMissed, omitempty"`
     TtUlBytesRx         int       `json:"TtUlBytes, omitempty"`
-    TtPassed            bool      `json:"TtPassed, omitempty"`
-    TtFailed            bool      `json:"TtFailed, omitempty"`
-    TtTimedOut          bool      `json:"TtTimedOut, omitempty"`
+    TtUlState           TrafficTestStateEnum    `json:"TtUlState", omitempty"`
+    TtDlState           TrafficTestStateEnum    `json:"TtDlState", omitempty"`
 }
 
 type FrontPageData struct {
@@ -232,18 +230,14 @@ func displayFrontPageData () *FrontPageData {
                 if deviceState.LatestTrafficTestContext.Parameters != nil {
                     deviceData.TtDlInterval = int(deviceState.LatestTrafficTestContext.Parameters.DlIntervalSeconds)
                 }
+                deviceData.TtTimeStarted = &deviceState.LatestTrafficTestContext.TimeStarted 
                 timeStopped := deviceState.LatestTrafficTestContext.UlTimeStopped
                 if deviceState.LatestTrafficTestContext.DlTimeStopped.After(timeStopped) {
                     timeStopped = deviceState.LatestTrafficTestContext.DlTimeStopped
                 }
-                if ((deviceState.LatestTrafficTestContext.DlState == TRAFFIC_TEST_RUNNING) ||
-                    (deviceState.LatestTrafficTestContext.DlState == TRAFFIC_TEST_TX_COMPLETE)) &&
-                   (deviceState.LatestTrafficTestContext.UlState == TRAFFIC_TEST_RUNNING) {
-                       deviceData.TtRunning = true
-                } else {
+                if timeStopped.After(*deviceData.TtTimeStarted) {
                     deviceData.TtTimeStopped = &timeStopped
                 }
-                deviceData.TtTimeStarted = &deviceState.LatestTrafficTestContext.TimeStarted 
                 deviceData.TtDlDatagramsTx = int(deviceState.LatestTrafficTestContext.DlDatagrams)
                 if deviceState.LatestTrafficTestContext.DeviceTrafficReport != nil {
                     deviceData.TtDlDatagramsRx = int(deviceState.LatestTrafficTestContext.DeviceTrafficReport.NumTrafficTestDatagramsDl)
@@ -254,21 +248,8 @@ func displayFrontPageData () *FrontPageData {
                 deviceData.TtUlDatagramsRx = int(deviceState.LatestTrafficTestContext.UlDatagrams)
                 deviceData.TtUlDatagramsMissed = int(deviceState.LatestTrafficTestContext.UlDatagramsMissed)
                 deviceData.TtUlBytesRx = int(deviceState.LatestTrafficTestContext.UlBytes)
-                // Need to establish an overall state from the separate UL and DL states.
-                // Here's the logic:
-                // If UL & DL are passed, it's a pass
-                // if one of UL or DL are failed, it's a fail
-                // if one of UL or DL are timed-out, it's a timeout
-                if (deviceState.LatestTrafficTestContext.DlState == TRAFFIC_TEST_PASS) &&
-                   (deviceState.LatestTrafficTestContext.UlState == TRAFFIC_TEST_PASS) {
-                    deviceData.TtPassed = true
-                } else if (deviceState.LatestTrafficTestContext.DlState == TRAFFIC_TEST_FAIL) ||
-                          (deviceState.LatestTrafficTestContext.UlState == TRAFFIC_TEST_FAIL) {
-                    deviceData.TtFailed = true
-                } else if (deviceState.LatestTrafficTestContext.DlState == TRAFFIC_TEST_TIMEOUT) ||
-                          (deviceState.LatestTrafficTestContext.UlState == TRAFFIC_TEST_TIMEOUT) {
-                    deviceData.TtTimedOut = true
-                }
+                deviceData.TtUlState = deviceState.LatestTrafficTestContext.UlState
+                deviceData.TtDlState = deviceState.LatestTrafficTestContext.DlState
            }
             
             data.DeviceData = append (data.DeviceData, deviceData)
@@ -276,7 +257,7 @@ func displayFrontPageData () *FrontPageData {
     
         // And finally, sort the data by whether the device is connected or not and then by friendly name
         sort.Sort(ByNameAndConnected(data.DeviceData))
-        globals.Dbg.PrintfTrace("%s [display] --> Displaying this:\n\n%+v\n\n", globals.LogTag, data)
+        globals.Dbg.PrintfInfo("%s [display] --> Displaying this:\n\n%+v\n\n", globals.LogTag, data)
     }
     
     return &data

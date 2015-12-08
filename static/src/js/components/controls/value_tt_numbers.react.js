@@ -26,9 +26,20 @@ var TtNumbers = React.createClass({
         var tx = this.props.Tx;
         var rx = this.props.Rx
         var missed = this.props.Missed;
+        var directionIcon = "fa fa-arrow-down";
+        var stateIcon = "static/dist/assets/images/black.png";
         
-        if (rx > tx) {
-        	rx = tx;
+        if (this.props.IsUplink) {
+        	directionIcon = "fa fa-arrow-up";
+        }
+        
+        // The reports of how many datagrams have been transmitted
+        // can be behind the number received (because we're waiting
+        // for a report from the device telling us how many have
+        // been sent), so adjust for that to stop things looking
+        // peculiar
+        if (tx < rx) {
+        	tx = rx;
         }
         
         if (this.props.Target) {
@@ -39,20 +50,36 @@ var TtNumbers = React.createClass({
         } else {
         	percentComplete = 0;
         }
-
-        if (this.props.IsUplink) {
-            return (
-                <div>
-                <i className="fa fa-arrow-up" /> <b>{rx}</b> out of <b>{tx}</b> (<b>{percentComplete}%</b>, <b>{missed}</b> missed)
-                </div>
-            );
-        } else {
-            return (
-                <div>
-                <i className="fa fa-arrow-down" /> <b>{rx}</b> out of <b>{tx}</b> (<b>{percentComplete}%</b>, <b>{missed}</b> missed)
-                </div>
-            );
+        
+        switch (this.props.State) {
+            case 1: //TRAFFIC_TEST_RUNNING"
+                stateIcon = "static/dist/assets/images/amber.png";
+            break;
+            case 2: //TRAFFIC_TEST_TX_COMPLETE"
+                stateIcon = "static/dist/assets/images/amber.png";
+            break;
+            case 3: //TRAFFIC_TEST_STOPPED"
+                stateIcon = "static/dist/assets/images/black.png";
+            break;
+            case 4: //TRAFFIC_TEST_TIMEOUT"
+                stateIcon = "static/dist/assets/images/red1.png";
+            break;
+            case 5: //TRAFFIC_TEST_PASS"
+                stateIcon = "static/dist/assets/images/green.png";
+            break;
+            case 6: //TRAFFIC_TEST_FAIL"
+                stateIcon = "static/dist/assets/images/red.png";
+            break;
+            default:
+                stateIcon = "static/dist/assets/images/black.png";
+            break;
         }
+
+        return (
+            <div>
+            <img src={stateIcon} style={{maxWidth: 12}} /> <i className={directionIcon} /> <b>{rx}</b> out of <b>{tx}</b> (<b>{percentComplete}%</b>, <b>{missed}</b> missed)
+            </div>
+        );
     }
 });
 

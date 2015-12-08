@@ -715,6 +715,7 @@ func decode(data []byte, uuid string, ulFill byte, ulLength uint32) ([]interface
                     // This message takes up the whole datagram so set bytesRemaining
                     // to zero
                     bytesRemaining = 0
+                    used = C.uint32_t(len(data))
                 }
                 case C.DECODE_RESULT_TRAFFIC_TEST_MODE_REPORT_IND_UL_MSG:
                 {
@@ -817,6 +818,7 @@ func decode(data []byte, uuid string, ulFill byte, ulLength uint32) ([]interface
                     // This message takes up the whole datagram so set bytesRemaining
                     // to zero
                     bytesRemaining = 0
+                    used = C.uint32_t(len(data))
                 }
                 case C.DECODE_RESULT_OUT_OF_SEQUENCE_TRAFFIC_TEST_MODE_DATAGRAM:
                 {
@@ -834,6 +836,7 @@ func decode(data []byte, uuid string, ulFill byte, ulLength uint32) ([]interface
                     // This message takes up the whole datagram so set bytesRemaining
                     // to zero
                     bytesRemaining = 0
+                    used = C.uint32_t(len(data))
                 }
                 case C.DECODE_RESULT_BAD_CHECKSUM:
                 default:

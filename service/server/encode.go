@@ -237,7 +237,7 @@ func encodeAndEnqueue(msg interface{}, uuid string) (error, int, ResponseTypeEnu
                 globals.Dbg.PrintfInfo("%s [decode] --> the XML data is:\n\n%s\n\n", globals.LogTag, spew.Sdump(xmlEncodeBuffer))            
                 globals.Dbg.PrintfInfo("%s [encode] --> XML buffer pointer 0x%08x, used %d, left %d:.\n", globals.LogTag, *ppXmlBuffer, C.uint32_t(len(xmlEncodeBuffer)) - xmlBufferLen, xmlBufferLen)
             } else {
-                return errors.New("No downlink message channel available to enqueue the encoded message.\n"), 0, RESPONSE_NONE    
+                return errors.New("No downlink message channel available to enqueue the encoded message."), 0, RESPONSE_NONE    
             }                
         }                       
         

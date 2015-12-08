@@ -110,6 +110,7 @@ func displayFrontPageData () *FrontPageData {
         for _, deviceState := range allDevicesState {
             
             var deviceData FrontPageDeviceData
+            var ttTimeStopped time.Time
             
             data.SummaryData.DevicesKnown++
             deviceData.Uuid             = deviceState.DeviceUuid
@@ -230,12 +231,16 @@ func displayFrontPageData () *FrontPageData {
                 if deviceState.LatestTrafficTestContext.Parameters != nil {
                     deviceData.TtDlInterval = int(deviceState.LatestTrafficTestContext.Parameters.DlIntervalSeconds)
                 }
-                deviceData.TtTimeStarted = &deviceState.LatestTrafficTestContext.TimeStarted 
-                timeStopped := deviceState.LatestTrafficTestContext.UlTimeStopped
-                if deviceState.LatestTrafficTestContext.DlTimeStopped.After(timeStopped) {
-                    timeStopped = deviceState.LatestTrafficTestContext.DlTimeStopped
+                deviceData.TtTimeStarted = &deviceState.LatestTrafficTestContext.TimeStarted
+                if deviceData.TtUlExpected > 0 { 
+                    ttTimeStopped = deviceState.LatestTrafficTestContext.UlTimeStopped
+                    if deviceState.LatestTrafficTestContext.DlTimeStopped.After(timeStopped) {
+                        ttTimeStopped = deviceState.LatestTrafficTestContext.DlTimeStopped
+                    }
+                } else {
+                    ttTimeStopped = deviceState.LatestTrafficTestContext.DlTimeStopped
                 }
-                if timeStopped.After(*deviceData.TtTimeStarted) {
+                if ttTimeStopped.After(*deviceData.TtTimeStarted) {
                     deviceData.TtTimeStopped = &timeStopped
                 }
                 deviceData.TtDlDatagramsTx = int(deviceState.LatestTrafficTestContext.DlDatagrams)

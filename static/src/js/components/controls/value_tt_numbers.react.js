@@ -48,7 +48,7 @@ var TtNumbers = React.createClass({
             	percentComplete = 100;
             }	
         } else {
-        	percentComplete = 0;
+        	percentComplete = 100;
         }
         
         switch (this.props.State) {

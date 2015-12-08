@@ -26703,7 +26703,7 @@ var TtConfig = React.createClass({displayName: "TtConfig",
             //<i className="fa fa-cog" /> <i className="fa fa-arrow-up" /> N:{this.props.UlDatagrams}/L:{this.props.UlLength} <i className="fa fa-arrow-down" /> N:{this.props.DlDatagrams}/L:{this.props.DlLength}/G:{this.props.DlInterval} T:{this.props.Timeout}
             return (
                 React.createElement("div", null, 
-                    React.createElement("i", {className: "fa fa-cog"}), " ", React.createElement("i", {className: "fa fa-arrow-up"}), " N:", this.props.UlDatagrams, "/L:", this.props.UlLength, " ", React.createElement("i", {className: "fa fa-arrow-down"}), " N:", this.props.DlDatagrams, "/L:", this.props.DlLength, "/G:", this.props.DlInterval
+                    React.createElement("i", {className: "fa fa-cog"}), " ", React.createElement("i", {className: "fa fa-arrow-up"}), " N:", React.createElement("b", null, this.props.UlDatagrams), "/L:", React.createElement("b", null, this.props.UlLength), " ", React.createElement("i", {className: "fa fa-arrow-down"}), " N:", React.createElement("b", null, this.props.DlDatagrams), "/L:", React.createElement("b", null, this.props.DlLength), "/G:", React.createElement("b", null, this.props.DlInterval)
                 )
             );
         } else {
@@ -27146,7 +27146,7 @@ var TtNumbers = React.createClass({displayName: "TtNumbers",
             	percentComplete = 100;
             }	
         } else {
-        	percentComplete = 0;
+        	percentComplete = 100;
         }
         
         switch (this.props.State) {

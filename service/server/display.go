@@ -234,14 +234,14 @@ func displayFrontPageData () *FrontPageData {
                 deviceData.TtTimeStarted = &deviceState.LatestTrafficTestContext.TimeStarted
                 if deviceData.TtUlExpected > 0 { 
                     ttTimeStopped = deviceState.LatestTrafficTestContext.UlTimeStopped
-                    if deviceState.LatestTrafficTestContext.DlTimeStopped.After(timeStopped) {
+                    if deviceState.LatestTrafficTestContext.DlTimeStopped.After(ttTimeStopped) {
                         ttTimeStopped = deviceState.LatestTrafficTestContext.DlTimeStopped
                     }
                 } else {
                     ttTimeStopped = deviceState.LatestTrafficTestContext.DlTimeStopped
                 }
                 if ttTimeStopped.After(*deviceData.TtTimeStarted) {
-                    deviceData.TtTimeStopped = &timeStopped
+                    deviceData.TtTimeStopped = &ttTimeStopped
                 }
                 deviceData.TtDlDatagramsTx = int(deviceState.LatestTrafficTestContext.DlDatagrams)
                 if deviceState.LatestTrafficTestContext.DeviceTrafficReport != nil {

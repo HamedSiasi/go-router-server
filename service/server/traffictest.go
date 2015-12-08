@@ -66,7 +66,9 @@ type TrafficTestContext struct {
     UlDatagramsBad      uint32
     UlDatagramsOOS      uint32
     DlFill              byte
+    DlFillOverflowCount byte
     UlFill              byte
+    UlFillOverflowCount byte
     DlState             TrafficTestStateEnum
     UlState             TrafficTestStateEnum
 }
@@ -116,7 +118,9 @@ func (value *TrafficTestContext) DeepCopy() *TrafficTestContext {
         UlDatagramsBad:      value.UlDatagramsBad,
         UlDatagramsOOS:      value.UlDatagramsOOS,
         DlFill:              value.DlFill,
+        DlFillOverflowCount: value.DlFillOverflowCount,
         UlFill:              value.UlFill,
+        UlFillOverflowCount: value.UlFillOverflowCount,
         DlState:             value.DlState,
         UlState:             value.UlState,
     }
@@ -140,6 +144,34 @@ func makeParameters(parameters *TrafficTestModeParametersServerSet) *TrafficTest
 
     return &data
 }
+
+// Increment DL fill wrap with wrap
+func incrementDlFill (fill byte, overflowCount byte) (byte, byte) {    
+    fill++
+    if (fill < DlFillMinValue) {
+        fill = DlFillMinValue
+        overflowCount++
+    }
+    
+    return fill, overflowCount
+}
+
+// Increment DL fill wrap with wrap
+func incrementUlFill (fill byte, overflowCount byte) (byte, byte) {    
+    fill++
+    if (fill < UlFillMinValue) {
+        fill = UlFillMinValue
+        overflowCount++
+    }
+    
+    return fill, overflowCount
+}
+
+// Calc a zero-based fill value, useed when subtracting UL fill values
+func calculateAbsZeroBasedFillValue(fill byte, overflowCount byte) byte {
+    return fill - UlFillMinValue + overflowCount * byte((256 - int(UlFillMinValue)));
+}
+
 
 // Do the traffic test stuff
 func operateTrafficTest() {
@@ -167,7 +199,7 @@ func operateTrafficTest() {
                                 err, byteCount, _ := encodeAndEnqueue (msg, context.DeviceUuid)
                                 if err == nil {
                                     context.TimeLastDl = time.Now().UTC()
-                                    context.DlFill++
+                                    context.DlFill, context.DlFillOverflowCount = incrementDlFill(context.DlFill, context.DlFillOverflowCount )
                                     context.DlDatagramsTotal++
                                     context.DlDatagrams++
                                     context.DlBytesTotal += uint32(byteCount)
@@ -315,28 +347,29 @@ func operateTrafficTest() {
                             if context.Parameters != nil {
                                 context.UlBytes += context.Parameters.DeviceParameters.LenUlDatagram
                             }
-                            context.UlFill++
-                            globals.Dbg.PrintfTrace("%s [traffic_test] --> received good UL traffic test mode datagram %d from  %s, incremented expected fill to %d.\n",
-                                globals.LogTag, context.UlDatagrams, value.DeviceUuid, context.UlFill)                                
+                            context.UlFill, context.UlFillOverflowCount = incrementUlFill(context.UlFill, context.UlFillOverflowCount)
+                            globals.Dbg.PrintfTrace("%s [traffic_test] --> received good UL traffic test mode datagram %d from  %s, incremented expected fill to %d/%d.\n",
+                                globals.LogTag, context.UlDatagrams, value.DeviceUuid, context.UlFill, context.UlFillOverflowCount)                                
                         }
                         case *BadTrafficTestModeRuleBreakerUlDatagram:
                         {
                             context.UlDatagramsBad++
                             context.UlDatagramsMissed++
-                            context.UlFill++
+                            context.UlFill, context.UlFillOverflowCount = incrementDlFill(context.UlFill, context.UlFillOverflowCount)
                             context.TimeLastUl = time.Now().UTC()
-                            globals.Dbg.PrintfTrace("%s [traffic_test] --> received %d BAD UL traffic test mode datagram(s) from  %s, missed count is now %d, incremented expected fill to %d.\n",
-                                globals.LogTag, context.UlDatagramsBad, value.DeviceUuid, context.UlDatagramsMissed, context.UlFill)
+                            globals.Dbg.PrintfTrace("%s [traffic_test] --> received %d BAD UL traffic test mode datagram(s) from  %s, missed count is now %d, incremented expected fill to %d/%d.\n",
+                                globals.LogTag, context.UlDatagramsBad, value.DeviceUuid, context.UlDatagramsMissed, context.UlFill, context.UlFillOverflowCount)
                         }
                         case *OutOfSequenceTrafficTestModeRuleBreakerUlDatagram:
                         {
                             context.UlDatagramsOOS++
                             // Account for the gap in the fill and resynchronise ourselves
-                            context.UlDatagramsMissed += uint32(utmMsg.Fill - context.UlFill)
-                            context.UlFill = utmMsg.Fill + 1
+                            context.UlDatagramsMissed += uint32(calculateAbsZeroBasedFillValue(utmMsg.Fill, context.UlFillOverflowCount) -
+                                                     calculateAbsZeroBasedFillValue(context.UlFill, context.UlFillOverflowCount))
+                            context.UlFill, context.UlFillOverflowCount = incrementDlFill(utmMsg.Fill, context.UlFillOverflowCount)
                             context.TimeLastUl = time.Now().UTC()
-                            globals.Dbg.PrintfTrace("%s [traffic_test] --> received %d OOS UL traffic test mode datagram(s) from %s, missed count is now, incremented expected fill to %d.\n",
-                                globals.LogTag, context.UlDatagramsOOS, value.DeviceUuid, context.UlDatagramsMissed, context.UlFill)
+                            globals.Dbg.PrintfTrace("%s [traffic_test] --> received %d OOS UL traffic test mode datagram(s) from %s, missed count is now, incremented expected fill to %d/%d.\n",
+                                globals.LogTag, context.UlDatagramsOOS, value.DeviceUuid, context.UlDatagramsMissed, context.UlFill, context.UlFillOverflowCount)
                         }
                         default:
                         {

@@ -257,7 +257,8 @@ func processUlAmqpMsgs(q *Queue) {
                         }
                         default:
                         {
-                            globals.Dbg.PrintfError("%s [server] --> unknown message type on AMQP UlMsg channel: %+v.\n", globals.LogTag, msg)
+                            globals.Dbg.PrintfError("%s [server] --> unknown message type on AMQP UlMsg channel, dropping out...\n\n%+v\n", globals.LogTag, msg)
+                            return
                         } // case    
                     } // switch
                 } else {

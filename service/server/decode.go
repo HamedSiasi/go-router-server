@@ -358,6 +358,7 @@ func decode(data []byte, uuid string, ulFill byte, ulLength uint32) ([]interface
         fill:    (C.char) (ulFill),
         length:  (C.uint32_t) (ulLength),
     }
+    globals.Dbg.PrintfTrace("%s [decode] --> [if in traffic test mode, decoder is expecting fill %d]\n", globals.LogTag, ulFill)
     pSrc := (*C.char)(unsafe.Pointer(&ulTrafficTestModeRuleBreakerDatagram))
     pDest := (*C.char)(unsafe.Pointer(pBuffer))
     C.byteCopy(pDest, pSrc, (C.uint32_t) (unsafe.Sizeof (ulTrafficTestModeRuleBreakerDatagram)));

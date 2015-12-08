@@ -35,7 +35,7 @@ var DisplayRow = React.createClass({
     handleCheckAll: function(checkAll) {
         if (this.props["DeviceData"] && (this.props["DeviceData"].length > 0)) {
         	for (var i = 0; i < this.props["DeviceData"].length; i++) {
-            	uuid = this.props["DeviceData"][i]["Uuid"];
+            	var uuid = this.props["DeviceData"][i]["Uuid"];
                 if (checkAll.target.checked == true) {
                     AppActions.setUuidChecked(uuid);
                 } else {

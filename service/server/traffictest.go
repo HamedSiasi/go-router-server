@@ -208,7 +208,7 @@ func operateTrafficTest() {
                                         globals.LogTag, context.DlDatagrams, context.DlFill, context.DeviceUuid)
                                 } else {
                                     globals.Dbg.PrintfTrace("%s [traffic_test] --> error sending DL datagram %d (fill %d) to device %s: \"%s\".\n",
-                                        globals.LogTag, context.DlDatagrams, context.DlFill, context.DeviceUuid, err.Error)
+                                        globals.LogTag, context.DlDatagrams, context.DlFill, context.DeviceUuid, err)
                                 }
                             }    
                         } else {

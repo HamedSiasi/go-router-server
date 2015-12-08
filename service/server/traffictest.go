@@ -310,39 +310,33 @@ func operateTrafficTest() {
                         }
                         case *TrafficTestModeRuleBreakerUlDatagram:
                         {
-                            if context.UlState == TRAFFIC_TEST_RUNNING {
-                                context.UlDatagrams++
-                                context.TimeLastUl = time.Now().UTC()
-                                if context.Parameters != nil {
-                                    context.UlBytes += context.Parameters.DeviceParameters.LenUlDatagram
-                                }
-                                context.UlFill++
-                                globals.Dbg.PrintfTrace("%s [traffic_test] --> received good UL traffic test mode datagram %d from  %s, incremented expected fill to %d.\n",
-                                    globals.LogTag, context.UlDatagrams, value.DeviceUuid, context.UlFill)                                
+                            context.UlDatagrams++
+                            context.TimeLastUl = time.Now().UTC()
+                            if context.Parameters != nil {
+                                context.UlBytes += context.Parameters.DeviceParameters.LenUlDatagram
                             }
+                            context.UlFill++
+                            globals.Dbg.PrintfTrace("%s [traffic_test] --> received good UL traffic test mode datagram %d from  %s, incremented expected fill to %d.\n",
+                                globals.LogTag, context.UlDatagrams, value.DeviceUuid, context.UlFill)                                
                         }
                         case *BadTrafficTestModeRuleBreakerUlDatagram:
                         {
-                            if context.UlState == TRAFFIC_TEST_RUNNING {
-                                context.UlDatagramsBad++
-                                context.UlDatagramsMissed++
-                                context.UlFill++
-                                context.TimeLastUl = time.Now().UTC()
-                                globals.Dbg.PrintfTrace("%s [traffic_test] --> received %d BAD UL traffic test mode datagram(s) from  %s, missed count is now %d, incremented expected fill to %d.\n",
-                                    globals.LogTag, context.UlDatagramsBad, value.DeviceUuid, context.UlDatagramsMissed, context.UlFill)
-                            }
+                            context.UlDatagramsBad++
+                            context.UlDatagramsMissed++
+                            context.UlFill++
+                            context.TimeLastUl = time.Now().UTC()
+                            globals.Dbg.PrintfTrace("%s [traffic_test] --> received %d BAD UL traffic test mode datagram(s) from  %s, missed count is now %d, incremented expected fill to %d.\n",
+                                globals.LogTag, context.UlDatagramsBad, value.DeviceUuid, context.UlDatagramsMissed, context.UlFill)
                         }
                         case *OutOfSequenceTrafficTestModeRuleBreakerUlDatagram:
                         {
-                            if context.UlState == TRAFFIC_TEST_RUNNING {
-                                context.UlDatagramsOOS++
-                                // Account for the gap in the fill and resynchronise ourselves
-                                context.UlDatagramsMissed += uint32(utmMsg.Fill - context.UlFill)
-                                context.UlFill = utmMsg.Fill + 1
-                                context.TimeLastUl = time.Now().UTC()
-                                globals.Dbg.PrintfTrace("%s [traffic_test] --> received %d OOS UL traffic test mode datagram(s) from %s, missed count is now, incremented expected fill to %d.\n",
-                                    globals.LogTag, context.UlDatagramsOOS, value.DeviceUuid, context.UlDatagramsMissed, context.UlFill)
-                            }
+                            context.UlDatagramsOOS++
+                            // Account for the gap in the fill and resynchronise ourselves
+                            context.UlDatagramsMissed += uint32(utmMsg.Fill - context.UlFill)
+                            context.UlFill = utmMsg.Fill + 1
+                            context.TimeLastUl = time.Now().UTC()
+                            globals.Dbg.PrintfTrace("%s [traffic_test] --> received %d OOS UL traffic test mode datagram(s) from %s, missed count is now, incremented expected fill to %d.\n",
+                                globals.LogTag, context.UlDatagramsOOS, value.DeviceUuid, context.UlDatagramsMissed, context.UlFill)
                         }
                         default:
                         {

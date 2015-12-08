@@ -27288,7 +27288,7 @@ var AppStore = require('../../stores/app_store.js');
 
 var ValueUuidSelected = React.createClass({displayName: "ValueUuidSelected",
     getInitialState: function() {
-        return {value: this.props.Uuid, checked: AppStore.isUuidChecked(this.props.Uuid)};
+        return {checked: AppStore.isUuidChecked(this.props.Uuid)};
     },
 
     componentDidMount: function() {

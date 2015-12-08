@@ -206,33 +206,20 @@ func operateTrafficTest() {
                                     context.DlBytes += uint32(byteCount)
                                     globals.Dbg.PrintfTrace("%s [traffic_test] --> sent DL datagram %d (fill %d) to device %s.\n",
                                         globals.LogTag, context.DlDatagrams, context.DlFill, context.DeviceUuid)
+                                } else {
+                                    globals.Dbg.PrintfTrace("%s [traffic_test] --> error sending DL datagram %d (fill %d) to device %s: \"%s\".\n",
+                                        globals.LogTag, context.DlDatagrams, context.DlFill, context.DeviceUuid, err.Error)
                                 }
                             }    
                         } else {
-                            context.UlTimeStopped = time.Now().UTC()
+                            context.DlTimeStopped = time.Now().UTC()
                             context.DlState = TRAFFIC_TEST_TX_COMPLETE;
                             globals.Dbg.PrintfTrace("%s [traffic_test] --> DL completed for device %s (%d DL datagrams sent).\n",
                                 globals.LogTag, context.DeviceUuid, context.DlDatagrams)
                         }
                     }   
-                    // The UL part
-                    if context.UlState == TRAFFIC_TEST_RUNNING {
-                        // Assess whether we're donn in the downlink direction from the report
-                        if context.UlDatagrams + context.UlDatagramsMissed >= context.Parameters.DeviceParameters.NumUlDatagrams {
-                            if context.UlDatagramsMissed == 0 {
-                                context.UlState = TRAFFIC_TEST_PASS
-                                context.UlTimeStopped = time.Now().UTC()
-                                globals.Dbg.PrintfTrace("%s [traffic_test] --> UL PASS on traffic test with device %s, %d datagrams received.\n",
-                                    globals.LogTag, context.DeviceUuid, context.UlDatagrams)
-                            } else {
-                                context.UlState = TRAFFIC_TEST_FAIL
-                                context.UlTimeStopped = time.Now().UTC()
-                                globals.Dbg.PrintfTrace("%s [traffic_test] --> DL FAIL on traffic test with device %s (%d datagrams missed out of %d).\n",
-                                    globals.LogTag, context.DeviceUuid, context.UlDatagramsMissed, context.UlDatagrams + context.UlDatagramsMissed)
-                            }
-                        }                        
-                    } // UL test running, check for timeout (don't worry about the DL as the UTM-end will timeout
-                      // on the DL taking too long)
+                    // UL test running, check for timeout (don't worry about the DL as the UTM-end will timeout
+                    // on the DL taking too long)
                     if (context.UlState == TRAFFIC_TEST_RUNNING) || (context.UlState == TRAFFIC_TEST_TX_COMPLETE) {
                         if context.Parameters.DeviceParameters.TimeoutSeconds > 0 {
                             if time.Now().UTC().After (context.TimeStarted.Add (time.Duration(context.Parameters.DeviceParameters.TimeoutSeconds) * time.Second)) {
@@ -268,6 +255,15 @@ func operateTrafficTest() {
                     }
                     
                     switch utmMsg := value.Message.(type) {
+                        case *InitIndUlMsg:
+                        {
+                            if ((context.DlState == TRAFFIC_TEST_RUNNING) || (context.DlState == TRAFFIC_TEST_TX_COMPLETE)) {
+                                globals.Dbg.PrintfTrace("%s [traffic_test] --> device %s reset, stopping DL test as well:\n\n%+v\n",
+                                globals.LogTag, value.DeviceUuid)
+                                context.DlState = TRAFFIC_TEST_STOPPED;
+                                context.DlTimeStopped = time.Now().UTC()
+                            }
+                        }                        
                         case *TrafficTestModeParametersServerSet:
                         {
                             globals.Dbg.PrintfTrace("%s [traffic_test] --> parameters received for device  %s:\n\n%+v\n",
@@ -295,7 +291,9 @@ func operateTrafficTest() {
                             if (utmMsg.Mode == MODE_TRAFFIC_TEST) && (context.Parameters != nil) {
                                 context.TimeLastDl = time.Time{}
                                 context.DlFill = DlFillMinValue
+                                context.DlFillOverflowCount = 0
                                 context.UlFill = UlFillMinValue
+                                context.UlFillOverflowCount = 0
                                 context.DlDatagrams = 0
                                 context.DlBytes = 0
                                 context.UlDatagrams = 0
@@ -308,6 +306,15 @@ func operateTrafficTest() {
                                 context.UlState = TRAFFIC_TEST_RUNNING
                                 context.DeviceTrafficReport = nil
                                 globals.Dbg.PrintfTrace("%s [traffic_test] --> started traffic test with device %s.\n", globals.LogTag, value.DeviceUuid)
+                            } else if utmMsg.Mode != MODE_TRAFFIC_TEST {
+                                // There is a risk that a ModeSetReqDlMsg to stop traffic test mode has
+                                // landed before this confirm to start it has come back from the UTM.
+                                // To prevent this, squish it again
+                                context.DlState = TRAFFIC_TEST_STOPPED;
+                                context.UlState = TRAFFIC_TEST_STOPPED;
+                                context.DlTimeStopped = time.Now().UTC()
+                                context.UlTimeStopped = time.Now().UTC()
+                                globals.Dbg.PrintfTrace("%s [traffic_test] --> stopped traffic test (again!) with the device %s.\n", globals.LogTag, value.DeviceUuid)
                             }
                         }
                         case *TrafficTestModeReportIndUlMsg:
@@ -317,28 +324,49 @@ func operateTrafficTest() {
                             // First, store this
                             context.DeviceTrafficReport = utmMsg.DeepCopy()
 
-                            // Assess whether we're done in the downlink direction from the report
-                            if utmMsg.TimedOut {
-                                context.DlState = TRAFFIC_TEST_TIMEOUT
-                                context.DlTimeStopped = time.Now().UTC()
-                                globals.Dbg.PrintfTrace("%s [traffic_test] --> DL TIMEOUT on traffic test with device %s (%d datagrams missed).\n",
-                                    globals.LogTag, value.DeviceUuid, context.DeviceTrafficReport.NumTrafficTestDlDatagramsMissed)
-                            } else {
-                                if context.DeviceTrafficReport.NumTrafficTestDatagramsDl + context.DeviceTrafficReport.NumTrafficTestDlDatagramsMissed >= context.DlDatagrams {
-                                    if context.DeviceTrafficReport.NumTrafficTestDlDatagramsMissed == 0 {
-                                        context.DlState = TRAFFIC_TEST_PASS
-                                        context.DlTimeStopped = time.Now().UTC()
-                                        globals.Dbg.PrintfTrace("%s [traffic_test] --> DL PASS on traffic test with device %s, %d datagrams received.\n",
-                                            globals.LogTag, value.DeviceUuid, context.DeviceTrafficReport.NumTrafficTestDatagramsDl)
+                            // The UL part
+                            if context.UlState == TRAFFIC_TEST_RUNNING {
+                                // Assess whether we're done in the uplink direction from the report
+                                if context.UlDatagrams + context.UlDatagramsMissed >= context.Parameters.DeviceParameters.NumUlDatagrams {
+                                    if context.UlDatagramsMissed == 0 {
+                                        context.UlState = TRAFFIC_TEST_PASS
+                                        context.UlTimeStopped = time.Now().UTC()
+                                        globals.Dbg.PrintfTrace("%s [traffic_test] --> UL PASS on traffic test with device %s, %d datagrams received.\n",
+                                            globals.LogTag, context.DeviceUuid, context.UlDatagrams)
                                     } else {
-                                        context.DlState = TRAFFIC_TEST_FAIL
-                                        context.DlTimeStopped = time.Now().UTC()
+                                        context.UlState = TRAFFIC_TEST_FAIL
+                                        context.UlTimeStopped = time.Now().UTC()
                                         globals.Dbg.PrintfTrace("%s [traffic_test] --> DL FAIL on traffic test with device %s (%d datagrams missed out of %d).\n",
-                                            globals.LogTag, value.DeviceUuid, context.DeviceTrafficReport.NumTrafficTestDlDatagramsMissed,
-                                            context.DeviceTrafficReport.NumTrafficTestDlDatagramsMissed +  context.DeviceTrafficReport.NumTrafficTestDatagramsDl)
+                                            globals.LogTag, context.DeviceUuid, context.UlDatagramsMissed, context.UlDatagrams + context.UlDatagramsMissed)
+                                    }
+                                }                        
+                            }
+                            // The DL part
+                            if (context.DlState == TRAFFIC_TEST_RUNNING) ||  (context.DlState == TRAFFIC_TEST_TX_COMPLETE) {                                
+                                // Assess whether we're done in the downlink direction from the report
+                                if utmMsg.TimedOut {
+                                    context.DlState = TRAFFIC_TEST_TIMEOUT
+                                    context.DlTimeStopped = time.Now().UTC()
+                                    globals.Dbg.PrintfTrace("%s [traffic_test] --> DL TIMEOUT on traffic test with device %s (%d datagrams missed).\n",
+                                        globals.LogTag, value.DeviceUuid, context.DeviceTrafficReport.NumTrafficTestDlDatagramsMissed)
+                                } else {
+                                    if context.DeviceTrafficReport.NumTrafficTestDatagramsDl + context.DeviceTrafficReport.NumTrafficTestDlDatagramsMissed >=
+                                         context.Parameters.DeviceParameters.NumDlDatagrams {
+                                        if context.DeviceTrafficReport.NumTrafficTestDlDatagramsMissed == 0 {
+                                            context.DlState = TRAFFIC_TEST_PASS
+                                            context.DlTimeStopped = time.Now().UTC()
+                                            globals.Dbg.PrintfTrace("%s [traffic_test] --> DL PASS on traffic test with device %s, %d datagrams received.\n",
+                                                globals.LogTag, value.DeviceUuid, context.DeviceTrafficReport.NumTrafficTestDatagramsDl)
+                                        } else {
+                                            context.DlState = TRAFFIC_TEST_FAIL
+                                            context.DlTimeStopped = time.Now().UTC()
+                                            globals.Dbg.PrintfTrace("%s [traffic_test] --> DL FAIL on traffic test with device %s (%d datagrams missed out of %d).\n",
+                                                globals.LogTag, value.DeviceUuid, context.DeviceTrafficReport.NumTrafficTestDlDatagramsMissed,
+                                                context.DeviceTrafficReport.NumTrafficTestDlDatagramsMissed +  context.DeviceTrafficReport.NumTrafficTestDatagramsDl)
+                                        }
                                     }
                                 }
-                            }
+                            }    
                         }
                         case *TrafficTestModeRuleBreakerUlDatagram:
                         {

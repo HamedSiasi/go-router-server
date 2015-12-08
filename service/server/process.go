@@ -367,6 +367,9 @@ func operateProcess() {
 
                     // Deal with expected or received responses
                     removeResponse (responseIdReceived, value.DeviceUuid)
+                    // Remove an expected response first as an addition is likely
+                    // to be a re-transmission of the first
+                    removeResponse (responseIdExpected, value.DeviceUuid)
                     addResponse (responseIdExpected, value.DeviceUuid)
                     
                     globals.Dbg.PrintfTrace("%s [process] --> processing completed.\n", globals.LogTag)

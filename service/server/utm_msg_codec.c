@@ -3291,9 +3291,14 @@ DecodeResult_t decodeDlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, DlMs
                     decodeResult = DECODE_RESULT_TRANSPARENT_DL_DATAGRAM;
                     if (pOutBuffer != NULL)
                     {
-                        memcpy(&(pOutBuffer->transparentDatagram.contents[0]), *ppInBuffer, sizeInBuffer - 1);
-                        (*ppInBuffer) += sizeInBuffer - 1;
-                        // NOTE: there is no checksum on this message, validation of contents is up to the application
+                        uint32_t copyLength = sizeInBuffer - 1;
+                        if (copyLength > MAX_MESSAGE_SIZE - 1)
+                        {
+                            copyLength = MAX_MESSAGE_SIZE - 1;
+                        }
+                        memcpy(&(pOutBuffer->transparentDatagram.contents[0]), *ppInBuffer, copyLength);
+                        (*ppInBuffer) += sizeInBuffer - 1;  // Yes, this is meant to be sizeInBuffer, skip the lot in the input
+                        // NOTE: no checksum on this message
                     }
                     if ((ppLog != NULL) && (*ppLog != NULL))
                     {
@@ -3822,8 +3827,13 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                     decodeResult = DECODE_RESULT_TRANSPARENT_UL_DATAGRAM;
                     if (pOutBuffer != NULL)
                     {
-                        memcpy(&(pOutBuffer->transparentDatagram.contents[0]), *ppInBuffer, sizeInBuffer - 1);
-                        (*ppInBuffer) += sizeInBuffer - 1;
+                        uint32_t copyLength = sizeInBuffer - 1;
+                        if (copyLength > MAX_MESSAGE_SIZE - 1)
+                        {
+                            copyLength = MAX_MESSAGE_SIZE - 1;
+                        }
+                        memcpy(&(pOutBuffer->transparentDatagram.contents[0]), *ppInBuffer, copyLength);
+                        (*ppInBuffer) += sizeInBuffer - 1;  // Yes, this is meant to be sizeInBuffer, skip the lot in the input
                         // NOTE: no checksum on this message
                     }
                     if ((ppLog != NULL) && (*ppLog != NULL))
@@ -3885,58 +3895,73 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                 break;
                 case INIT_IND_UL_MSG:
                 {
-                    decodeResult = DECODE_RESULT_INIT_IND_UL_MSG;
-                    if (pOutBuffer != NULL)
+                    // UELogViewer, the Neul debug tool, when told to send a message, offers default
+                    // contents of 0x01-02-03-04.  If that lands in here, 01 means ping request,
+                    // 02 is a bad checksum on the ping request, 03 is an InitInd but there must be
+                    // three bytes to follow (wake-up code, revision level and check-sum). With only
+                    // one byte following, on a PC, we would hit a memory exception if we continued.
+                    // So, for this specific case, check the length and, if it's not sufficient,
+                    // flag a decode error instead.
+                    if (sizeInBuffer < 4)
                     {
-                        pOutBuffer->initIndUlMsg.wakeUpCode = (WakeUpCode_t) **ppInBuffer;
-                        (*ppInBuffer)++;
-                        pOutBuffer->initIndUlMsg.revisionLevel = (uint8_t) * *ppInBuffer;
-                        (*ppInBuffer)++;
-
-                        pOutBuffer->initIndUlMsg.sdCardNotRequired = false;
-                        pOutBuffer->initIndUlMsg.disableModemDebug = false;
-                        pOutBuffer->initIndUlMsg.disableButton = false;
-                        pOutBuffer->initIndUlMsg.disableServerPing = false;
-
-                        if (**ppInBuffer & 0x01)
-                        {
-                            pOutBuffer->initIndUlMsg.sdCardNotRequired = true;
-                        }
-                        if (**ppInBuffer & 0x02)
-                        {
-                            pOutBuffer->initIndUlMsg.disableModemDebug = true;
-                        }
-                        if (**ppInBuffer & 0x04)
-                        {
-                            pOutBuffer->initIndUlMsg.disableButton = true;
-                        }
-                        if (**ppInBuffer & 0x08)
-                        {
-                            pOutBuffer->initIndUlMsg.disableServerPing = true;
-                        }
-                        (*ppInBuffer)++;
-                        if (calculateChecksum(pBufferAtStart, *ppInBuffer - pBufferAtStart) != **ppInBuffer)
-                        {
-                            decodeResult = DECODE_RESULT_BAD_CHECKSUM;
-                        }
-                        (*ppInBuffer)++;
+                        decodeResult = DECODE_RESULT_INPUT_TOO_SHORT;
+                        (*ppInBuffer) += sizeInBuffer - 1; //-1 as the ID has already been taken off
                     }
-                    if ((ppLog != NULL) && (*ppLog != NULL))
+                    else
                     {
-                        *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_UL);
-                        *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_NAME, "InitIndUlMsg");
-                        *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-                        *ppLog += logTagWithStringValue(*ppLog, pLogSize, "WakeupCode", getStringWakeUpCode(pOutBuffer->initIndUlMsg.wakeUpCode));
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, "RevisionLevel", pOutBuffer->initIndUlMsg.revisionLevel);
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, "SdCardRequired", !(pOutBuffer->initIndUlMsg.sdCardNotRequired));
-                        *ppLog += logTagWithStringValue(*ppLog, pLogSize, "DisableModemDebug", getStringBoolean(pOutBuffer->initIndUlMsg.disableModemDebug));
-                        *ppLog += logTagWithStringValue(*ppLog, pLogSize, "DisableButton", getStringBoolean(pOutBuffer->initIndUlMsg.disableButton));
-                        *ppLog += logTagWithStringValue(*ppLog, pLogSize, "DisableServerPing", getStringBoolean(pOutBuffer->initIndUlMsg.disableServerPing));
-                        *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
-                        *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
-                        *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_UL);
-                    }
+                        decodeResult = DECODE_RESULT_INIT_IND_UL_MSG;
+                        if (pOutBuffer != NULL)
+                        {
+                            pOutBuffer->initIndUlMsg.wakeUpCode = (WakeUpCode_t) **ppInBuffer;
+                            (*ppInBuffer)++;
+                            pOutBuffer->initIndUlMsg.revisionLevel = (uint8_t) * *ppInBuffer;
+                            (*ppInBuffer)++;
+
+                            pOutBuffer->initIndUlMsg.sdCardNotRequired = false;
+                            pOutBuffer->initIndUlMsg.disableModemDebug = false;
+                            pOutBuffer->initIndUlMsg.disableButton = false;
+                            pOutBuffer->initIndUlMsg.disableServerPing = false;
+
+                            if (**ppInBuffer & 0x01)
+                            {
+                                pOutBuffer->initIndUlMsg.sdCardNotRequired = true;
+                            }
+                            if (**ppInBuffer & 0x02)
+                            {
+                                pOutBuffer->initIndUlMsg.disableModemDebug = true;
+                            }
+                            if (**ppInBuffer & 0x04)
+                            {
+                                pOutBuffer->initIndUlMsg.disableButton = true;
+                            }
+                            if (**ppInBuffer & 0x08)
+                            {
+                                pOutBuffer->initIndUlMsg.disableServerPing = true;
+                            }
+                            (*ppInBuffer)++;
+                            if (calculateChecksum(pBufferAtStart, *ppInBuffer - pBufferAtStart) != **ppInBuffer)
+                            {
+                                decodeResult = DECODE_RESULT_BAD_CHECKSUM;
+                            }
+                            (*ppInBuffer)++;
+                        }
+                        if ((ppLog != NULL) && (*ppLog != NULL))
+                        {
+                            *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_UL);
+                            *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_NAME, "InitIndUlMsg");
+                            *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
+                            *ppLog += logTagWithStringValue(*ppLog, pLogSize, "WakeupCode", getStringWakeUpCode(pOutBuffer->initIndUlMsg.wakeUpCode));
+                            *ppLog += logTagWithUint32Value(*ppLog, pLogSize, "RevisionLevel", pOutBuffer->initIndUlMsg.revisionLevel);
+                            *ppLog += logTagWithUint32Value(*ppLog, pLogSize, "SdCardRequired", !(pOutBuffer->initIndUlMsg.sdCardNotRequired));
+                            *ppLog += logTagWithStringValue(*ppLog, pLogSize, "DisableModemDebug", getStringBoolean(pOutBuffer->initIndUlMsg.disableModemDebug));
+                            *ppLog += logTagWithStringValue(*ppLog, pLogSize, "DisableButton", getStringBoolean(pOutBuffer->initIndUlMsg.disableButton));
+                            *ppLog += logTagWithStringValue(*ppLog, pLogSize, "DisableServerPing", getStringBoolean(pOutBuffer->initIndUlMsg.disableServerPing));
+                            *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
+                            *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                            *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
+                            *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_UL);
+                        }
+                	}
                 }
                 break;
                 case POLL_IND_UL_MSG:

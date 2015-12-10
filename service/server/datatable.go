@@ -169,8 +169,8 @@ func operateDataTable() {
                 {
                     if state, isPresent := deviceLatestStateList[value.DeviceUuid]; isPresent {
                         state.DeviceUuid = value.DeviceUuid
-                        state.DeviceName = value.DeviceName;
-                        state.Connected = true;
+                        state.DeviceName = value.DeviceName
+                        state.Connected = true
                         state.LastHeardFrom = value.DlDevice.Timestamp
                         if value.UlDevice.Timestamp.After (value.DlDevice.Timestamp) {
                             state.LastHeardFrom = value.UlDevice.Timestamp

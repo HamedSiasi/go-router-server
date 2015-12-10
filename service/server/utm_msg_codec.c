@@ -3292,9 +3292,9 @@ DecodeResult_t decodeDlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, DlMs
                     if (pOutBuffer != NULL)
                     {
                         uint32_t copyLength = sizeInBuffer - 1;
-                        if (copyLength > MAX_MESSAGE_SIZE - 1)
+                        if (copyLength > sizeof(pOutBuffer->transparentDatagram.contents))
                         {
-                            copyLength = MAX_MESSAGE_SIZE - 1;
+                            copyLength = sizeof(pOutBuffer->transparentDatagram.contents);
                         }
                         memcpy(&(pOutBuffer->transparentDatagram.contents[0]), *ppInBuffer, copyLength);
                         (*ppInBuffer) += sizeInBuffer - 1;  // Yes, this is meant to be sizeInBuffer, skip the lot in the input
@@ -3828,9 +3828,9 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                     if (pOutBuffer != NULL)
                     {
                         uint32_t copyLength = sizeInBuffer - 1;
-                        if (copyLength > MAX_MESSAGE_SIZE - 1)
+                        if (copyLength > sizeof(pOutBuffer->transparentDatagram.contents))
                         {
-                            copyLength = MAX_MESSAGE_SIZE - 1;
+                            copyLength = sizeof(pOutBuffer->transparentDatagram.contents);
                         }
                         memcpy(&(pOutBuffer->transparentDatagram.contents[0]), *ppInBuffer, copyLength);
                         (*ppInBuffer) += sizeInBuffer - 1;  // Yes, this is meant to be sizeInBuffer, skip the lot in the input

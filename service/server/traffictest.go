@@ -223,9 +223,27 @@ func operateTrafficTest() {
                     if (context.UlState == TRAFFIC_TEST_RUNNING) || (context.UlState == TRAFFIC_TEST_TX_COMPLETE) {
                         if context.Parameters.DeviceParameters.TimeoutSeconds > 0 {
                             if time.Now().UTC().After (context.TimeStarted.Add (time.Duration(context.Parameters.DeviceParameters.TimeoutSeconds) * time.Second)) {
-                                context.UlState = TRAFFIC_TEST_TIMEOUT;
+                                context.UlState = TRAFFIC_TEST_TIMEOUT
+                                // Calculate the exact number missed, in case there were any outstanding when the timeout hit
+                                context.UlDatagramsMissed = context.Parameters.DeviceParameters.NumUlDatagrams - context.UlDatagrams
                                 context.UlTimeStopped = time.Now().UTC()
-                                globals.Dbg.PrintfTrace("%s [traffic_test] --> UL timed out for %s (started %s, %d DL datagrams sent).\n",
+                                globals.Dbg.PrintfTrace("%s [traffic_test] --> UL timed out for %s (started %s, %d UL datagrams received).\n",
+                                    globals.LogTag, context.DeviceUuid, context.TimeStarted, context.UlDatagrams)
+                            }
+                        }                                
+                    }
+                    // Actually, the DL might not time out if the device is switched off before the time-out message
+                    // can be sent so, as a back-stop, timeout here if it doesn't arrive within a little while
+                    if (context.DlState == TRAFFIC_TEST_RUNNING) || (context.DlState == TRAFFIC_TEST_TX_COMPLETE) {
+                        if context.Parameters.DeviceParameters.TimeoutSeconds > 0 {
+                            if time.Now().UTC().After (context.TimeStarted.Add (time.Duration(context.Parameters.DeviceParameters.TimeoutSeconds + 300) * time.Second)) {
+                                context.DlState = TRAFFIC_TEST_TIMEOUT
+                                if context.DeviceTrafficReport != nil {
+                                   // Calculate the exact number missed
+                                    context.DeviceTrafficReport.NumTrafficTestDlDatagramsMissed = context.Parameters.DeviceParameters.NumDlDatagrams - context.DeviceTrafficReport.NumTrafficTestDatagramsDl
+                                }
+                                context.DlTimeStopped = time.Now().UTC()
+                                globals.Dbg.PrintfTrace("%s [traffic_test] --> didn't receive DL timeout message from %s so timing it out anyway (started %s, %d DL datagrams received).\n",
                                     globals.LogTag, context.DeviceUuid, context.TimeStarted, context.DlDatagrams)
                             }
                         }                                

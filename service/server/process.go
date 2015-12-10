@@ -129,7 +129,7 @@ func operateProcess() {
                 var x = 0
                 for x < len(*expectedMsgList) {
                     if time.Now().After((*expectedMsgList)[x].TimeStarted.Add(time.Hour)) {
-                        globals.Dbg.PrintfTrace("%s [server] --> giving up after waiting > 1 hour for %d from device %s.\n", globals.LogTag, (*expectedMsgList)[x].ResponseId, uuid)
+                        globals.Dbg.PrintfTrace("%s [process] --> giving up after waiting > 1 hour for %d from device %s.\n", globals.LogTag, (*expectedMsgList)[x].ResponseId, uuid)
                         *expectedMsgList = append((*expectedMsgList)[:x], (*expectedMsgList)[x+1:]...)
                     }
                     x++

@@ -36,6 +36,7 @@ import (
 type DeviceTotalsState struct {
     Timestamp       time.Time
     DeviceUuid      string
+    DeviceName      string
     Msgs            int
     Bytes           int 
     Totals          *TotalsState 
@@ -99,10 +100,102 @@ var deviceTtValuesList map[string]*TtValues
 // Functions
 //--------------------------------------------------------------------
 
+// Given a UUID and a pointer to the decode state for that UUID, get the
+// encode state and the traffic test state and pass all of this along
+// to the datatable so that it is kept up to date.
+func updateDatatableState (uuid string, decodeState *DeviceTotalsState) {
+    var ttDlBytes uint32
+    var ttDlDatagrams uint32
+    var ttTimeLastDl time.Time
+    
+    // Keep track of traffic test progress
+    getTrafficTestContext := &DeviceTrafficTestContextGet{
+        DeviceUuid: uuid,
+    }
+    getTrafficTestContext.Context = make(chan TrafficTestContext)
+    trafficTestChannel <- getTrafficTestContext
+    trafficTestContext, isOpen := <- getTrafficTestContext.Context
+    if isOpen {
+        ttDlBytes = trafficTestContext.DlBytesTotal 
+        ttDlDatagrams = trafficTestContext.DlDatagramsTotal
+        ttTimeLastDl = trafficTestContext.TimeLastDl
+        // Send it all off to the datatable
+        dataTableChannel <- &trafficTestContext
+    }
+    
+    // Ask the process channel for the encode status now
+    getEncodeState := &DeviceEncodeStateGet{
+        DeviceUuid: uuid,
+    }
+    getEncodeState.State = make(chan DeviceTotalsState)
+    processMsgsChannel <- getEncodeState
+    encodeState, isOpen := <- getEncodeState.State
+    
+    // Only do this if the channel wasn't closed prematurely
+    // (e.g. due to an unknown UE being requested, which might
+    // happen if it's sending rubbish and so no messages
+    // will have been decoded)
+    if isOpen {
+        // Add in the traffic test encoded stuff, if there is
+        // any (the decode counts for the traffic test stuff
+        // is already taken into account by the decoder) 
+        if ttTimeLastDl.After (encodeState.Timestamp) {
+            encodeState.Timestamp = ttTimeLastDl
+        }
+        encodeState.Totals.Msgs += int(ttDlDatagrams)
+        encodeState.Msgs += int(ttDlDatagrams)
+        encodeState.Totals.Bytes += int(ttDlBytes)
+        encodeState.Bytes += int(ttDlBytes)
+        // Send the datatable a message with connection
+        // data for this device plus the totals for all
+        ulTotals := TotalsState {
+            Timestamp:    totalsDecodeState.Timestamp,
+            Msgs:         totalsDecodeState.Msgs,
+            Bytes:        totalsDecodeState.Bytes,
+        }
+        dlTotals := TotalsState {
+            Timestamp:    encodeState.Timestamp,
+            Msgs:         encodeState.Totals.Msgs,
+            Bytes:        encodeState.Totals.Bytes,
+        }
+        // Send it off
+        dataTableChannel <- &Connection {
+            DeviceUuid:    uuid,
+            DeviceName:    decodeState.DeviceName,
+            UlDevice: TotalsState {
+                Timestamp: decodeState.Timestamp,
+                Msgs:      decodeState.Msgs,
+                Bytes:     decodeState.Bytes,
+            },
+            DlDevice: TotalsState {
+                Timestamp: encodeState.Timestamp,
+                Msgs:      encodeState.Msgs,
+                Bytes:     encodeState.Bytes,
+            },
+            ExpectedMsgList: encodeState.ExpectedMsgList,
+            UlTotals:        &ulTotals, 
+            DlTotals:        &dlTotals,    
+        }
+    }    
+}
+
 // Process uplink messages from the AMQP queue until it is closed or
 // an error is flagged
 func processUlAmqpMsgs(q *Queue) {
+    statusTick := time.NewTicker(time.Minute)
 
+    // Establish the status of the process loop and of traffic test
+    // for all devices on a background timer, just in case there are
+    // no datagrams arriving from them
+    go func() {
+        for _ = range statusTick.C {
+            for uuid, decodeState := range deviceDecodeStateList {
+                updateDatatableState (uuid, decodeState)                
+            }
+        }
+    }()
+
+    // The uplink processing loop
     for {
         amqpMessageCount++
         select {            
@@ -112,11 +205,7 @@ func processUlAmqpMsgs(q *Queue) {
                     // Deal with a message on the AMQP Uplink queue
                     switch value := msg.(type) {
                         case *AmqpResponseMessage:
-                        {
-                            var ttDlBytes uint32
-                            var ttDlDatagrams uint32
-                            var ttTimeLastDl time.Time
-                            
+                        {                            
                             globals.Dbg.PrintfTrace("%s [server] --> decoded AMQP JSON msg:\n\n%+v\n\n", globals.LogTag, msg)
                             if value.Command == "UART_data" {
                                 // UART data from the UTM-API which needs to be decoded                            
@@ -126,6 +215,7 @@ func processUlAmqpMsgs(q *Queue) {
                                     decodeState = &DeviceTotalsState {
                                         Timestamp:       time.Now().UTC(),
                                         DeviceUuid:      value.DeviceUuid,
+                                        DeviceName:      value.DeviceName,
                                         Msgs:            0,
                                         Bytes:           0,
                                         Totals:          &totalsDecodeState,
@@ -134,8 +224,8 @@ func processUlAmqpMsgs(q *Queue) {
                                     deviceDecodeStateList[value.DeviceUuid] = decodeState
                                 }
                                 
-                                // Similarly, for the traffic test values we need to pass from
-                                // the traffic test channel back to the decoder
+                                // Similarly, populate a map for the traffic test values we need
+                                // to pass from the traffic test channel back to the decoder
                                 ttValues := deviceTtValuesList[value.DeviceUuid]
                                 if ttValues == nil {
                                     ttValues = &TtValues {
@@ -185,69 +275,13 @@ func processUlAmqpMsgs(q *Queue) {
                                         ttValues.UlFill = trafficTestContext.UlFill
                                         ttValues.UlLength = trafficTestContext.Parameters.DeviceParameters.LenUlDatagram
                                     }
-                                    // Also keep track of the downlink encode additions so that we can
-                                    // add them to the totals
-                                    ttDlBytes = trafficTestContext.DlBytesTotal 
-                                    ttDlDatagrams = trafficTestContext.DlDatagramsTotal
-                                    ttTimeLastDl = trafficTestContext.TimeLastDl
                                     // Send it all off to the datatable
                                     dataTableChannel <- &trafficTestContext
                                 }
                                 
-                                // Ask the process channel for the encode status now
-                                getEncodeState := &DeviceEncodeStateGet{
-                                    DeviceUuid: value.DeviceUuid,
-                                }
-                                getEncodeState.State = make(chan DeviceTotalsState)
-                                processMsgsChannel <- getEncodeState
-                                encodeState, isOpen := <- getEncodeState.State
-                                
-                                // Only do this if the channel wasn't closed prematurely
-                                // (e.g. due to an unknown UE being requested, which might
-                                // happen if it's sending rubbish and so no messages
-                                // will have been decoded)
-                                if isOpen {
-                                    // Add in the traffic test encoded stuff, if there is
-                                    // any (the decode counts for the traffic test stuff
-                                    // is already taken into account by the decoder) 
-                                    if ttTimeLastDl.After (encodeState.Timestamp) {
-                                        encodeState.Timestamp = ttTimeLastDl
-                                    }
-                                    encodeState.Totals.Msgs += int(ttDlDatagrams)
-                                    encodeState.Msgs += int(ttDlDatagrams)
-                                    encodeState.Totals.Bytes += int(ttDlBytes)
-                                    encodeState.Bytes += int(ttDlBytes)
-                                    // Send the datatable a message with connection
-                                    // data for this device plus the totals for all
-                                    ulTotals := TotalsState {
-                                        Timestamp:    totalsDecodeState.Timestamp,
-                                        Msgs:         totalsDecodeState.Msgs,
-                                        Bytes:        totalsDecodeState.Bytes,
-                                    }
-                                    dlTotals := TotalsState {
-                                        Timestamp:    encodeState.Timestamp,
-                                        Msgs:         encodeState.Totals.Msgs,
-                                        Bytes:        encodeState.Totals.Bytes,
-                                    }
-                                    // Send it off
-                                    dataTableChannel <- &Connection {
-                                        DeviceUuid:    value.DeviceUuid,
-                                        DeviceName:    value.DeviceName,
-                                        UlDevice: TotalsState {
-                                            Timestamp: decodeState.Timestamp,
-                                            Msgs:      decodeState.Msgs,
-                                            Bytes:     decodeState.Bytes,
-                                        },
-                                        DlDevice: TotalsState {
-                                            Timestamp: encodeState.Timestamp,
-                                            Msgs:      encodeState.Msgs,
-                                            Bytes:     encodeState.Bytes,
-                                        },
-                                        ExpectedMsgList: encodeState.ExpectedMsgList,
-                                        UlTotals:        &ulTotals, 
-                                        DlTotals:        &dlTotals,    
-                                    }
-                                }    
+                                // Update the datatable with the decode state, which will also
+                                // update the encode and traffic tests states
+                                updateDatatableState (value.DeviceUuid, decodeState)                
                             }
                         } 
                         case *error:

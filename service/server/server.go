@@ -63,6 +63,7 @@ type TtValues struct {
 type Connection struct {
     DeviceUuid      string  `bson:"DeviceUuid" json:"DeviceUuid"`
     DeviceName      string
+    RecentUl        bool
     UlDevice        TotalsState
     DlDevice        TotalsState
     ExpectedMsgList *[]ExpectedMsg
@@ -103,7 +104,7 @@ var deviceTtValuesList map[string]*TtValues
 // Given a UUID and a pointer to the decode state for that UUID, get the
 // encode state and the traffic test state and pass all of this along
 // to the datatable so that it is kept up to date.
-func updateDatatableState (uuid string, decodeState *DeviceTotalsState) {
+func updateDatatableState (uuid string, decodeState *DeviceTotalsState, recentUl bool) {
     var ttDlBytes uint32
     var ttDlDatagrams uint32
     var ttTimeLastDl time.Time
@@ -162,6 +163,7 @@ func updateDatatableState (uuid string, decodeState *DeviceTotalsState) {
         dataTableChannel <- &Connection {
             DeviceUuid:    uuid,
             DeviceName:    decodeState.DeviceName,
+            RecentUl:      recentUl,
             UlDevice: TotalsState {
                 Timestamp: decodeState.Timestamp,
                 Msgs:      decodeState.Msgs,
@@ -190,7 +192,7 @@ func processUlAmqpMsgs(q *Queue) {
     go func() {
         for _ = range statusTick.C {
             for uuid, decodeState := range deviceDecodeStateList {
-                updateDatatableState (uuid, decodeState)                
+                updateDatatableState (uuid, decodeState, false)                
             }
         }
     }()
@@ -281,7 +283,7 @@ func processUlAmqpMsgs(q *Queue) {
                                 
                                 // Update the datatable with the decode state, which will also
                                 // update the encode and traffic tests states
-                                updateDatatableState (value.DeviceUuid, decodeState)                
+                                updateDatatableState (value.DeviceUuid, decodeState, true)                
                             }
                         } 
                         case *error:

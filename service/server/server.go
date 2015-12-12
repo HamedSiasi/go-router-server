@@ -213,11 +213,12 @@ func processUlAmqpMsgs(q *Queue) {
                             if value.Command == "UART_data" {
                                 // UART data from the UTM-API which needs to be decoded                            
                                 // If the device is not known, add it
+                                value.DeviceUuid = strings.ToLower(value.DeviceUuid) // force to lower case from the very beginning
                                 decodeState := deviceDecodeStateList[value.DeviceUuid]
                                 if decodeState == nil {
                                     decodeState = &DeviceTotalsState {
                                         Timestamp:       time.Now().UTC(),
-                                        DeviceUuid:      strings.ToLower(value.DeviceUuid),
+                                        DeviceUuid:      value.DeviceUuid,
                                         DeviceName:      value.DeviceName,
                                         Msgs:            0,
                                         Bytes:           0,

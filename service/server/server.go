@@ -25,6 +25,7 @@ import (
     "github.com/robmeades/utm/service/routes"
     "github.com/robmeades/utm/service/system"
     "time"
+    "strings"
 )
 
 //--------------------------------------------------------------------
@@ -216,7 +217,7 @@ func processUlAmqpMsgs(q *Queue) {
                                 if decodeState == nil {
                                     decodeState = &DeviceTotalsState {
                                         Timestamp:       time.Now().UTC(),
-                                        DeviceUuid:      value.DeviceUuid,
+                                        DeviceUuid:      strings.ToLower(value.DeviceUuid),
                                         DeviceName:      value.DeviceName,
                                         Msgs:            0,
                                         Bytes:           0,
@@ -364,13 +365,18 @@ func Run() {
     // Set up logging
     log.SetFlags(log.LstdFlags)
 
+    // Set up downloads directory
+    downloads := http.FileServer(http.Dir("./"))
+
     store := cookiestore.New([]byte("secretkey789"))
     router := routes.LoadRoutes()
 
     router.Handle("/frontPageData", utilities.Handler(GetFrontPageData))
     router.HandleFunc("/register", RegisterHandler)
     router.HandleFunc("/login", LoginHandler)
+    router.HandleFunc("/query", QueryHandler)
     router.HandleFunc("/display", ShowDisplayHandler)
+    router.PathPrefix("/downloads").Handler(downloads)
     router.HandleFunc("/logout", LogoutHandler)
 
     sendMsg := ClientSendMsg{}

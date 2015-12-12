@@ -14,12 +14,16 @@ package server
 
 import (
     "encoding/json"
+    "io"
     "github.com/davecgh/go-spew/spew"
     "github.com/goincremental/negroni-sessions"
     "github.com/robmeades/utm/service/globals"
     "github.com/robmeades/utm/service/models"
     "github.com/robmeades/utm/service/utilities"
     "net/http"
+    "time"
+    "strconv"
+    "strings"
 )
 
 //--------------------------------------------------------------------
@@ -105,6 +109,63 @@ func RegisterHandler(response http.ResponseWriter, request *http.Request) {
     } else {
         response.WriteHeader(404)        
     }            
+}
+
+/// Query the database
+func QueryHandler(response http.ResponseWriter, request *http.Request) {
+
+    var duration int64
+    var startDateTime time.Time
+    var endDateTime time.Time
+    var err error
+    
+    uuid := strings.ToLower(request.FormValue("uuid"))        
+    durationString := request.FormValue("duration")
+    startDateTimeString := request.FormValue("startDateTime")
+    
+    globals.Dbg.PrintfTrace ("%s [handler] --> uuid %s, startDateTimeString %s, durationString %s.\n", globals.LogTag, uuid, startDateTimeString, durationString)
+    
+    if (len(uuid) > 0) {
+        if len(startDateTimeString) > 0 {
+            startDateTime, err = time.Parse("2006-01-02T15:04", startDateTimeString)
+            if err != nil {
+                globals.Dbg.PrintfTrace ("%s [handler] --> couldn't parse date/time string \"%s\".\n", globals.LogTag, startDateTimeString)
+            }
+        }
+        
+        if len(durationString) > 0 {
+            duration, err = strconv.ParseInt (durationString, 10, 0)
+            if err != nil {
+                globals.Dbg.PrintfTrace ("%s [handler] --> couldn't parse duration string \"%s\".\n", globals.LogTag, durationString)
+            } else {
+                endDateTime = startDateTime.Add(time.Duration(duration) * time.Minute)
+            }
+        }    
+        
+        db := utilities.GetDB(request)
+        if db != nil {
+            globals.Dbg.PrintfTrace ("%s [handler] --> Querying UtmXmlData collection for uuid: %s, start date/time: %v, end date/time: %v.\n",
+                globals.LogTag, uuid, startDateTime, endDateTime)
+            query, err := utilities.XmlDataQuery(uuid, startDateTime, endDateTime)
+            if err == nil {
+                // Send the requested data
+                response.Header().Set("content-type", "application/text")
+                response.Header().Set("content-disposition", "attachment; filename=\"" + uuid +".txt\"");
+                response.WriteHeader(http.StatusOK)
+                for _, item := range *query {
+                    var output string
+                    output = item.Date.Format(time.RFC3339) + "\t" + item.XmlData + "\n"
+                    io.WriteString(response, output)
+                }
+            } else {
+                response.WriteHeader(http.StatusNoContent)
+            }
+        } else {
+            response.WriteHeader(404)        
+        }
+    } else {
+        response.WriteHeader(http.StatusNoContent)
+    }
 }
 
 /// Get the summary data for the front page

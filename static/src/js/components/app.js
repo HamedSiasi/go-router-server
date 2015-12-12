@@ -22,6 +22,7 @@ var React = require('react');
 var Template = require('./app_template.js');
 var Router = require('react-router-component');
 var Display = require('./display/display.react');
+var Query = require('./db/query.react');
 var Login = require('./user/login.react');
 var Register = require('./user/register.react');
 var Index = require('./index');
@@ -38,6 +39,7 @@ var App = React.createClass({
                     <Location path="#/display" handler={Display} />
                     <Location path="#/login" handler={Login} />
                     <Location path="#/register" handler={Register} />
+                    <Location path="#/query" handler={Query} />
                 </Locations>
             </Template>
         );

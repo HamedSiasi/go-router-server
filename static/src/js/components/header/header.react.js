@@ -52,7 +52,7 @@ var Header = React.createClass({
                         </a>
                         <ul className="dropdown-menu dropdown-user">
                             <li><Link href="#/display"><i className="fa fa-tachometer" /> Dash Board</Link></li>
-                            <li className="disabled"><a href="#"><i className="fa fa-database" />&nbsp;Report</a></li>
+                            <li className="disabled"><Link href="#/query"><i className="fa fa-database" /> Query</Link></li>
                         </ul>
                     </li>
                     {/* /.dropdown Downloads */}
@@ -61,14 +61,12 @@ var Header = React.createClass({
                             <i className="fa fa-download" />&nbsp;Downloads&nbsp;<i className="fa fa-caret-down" />
                         </a>
                         <ul className="dropdown-menu dropdown-user">                        
-                            <li className="disabled"><a href="#/utm_downloadable_files/utils.zip" download="utm_downloadable_files/utils.zip">
-                                    <i className="fa fa-download" />
-                                        &nbsp;Download Utilities
-                                </a>
+                            <li><a href="/downloads/utils.zip"><i className="fa fa-download" /> Download Utilities</a></li>
+                            {/*
+                            <li className="disabled">
+                                <a href="/downloads/UTM-N1_User_Manual.pdf"><i className="fa fa-book" /> Download User Manual</a>
                             </li>
-                            <li className="disabled"><a href="#/utm_downloadable_files/UTM-N1_User_Manual.pdf" download="utm_downloadable_files/UTM-N1_User_Manual.pdf">
-                                <i className="fa fa-book" />&nbsp;Download User Manual</a>
-                            </li>
+                            */}
                         </ul>
                     </li>
                 </ul>

@@ -23,13 +23,11 @@ var Link = require('react-router-component').Link;
 var Moment = require('moment');
 
 var Query = React.createClass({
-    formatDate: function(event) {
-        if (this.isMounted()) {    
-	        document.getElementById("startDateTime").value = Moment(Date.parse(document.getElementById("startDateTime").value)).format("YYYY-MM-DDTHH:mm");
-        }
-    },
-
     render: function() {
+	    var formatDate = function() {
+	        document.getElementById("startDateTime").value = Moment(Date.parse(document.getElementById("startDateTime").value)).format("YYYY-MM-DDTHH:mm");
+	    }
+
         return (   
             <div className="row centered-form"><br /><br /><br />
                 <div className="col-xs-12 col-sm-8 col-md-4 col-sm-offset-2 col-md-offset-4">
@@ -38,7 +36,7 @@ var Query = React.createClass({
                             <h4 className="panel-title text-left">Database Message Query</h4>
                         </div>
                         <div className="panel-body">
-                            <form role="form" onSubmit={this.formatDate} action="/query" method="post">
+                            <form role="form" onSubmit={formatDate} action="/query" method="post">
                                 <div className="form-group">
                                     <input type="text" name="uuid" id="uuid" className="form-control input-sm" placeholder="UUID (e.g. b7afe031-9c1d-46b8-bf09-5dcb520003b4)" autofocus />
                                </div>

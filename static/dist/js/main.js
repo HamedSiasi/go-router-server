@@ -27348,13 +27348,11 @@ var Link = require('react-router-component').Link;
 var Moment = require('moment');
 
 var Query = React.createClass({displayName: "Query",
-    formatDate: function(event) {
-        if (this.isMounted()) {    
-	        document.getElementById("startDateTime").value = Moment(Date.parse(document.getElementById("startDateTime").value)).format("YYYY-MM-DDTHH:mm");
-        }
-    },
-
     render: function() {
+	    var formatDate = function() {
+	        document.getElementById("startDateTime").value = Moment(Date.parse(document.getElementById("startDateTime").value)).format("YYYY-MM-DDTHH:mm");
+	    }
+
         return (   
             React.createElement("div", {className: "row centered-form"}, React.createElement("br", null), React.createElement("br", null), React.createElement("br", null), 
                 React.createElement("div", {className: "col-xs-12 col-sm-8 col-md-4 col-sm-offset-2 col-md-offset-4"}, 
@@ -27363,7 +27361,7 @@ var Query = React.createClass({displayName: "Query",
                             React.createElement("h4", {className: "panel-title text-left"}, "Database Message Query")
                         ), 
                         React.createElement("div", {className: "panel-body"}, 
-                            React.createElement("form", {role: "form", onSubmit: this.formatDate, action: "/query", method: "post"}, 
+                            React.createElement("form", {role: "form", onSubmit: formatDate, action: "/query", method: "post"}, 
                                 React.createElement("div", {className: "form-group"}, 
                                     React.createElement("input", {type: "text", name: "uuid", id: "uuid", className: "form-control input-sm", placeholder: "UUID (e.g. b7afe031-9c1d-46b8-bf09-5dcb520003b4)", autofocus: true})
                                ), 

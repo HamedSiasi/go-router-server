@@ -118,7 +118,7 @@ func QueryHandler(response http.ResponseWriter, request *http.Request) {
     var endDateTime time.Time
     var err error
     
-    uuid := strings.ToLower(request.FormValue("uuid"))        
+    uuid := strings.ToLower(strings.TrimSpace(request.FormValue("uuid")))        
     durationString := request.FormValue("duration")
     startDateTimeString := request.FormValue("startDateTime")
     

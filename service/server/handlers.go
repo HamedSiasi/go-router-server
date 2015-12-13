@@ -38,31 +38,31 @@ import (
 // Functions
 //--------------------------------------------------------------------
 
-func LogoutHandler(request http.ResponseWriter, response *http.Request) {
-    session := sessions.GetSession(response)
+func LogoutHandler(response http.ResponseWriter, request *http.Request) {
+    session := sessions.GetSession(request)
     user_id := session.Get("user_id")
 
     globals.Dbg.PrintfTrace("Calling Logout User_id session \n%s\n", spew.Sdump(user_id))
 
     if user_id == nil {
-        request.WriteHeader(403)
-        http.Redirect(request, response, "/", 403)
+        response.WriteHeader(403)
+        http.Redirect(response, request, "/", 403)
     } else {
         session.Delete("user_id")
-        http.Redirect(request, response, "/", 202)
+        http.Redirect(response, request, "/", 202)
     }
 }
 
-func ShowDisplayHandler(request http.ResponseWriter, response *http.Request) {
-    session := sessions.GetSession(response)
+func ShowDisplayHandler(response http.ResponseWriter, request *http.Request) {
+    session := sessions.GetSession(request)
     user_id := session.Get("user_id")
 
     globals.Dbg.PrintfTrace("Calling ShowDisplay User_id session \n%s\n", spew.Sdump(user_id))
     if user_id == nil {
-        request.WriteHeader(403)
-        http.Redirect(request, response, "/", 403)
+        response.WriteHeader(403)
+        http.Redirect(response, request, "/", 403)
     } else {
-        http.Redirect(request, response, "/display", 202)
+        http.Redirect(response, request, "/display", 202)
     }
 }
 
@@ -84,7 +84,6 @@ func LoginHandler(response http.ResponseWriter, request *http.Request) {
             http.Redirect(response, request, "/display", 302)
         } else {
             http.Redirect(response, request, "/", 302)
-    
         }
     } else {
         response.WriteHeader(404)        

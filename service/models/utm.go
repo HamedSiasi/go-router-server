@@ -21,7 +21,7 @@ import (
 // TODO Rob to understand this later
 type UtmMsg struct {
     id      bson.ObjectId `bson:"_id,omitempty" json:"id"`
-      date    time.Time     `bson:"date" json:"date"`
+    date    time.Time     `bson:"date" json:"date"`
     uuid    string        `bson:"uuid" json:"uuid"`
     msg     string        `bson:"msg" json:"msg"`
 }

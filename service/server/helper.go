@@ -45,7 +45,7 @@ var DiskSpaceLeftLookUp = map[DiskSpaceLeftEnum]string {
 var EnergyLeftLookUp = map[EnergyLeftEnum]string {
     0:  " > 5%",
     1:  " < 10%",
-    2:  " > 20%",
+    2:  " > 10%",
     3:  " > 30%",
     4:  " > 50%",
     5:  " > 70%",

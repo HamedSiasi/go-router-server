@@ -25703,7 +25703,7 @@ var AppActions = {
 
 module.exports = AppActions;
 
-},{"../constants/app_store_types":226,"../dispatchers/app_dispatcher":227}],191:[function(require,module,exports){
+},{"../constants/app_store_types":227,"../dispatchers/app_dispatcher":228}],191:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -25754,7 +25754,7 @@ var App = React.createClass({displayName: "App",
 
 module.exports = App;
 
-},{"./app_template.js":192,"./db/query.react":215,"./display/display.react":216,"./index":219,"./user/login.react":222,"./user/register.react":223,"react":189,"react-router-component":9}],192:[function(require,module,exports){
+},{"./app_template.js":192,"./db/query.react":216,"./display/display.react":217,"./index":220,"./user/login.react":223,"./user/register.react":224,"react":189,"react-router-component":9}],192:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -25791,7 +25791,7 @@ var Template = React.createClass({displayName: "Template",
 
 module.exports = Template;
 
-},{"./header/header.react":218,"react":189}],193:[function(require,module,exports){
+},{"./header/header.react":219,"react":189}],193:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -25860,7 +25860,7 @@ var GetIntervals = React.createClass({displayName: "GetIntervals",
 
 module.exports = GetIntervals;
 
-},{"../../stores/app_store.js":229,"../utilities/make_li_name_list.react":224,"react":189}],194:[function(require,module,exports){
+},{"../../stores/app_store.js":230,"../utilities/make_li_name_list.react":225,"react":189}],194:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -25930,7 +25930,7 @@ var GetPing = React.createClass({displayName: "GetPing",
 
 module.exports = GetPing;
 
-},{"../../stores/app_store.js":229,"../utilities/make_li_name_list.react":224,"react":189}],195:[function(require,module,exports){
+},{"../../stores/app_store.js":230,"../utilities/make_li_name_list.react":225,"react":189}],195:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26000,7 +26000,7 @@ var GetTime = React.createClass({displayName: "GetTime",
 
 module.exports = GetTime;
 
-},{"../../stores/app_store.js":229,"../utilities/make_li_name_list.react":224,"react":189}],196:[function(require,module,exports){
+},{"../../stores/app_store.js":230,"../utilities/make_li_name_list.react":225,"react":189}],196:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26071,7 +26071,7 @@ var SetHeartBeat = React.createClass({displayName: "SetHeartBeat",
 
 module.exports = SetHeartBeat;
 
-},{"../../stores/app_store.js":229,"../utilities/make_li_name_list.react":224,"react":189}],197:[function(require,module,exports){
+},{"../../stores/app_store.js":230,"../utilities/make_li_name_list.react":225,"react":189}],197:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26139,7 +26139,7 @@ var AppStore = require('../../stores/app_store.js');
 
 module.exports = SetReporting;
 
-},{"../../stores/app_store.js":229,"../utilities/make_li_name_list.react":224,"react":189}],198:[function(require,module,exports){
+},{"../../stores/app_store.js":230,"../utilities/make_li_name_list.react":225,"react":189}],198:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26214,7 +26214,7 @@ var SetTTParameters = React.createClass({displayName: "SetTTParameters",
 
 module.exports = SetTTParameters;
 
-},{"../../stores/app_store.js":229,"../utilities/make_li_name_list.react":224,"react":189}],199:[function(require,module,exports){
+},{"../../stores/app_store.js":230,"../utilities/make_li_name_list.react":225,"react":189}],199:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26282,7 +26282,7 @@ var SetTtStart = React.createClass({displayName: "SetTtStart",
 
 module.exports = SetTtStart;
 
-},{"../../stores/app_store.js":229,"../utilities/make_li_name_list.react":224,"react":189}],200:[function(require,module,exports){
+},{"../../stores/app_store.js":230,"../utilities/make_li_name_list.react":225,"react":189}],200:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26350,7 +26350,7 @@ var SetTtStop = React.createClass({displayName: "SetTtStop",
 
 module.exports = SetTtStop;
 
-},{"../../stores/app_store.js":229,"../utilities/make_li_name_list.react":224,"react":189}],201:[function(require,module,exports){
+},{"../../stores/app_store.js":230,"../utilities/make_li_name_list.react":225,"react":189}],201:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26415,7 +26415,7 @@ var SettingStd = React.createClass({displayName: "SettingStd",
 
 module.exports = SettingStd;
 
-},{"./get_intervals.react":193,"./get_ping.react":194,"./get_time.react":195,"./set_heartbeat.react":196,"./set_reporting.react":197,"./value_heartbeat.react":204,"./value_reporting.react":205,"react":189}],202:[function(require,module,exports){
+},{"./get_intervals.react":193,"./get_ping.react":194,"./get_time.react":195,"./set_heartbeat.react":196,"./set_reporting.react":197,"./value_heartbeat.react":205,"./value_reporting.react":206,"react":189}],202:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26486,7 +26486,86 @@ var SettingTt = React.createClass({displayName: "SettingTt",
 
 module.exports = SettingTt;
 
-},{"./set_tt_parameters.react":198,"./set_tt_start.react":199,"./set_tt_stop.react":200,"./value_tt_dl_interval.react":207,"./value_tt_len_dl_datagram.react":208,"./value_tt_len_ul_datagram.react":209,"./value_tt_num_dl_datagrams.react":210,"./value_tt_num_ul_datagrams.react":211,"./value_tt_timeout.react":213,"react":189}],203:[function(require,module,exports){
+},{"./set_tt_parameters.react":198,"./set_tt_start.react":199,"./set_tt_stop.react":200,"./value_tt_dl_interval.react":208,"./value_tt_len_dl_datagram.react":209,"./value_tt_len_ul_datagram.react":210,"./value_tt_num_dl_datagrams.react":211,"./value_tt_num_ul_datagrams.react":212,"./value_tt_timeout.react":214,"react":189}],203:[function(require,module,exports){
+/**
+ * Copyright (C) u-blox Melbourn Ltd
+ * u-blox Melbourn Ltd, Melbourn, UK
+ * 
+ * All rights reserved.
+ *
+ * This source file is the sole property of u-blox Melbourn Ltd.
+ * Reproduction or utilization of this source in whole or part is
+ * forbidden without the written consent of u-blox Melbourn Ltd.
+ * 
+ * Parts of this file are written in JSX, not HTML.  If you want
+ * to put any content in here that should be generated as HTML,
+ * stuff it through:
+ * 
+ * https://facebook.github.io/react/html-jsx.html
+ * 
+ * ...to get your syntax correct.
+ */
+"use strict";
+
+var React = require('react');
+
+var BatteryLevel = React.createClass({displayName: "BatteryLevel",
+    render:function() {
+        if (this.props.Percentage.search("> 90") >= 0) {
+            return (
+                React.createElement("div", null, 
+                    React.createElement("i", {className: "fa fa-battery-full"}), " ", this.props.Percentage
+                )
+            );
+	    } else if (this.props.Percentage.search("> 70") >= 0) {
+	        return (
+                React.createElement("div", null, 
+	                React.createElement("i", {className: "fa fa-battery-three-quarters"}), " ", this.props.Percentage
+                )
+	        );
+	    } else if (this.props.Percentage.search("> 50") >= 0) {
+	        return (
+                React.createElement("div", null, 
+	                React.createElement("i", {className: "fa fa-battery-half"}), " ", this.props.Percentage
+                )
+	        );
+	    } else if (this.props.Percentage.search("> 30") >= 0) {
+	        return (
+                React.createElement("div", null, 
+	                React.createElement("i", {className: "fa fa-battery-quarter"}), " ", this.props.Percentage
+                )
+	        );
+	    } else if (this.props.Percentage.search("> 10") >= 0) {
+	        return (
+                React.createElement("div", null, 
+	                React.createElement("i", {className: "fa fa-battery-empty"}), " ", this.props.Percentage
+                )
+	        );
+	    } else if (this.props.Percentage.search("< 10") >= 0) {
+	        return (
+                React.createElement("div", null, 
+                    React.createElement("i", {className: "fa fa-battery-empty"}), " ", React.createElement("p", {style: "color:red"}, this.props.Percentage, " ")
+                )
+	        );
+	    } else if (this.props.Percentage.search("< 5") >= 0) {
+	        return (
+                React.createElement("div", null, 
+                    React.createElement("i", {className: "fa fa-battery-empty"}), " ", React.createElement("b", null, React.createElement("p", {style: "color:red"}, this.props.Percentage, " "))
+                )
+	        );
+        } else { // Just in case
+            return (
+                React.createElement("div", null, 
+                    React.createElement("i", {className: "fa fa-battery-full"}), " ", this.props.Percentage
+                )
+            );
+        }
+    }    
+});
+
+module.exports = BatteryLevel;
+
+},{"react":189}],204:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26525,7 +26604,7 @@ var Connected = React.createClass({displayName: "Connected",
 
 module.exports = Connected;
 
-},{"react":189}],204:[function(require,module,exports){
+},{"react":189}],205:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26601,7 +26680,7 @@ var ValueHeartbeat = React.createClass({displayName: "ValueHeartbeat",
 
 module.exports = ValueHeartbeat;
 
-},{"../../actions/app_actions.js":190,"../../constants/app_limits":225,"../../stores/app_store.js":229,"react":189}],205:[function(require,module,exports){
+},{"../../actions/app_actions.js":190,"../../constants/app_limits":226,"../../stores/app_store.js":230,"react":189}],206:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26676,7 +26755,7 @@ var ValueReporting = React.createClass({displayName: "ValueReporting",
 
 module.exports = ValueReporting;
 
-},{"../../actions/app_actions.js":190,"../../constants/app_limits":225,"../../stores/app_store.js":229,"react":189}],206:[function(require,module,exports){
+},{"../../actions/app_actions.js":190,"../../constants/app_limits":226,"../../stores/app_store.js":230,"react":189}],207:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26720,7 +26799,7 @@ var TtConfig = React.createClass({displayName: "TtConfig",
 
 module.exports = TtConfig;
 
-},{"react":189}],207:[function(require,module,exports){
+},{"react":189}],208:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26795,7 +26874,7 @@ var ValueTTDlInterval = React.createClass({displayName: "ValueTTDlInterval",
 
 module.exports = ValueTTDlInterval;
 
-},{"../../actions/app_actions.js":190,"../../constants/app_limits":225,"../../stores/app_store.js":229,"react":189}],208:[function(require,module,exports){
+},{"../../actions/app_actions.js":190,"../../constants/app_limits":226,"../../stores/app_store.js":230,"react":189}],209:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26870,7 +26949,7 @@ var ValueTtLenDlDatagram = React.createClass({displayName: "ValueTtLenDlDatagram
 
 module.exports = ValueTtLenDlDatagram;
 
-},{"../../actions/app_actions.js":190,"../../constants/app_limits":225,"../../stores/app_store.js":229,"react":189}],209:[function(require,module,exports){
+},{"../../actions/app_actions.js":190,"../../constants/app_limits":226,"../../stores/app_store.js":230,"react":189}],210:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -26945,7 +27024,7 @@ var ValueTtLenUlDatagram = React.createClass({displayName: "ValueTtLenUlDatagram
 
 module.exports = ValueTtLenUlDatagram;
 
-},{"../../actions/app_actions.js":190,"../../constants/app_limits":225,"../../stores/app_store.js":229,"react":189}],210:[function(require,module,exports){
+},{"../../actions/app_actions.js":190,"../../constants/app_limits":226,"../../stores/app_store.js":230,"react":189}],211:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -27021,7 +27100,7 @@ var ValueTtNumDlDatagrams = React.createClass({displayName: "ValueTtNumDlDatagra
 
 module.exports = ValueTtNumDlDatagrams;
 
-},{"../../actions/app_actions.js":190,"../../constants/app_limits":225,"../../stores/app_store.js":229,"react":189}],211:[function(require,module,exports){
+},{"../../actions/app_actions.js":190,"../../constants/app_limits":226,"../../stores/app_store.js":230,"react":189}],212:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -27097,7 +27176,7 @@ var ValueTtNumUlDatagrams = React.createClass({displayName: "ValueTtNumUlDatagra
 
 module.exports = ValueTtNumUlDatagrams;
 
-},{"../../actions/app_actions.js":190,"../../constants/app_limits":225,"../../stores/app_store.js":229,"react":189}],212:[function(require,module,exports){
+},{"../../actions/app_actions.js":190,"../../constants/app_limits":226,"../../stores/app_store.js":230,"react":189}],213:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -27185,7 +27264,7 @@ var TtNumbers = React.createClass({displayName: "TtNumbers",
 
 module.exports = TtNumbers;
 
-},{"react":189}],213:[function(require,module,exports){
+},{"react":189}],214:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -27263,7 +27342,7 @@ var ValueTtTimeout = React.createClass({displayName: "ValueTtTimeout",
 
 module.exports = ValueTtTimeout;
 
-},{"../../actions/app_actions.js":190,"../../constants/app_limits":225,"../../stores/app_store.js":229,"react":189}],214:[function(require,module,exports){
+},{"../../actions/app_actions.js":190,"../../constants/app_limits":226,"../../stores/app_store.js":230,"react":189}],215:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -27322,7 +27401,7 @@ var ValueUuidSelected = React.createClass({displayName: "ValueUuidSelected",
 
 module.exports = ValueUuidSelected;
 
-},{"../../actions/app_actions.js":190,"../../stores/app_store.js":229,"react":189}],215:[function(require,module,exports){
+},{"../../actions/app_actions.js":190,"../../stores/app_store.js":230,"react":189}],216:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -27383,7 +27462,7 @@ var Query = React.createClass({displayName: "Query",
 
 module.exports = Query;
 
-},{"moment":6,"react":189,"react-router-component":9}],216:[function(require,module,exports){
+},{"moment":6,"react":189,"react-router-component":9}],217:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -27464,7 +27543,7 @@ var Display = React.createClass({displayName: "Display",
 
 module.exports = Display;
 
-},{"../panels/settings.react":220,"../panels/summary.react":221,"./display_row.react":217,"react":189,"react-router-component":9}],217:[function(require,module,exports){
+},{"../panels/settings.react":221,"../panels/summary.react":222,"./display_row.react":218,"react":189,"react-router-component":9}],218:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -27491,6 +27570,7 @@ var Connected = require('../controls/value_connected.react');
 var TtNumbers = require('../controls/value_tt_numbers.react');
 var TtConfig = require('../controls/value_tt_config.react');
 var AppActions = require('../../actions/app_actions.js');
+var BatteryLevel = require ('../controls/value_battery_level.react');
 var Moment = require('moment');
 var Link = require('react-router-component').Link;
 
@@ -27625,7 +27705,7 @@ var DisplayRow = React.createClass({displayName: "DisplayRow",
                         ), 
                         React.createElement("td", {style: {width: 80}}, 
                             React.createElement("i", {className: "fa fa-floppy-o"}), " ", device["DiskSpaceLeft"], React.createElement("br", null), 
-                            React.createElement("i", {className: "fa fa-battery-full"}), " ", device["BatteryLevel"], React.createElement("br", null), 
+                            React.createElement(BatteryLevel, {Percentage: device["BatteryLevel"]}), 
                             React.createElement("i", {className: "fa fa-clock-o"}), " ", device["UpDuration"], React.createElement("br", null), 
                             React.createElement("i", {className: "fa fa-arrow-up"}), " ", device["TxTime"], React.createElement("br", null), 
                             React.createElement("i", {className: "fa fa-arrow-down"}), " ", device["RxTime"], React.createElement("br", null), 
@@ -27675,7 +27755,7 @@ var DisplayRow = React.createClass({displayName: "DisplayRow",
 
 module.exports = DisplayRow;
 
-},{"../../actions/app_actions.js":190,"../controls/value_connected.react":203,"../controls/value_tt_config.react":206,"../controls/value_tt_numbers.react":212,"../controls/value_uuid_selected.react":214,"moment":6,"react":189,"react-router-component":9}],218:[function(require,module,exports){
+},{"../../actions/app_actions.js":190,"../controls/value_battery_level.react":203,"../controls/value_connected.react":204,"../controls/value_tt_config.react":207,"../controls/value_tt_numbers.react":213,"../controls/value_uuid_selected.react":215,"moment":6,"react":189,"react-router-component":9}],219:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -27756,7 +27836,7 @@ var Header = React.createClass({displayName: "Header",
 
 module.exports = Header;
 
-},{"react":189,"react-router-component":9}],219:[function(require,module,exports){
+},{"react":189,"react-router-component":9}],220:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -27803,7 +27883,7 @@ var Index = React.createClass({displayName: "Index",
 
 module.exports = Index;
 
-},{"react":189}],220:[function(require,module,exports){
+},{"react":189}],221:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -27861,7 +27941,7 @@ var Settings = React.createClass({displayName: "Settings",
 
 module.exports = Settings;
 
-},{"../controls/setting_std.react":201,"../controls/setting_tt.react":202,"react":189}],221:[function(require,module,exports){
+},{"../controls/setting_std.react":201,"../controls/setting_tt.react":202,"react":189}],222:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -27913,7 +27993,7 @@ var Summary = React.createClass({displayName: "Summary",
 
 module.exports = Summary;
 
-},{"moment":6,"react":189}],222:[function(require,module,exports){
+},{"moment":6,"react":189}],223:[function(require,module,exports){
 var React = require('react');
 var Link = require('react-router-component').Link;
 
@@ -27946,7 +28026,7 @@ var Login = React.createClass({displayName: "Login",
 
 module.exports = Login;
 
-},{"react":189,"react-router-component":9}],223:[function(require,module,exports){
+},{"react":189,"react-router-component":9}],224:[function(require,module,exports){
 var React = require('react');
 var Link = require('react-router-component').Link;
 
@@ -28023,7 +28103,7 @@ var Register = React.createClass({displayName: "Register",
 
 module.exports = Register;
 
-},{"react":189,"react-router-component":9}],224:[function(require,module,exports){
+},{"react":189,"react-router-component":9}],225:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -28073,7 +28153,7 @@ Object.size = function(obj) {
 
 module.exports = MakeLiUuidList, Object.size;
 
-},{"react":189}],225:[function(require,module,exports){
+},{"react":189}],226:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -28108,7 +28188,7 @@ module.exports = {
     TT_DL_INTERVAL_MAX: 300,
     TT_DL_INTERVAL_MIN: 1,
 };
-},{}],226:[function(require,module,exports){
+},{}],227:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -28135,7 +28215,7 @@ module.exports = {
     STORE_TT_NO_REPORTS_DURING_TEST: "STORE_TT_NO_REPORTS_DURING_TEST",
     STORE_TT_DL_INTERVAL_SECONDS: "STORE_TT_DL_INTERVAL_SECONDS"
 };
-},{}],227:[function(require,module,exports){
+},{}],228:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -28167,7 +28247,7 @@ var AppDispatcher = assign(new Dispatcher(), {
 
 module.exports = AppDispatcher;
 
-},{"flux":3,"react/lib/Object.assign":57}],228:[function(require,module,exports){
+},{"flux":3,"react/lib/Object.assign":57}],229:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -28184,7 +28264,7 @@ var App = require('./components/app');
 var React = require('react');
 
 React.render(React.createElement(App, null), document.getElementById('main'));
-},{"./components/app":191,"react":189}],229:[function(require,module,exports){
+},{"./components/app":191,"react":189}],230:[function(require,module,exports){
 /**
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
@@ -28418,4 +28498,4 @@ var AppStore = assign(EventEmitter.prototype, {
 })
 
 module.exports = AppStore;
-},{"../constants/app_store_types":226,"../dispatchers/app_dispatcher":227,"events":1,"react/lib/Object.assign":57}]},{},[228]);
+},{"../constants/app_store_types":227,"../dispatchers/app_dispatcher":228,"events":1,"react/lib/Object.assign":57}]},{},[229]);

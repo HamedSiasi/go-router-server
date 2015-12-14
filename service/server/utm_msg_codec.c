@@ -64,7 +64,7 @@ extern "C"
 // with a backtrace (type "bt").
 //
 // In my case it turns out that I was calling strftime() with a
-// C99 formatter, %F, which is a but to recent for Golang's use
+// C99 formatter, %F, which is a bit too recent for Golang's use
 // of GCC.  I needed to use the equivalent %Y-%m-%d instead.
 
 // ----------------------------------------------------------------
@@ -1664,7 +1664,12 @@ uint32_t logHeartbeat(char * pBuffer, uint32_t *pBufferSize, uint32_t heartbeatV
 /// Log the RSSI
 uint32_t logRssi(char * pBuffer, uint32_t *pBufferSize, Rssi_t rssi)
 {
-    uint32_t bytesUsed = snprintf(pBuffer, *pBufferSize, "<Rssi Value=\"%.1f\" Units=\"dBm\" />", (double) rssi / 10);
+    // TODO After the note below I noticed that use of %.1f in a PC build
+    // here is not working either, I'm just getting "f" in the output.  It is working
+    // in the build on the Linux server.  I think printing of floats in the GCC PC
+    // libs I'm using is bust, or not present...?
+    // uint32_t bytesUsed = snprintf(pBuffer, *pBufferSize, "<Rssi Value=\"%.1f\" Units=\"dBm\" />", (double) rssi / 10);
+    uint32_t bytesUsed = snprintf(pBuffer, *pBufferSize, "<Rssi Value=\"%d.%.1d\" Units=\"dBm\" />", rssi / 10, (rssi % 10) * -1);
     return calcBytesUsed(pBufferSize, bytesUsed);
 }
 
@@ -1678,7 +1683,7 @@ uint32_t logRsrp(char * pBuffer, uint32_t *pBufferSize, Rssi_t rsrp, bool isSync
 	// isn't actually getting too large for the supplied buffer.  If I don't do the float
 	// the problem goes away.  Don't understand.  Be afraid, be moderately afraid.
     //uint32_t bytesUsed = snprintf(pBuffer, *pBufferSize, "<Rrsp Value=\"%.1f\" Units=\"dBm\" IsSyncedWithRssi=\"%s\" />", (double) rsrp / 10, getStringBoolean(isSyncedWithRssi));
-    uint32_t bytesUsed = snprintf(pBuffer, *pBufferSize, "<Rrsp Value=\"%d.%.1d\" Units=\"dBm\" IsSyncedWithRssi=\"%s\" />", rsrp / 10, rsrp % 10, getStringBoolean(isSyncedWithRssi));
+    uint32_t bytesUsed = snprintf(pBuffer, *pBufferSize, "<Rrsp Value=\"%d.%.1d\" Units=\"dBm\" IsSyncedWithRssi=\"%s\" />", rsrp / 10, (rsrp % 10) * -1, getStringBoolean(isSyncedWithRssi));
 	return calcBytesUsed(pBufferSize, bytesUsed);
 }
 
@@ -3307,7 +3312,7 @@ DecodeResult_t decodeDlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, DlMs
                         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
                         *ppLog += logTransparentData(*ppLog, pLogSize, sizeInBuffer - 1, &(pOutBuffer->transparentDatagram.contents[0]));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_DL);
                     }
@@ -3326,7 +3331,7 @@ DecodeResult_t decodeDlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, DlMs
                     {
                         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_DL);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_NAME, "PingReqDlMsg");
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_DL);
                     }
@@ -3345,7 +3350,7 @@ DecodeResult_t decodeDlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, DlMs
                     {
                         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_DL);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_NAME, "PingCnfDlMsg");
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_DL);
                     }
@@ -3394,7 +3399,7 @@ DecodeResult_t decodeDlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, DlMs
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, "DisableButton", getStringBoolean(pOutBuffer->rebootReqDlMsg.disableButton));
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, "DisableServerPing", getStringBoolean(pOutBuffer->rebootReqDlMsg.disableServerPing));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_DL);
                     }
@@ -3421,7 +3426,7 @@ DecodeResult_t decodeDlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, DlMs
                         *ppLog += logDateTime(*ppLog, pLogSize, pOutBuffer->dateTimeSetReqDlMsg.time);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_SET_DATE_ONLY, getStringBoolean(pOutBuffer->dateTimeSetReqDlMsg.setDateOnly));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_DL);
                     }
@@ -3440,7 +3445,7 @@ DecodeResult_t decodeDlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, DlMs
                     {
                         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_DL);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_NAME, "DateTimeGetReqDlMsg");
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_DL);
                     }
@@ -3466,7 +3471,7 @@ DecodeResult_t decodeDlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, DlMs
                         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MODE, getStringMode(pOutBuffer->modeSetReqDlMsg.mode));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_DL);
                     }
@@ -3485,7 +3490,7 @@ DecodeResult_t decodeDlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, DlMs
                     {
                         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_DL);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_NAME, "ModeGetReqDlMsg");
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_DL);
                     }
@@ -3511,7 +3516,7 @@ DecodeResult_t decodeDlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, DlMs
                         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
                         *ppLog += logHeartbeat(*ppLog, pLogSize, pOutBuffer->heartbeatSetReqDlMsg.heartbeatSeconds, pOutBuffer->heartbeatSetReqDlMsg.heartbeatSnapToRtc);
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_DL);
                     }
@@ -3536,7 +3541,7 @@ DecodeResult_t decodeDlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, DlMs
                         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
                         *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_REPORTING_INTERVAL, pOutBuffer->reportingIntervalSetReqDlMsg.reportingInterval);
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_DL);
                     }
@@ -3555,7 +3560,7 @@ DecodeResult_t decodeDlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, DlMs
                     {
                         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_DL);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_NAME, "IntervalsGetReqDlMsg");
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_DL);
                     }
@@ -3574,7 +3579,7 @@ DecodeResult_t decodeDlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, DlMs
                     {
                         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_DL);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_NAME, "MeasurementsGetReqDlMsg");
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_DL);
                     }
@@ -3609,7 +3614,7 @@ DecodeResult_t decodeDlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, DlMs
                     if ((ppLog != NULL) && (*ppLog != NULL))
                     {
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_DL);
                     }
@@ -3628,7 +3633,7 @@ DecodeResult_t decodeDlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, DlMs
                     {
                         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_DL);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_NAME, "MeasurementsControlGetReqDlMsg");
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_DL);
                     }
@@ -3647,7 +3652,7 @@ DecodeResult_t decodeDlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, DlMs
                     {
                         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_DL);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_NAME, "MeasurementsControlDefaultsSetReqDlMsg");
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_DL);
                     }
@@ -3666,7 +3671,7 @@ DecodeResult_t decodeDlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, DlMs
                     {
                         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_DL);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_NAME, "TrafficReportGetReqDlMsg");
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_DL);
                     }
@@ -3702,7 +3707,7 @@ DecodeResult_t decodeDlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, DlMs
                         *ppLog += logTagWithPresenceAndUint32Value(*ppLog, pLogSize, TAG_TIMEOUT, (pOutBuffer->trafficTestModeParametersSetReqDlMsg.timeoutSeconds != 0),
                                 pOutBuffer->trafficTestModeParametersSetReqDlMsg.timeoutSeconds);
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_DL);
                     }
@@ -3721,7 +3726,7 @@ DecodeResult_t decodeDlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, DlMs
                     {
                         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_DL);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_NAME, "TrafficTestModeParametersGetReqDlMsg");
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_DL);
                     }
@@ -3762,7 +3767,7 @@ DecodeResult_t decodeDlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, DlMs
                     {
                         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_DL);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_NAME, "TrafficTestModeReportGetReqDlMsg");
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_DL);
                     }
@@ -3781,7 +3786,7 @@ DecodeResult_t decodeDlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, DlMs
                     {
                         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_DL);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_NAME, "ActivityReportGetReqDlMsg");
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_DL);
                     }
@@ -3843,7 +3848,7 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
                         *ppLog += logTransparentData(*ppLog, pLogSize, sizeInBuffer - 1, &(pOutBuffer->transparentDatagram.contents[0]));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_UL);
                     }
@@ -3865,7 +3870,7 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                     {
                         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_DL);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_NAME, "PingReqUlMsg");
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_DL);
                     }
@@ -3887,7 +3892,7 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                     {
                         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_DL);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_NAME, "PingCnfUlMsg");
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_DL);
                     }
@@ -3957,7 +3962,7 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                             *ppLog += logTagWithStringValue(*ppLog, pLogSize, "DisableButton", getStringBoolean(pOutBuffer->initIndUlMsg.disableButton));
                             *ppLog += logTagWithStringValue(*ppLog, pLogSize, "DisableServerPing", getStringBoolean(pOutBuffer->initIndUlMsg.disableServerPing));
                             *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-                            *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                            *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                             *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                             *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_UL);
                         }
@@ -3988,7 +3993,7 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_ENERGY_LEFT, getStringEnergyLeft(pOutBuffer->pollIndUlMsg.energyLeft));
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_DISK_SPACE_LEFT, getStringDiskSpaceLeft(pOutBuffer->pollIndUlMsg.diskSpaceLeft));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_UL);
                     }
@@ -4016,7 +4021,7 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                         *ppLog += logDateTime(*ppLog, pLogSize, pOutBuffer->dateTimeIndUlMsg.time);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_TIME_SET_BY, getStringTimeSetBy(pOutBuffer->dateTimeIndUlMsg.setBy));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_UL);
                     }
@@ -4044,7 +4049,7 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                         *ppLog += logDateTime(*ppLog, pLogSize, pOutBuffer->dateTimeSetCnfUlMsg.time);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_TIME_SET_BY, getStringTimeSetBy(pOutBuffer->dateTimeSetCnfUlMsg.setBy));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_UL);
                     }
@@ -4072,7 +4077,7 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                         *ppLog += logDateTime(*ppLog, pLogSize, pOutBuffer->dateTimeGetCnfUlMsg.time);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_TIME_SET_BY, getStringTimeSetBy(pOutBuffer->dateTimeGetCnfUlMsg.setBy));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_UL);
                     }
@@ -4098,7 +4103,7 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MODE, getStringMode(pOutBuffer->modeSetCnfUlMsg.mode));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_UL);
                     }
@@ -4124,7 +4129,7 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MODE, getStringMode(pOutBuffer->modeGetCnfUlMsg.mode));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_UL);
                     }
@@ -4150,7 +4155,7 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
                         *ppLog += logHeartbeat(*ppLog, pLogSize, pOutBuffer->heartbeatSetCnfUlMsg.heartbeatSeconds, pOutBuffer->heartbeatSetCnfUlMsg.heartbeatSnapToRtc);
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_UL);
                     }
@@ -4175,7 +4180,7 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
                         *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_REPORTING_INTERVAL, pOutBuffer->reportingIntervalSetCnfUlMsg.reportingInterval);
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_UL);
                     }
@@ -4203,7 +4208,7 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                         *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_REPORTING_INTERVAL, pOutBuffer->intervalsGetCnfUlMsg.reportingInterval);
                         *ppLog += logHeartbeat(*ppLog, pLogSize, pOutBuffer->intervalsGetCnfUlMsg.heartbeatSeconds, pOutBuffer->intervalsGetCnfUlMsg.heartbeatSnapToRtc);
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_UL);
                     }
@@ -4232,7 +4237,7 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                         if ((ppLog != NULL) && (*ppLog != NULL))
                         {
                             *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-                            *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                            *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                             *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                             *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_UL);
                         }
@@ -4262,7 +4267,7 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                         if ((ppLog != NULL) && (*ppLog != NULL))
                         {
                             *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-                            *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                            *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                             *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                             *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_UL);
                         }
@@ -4295,7 +4300,7 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                         if ((ppLog != NULL) && (*ppLog != NULL))
                         {
                             *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-                            *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                            *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                             *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                             *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_UL);
                         }
@@ -4352,7 +4357,7 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                         if ((ppLog != NULL) && (*ppLog != NULL))
                         {
                             *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-                            *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                            *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                             *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                             *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_UL);
                         }
@@ -4409,7 +4414,7 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                         if ((ppLog != NULL) && (*ppLog != NULL))
                         {
                             *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-                            *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                            *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                             *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                             *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_UL);
                         }
@@ -4432,7 +4437,7 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                     {
                         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_UL);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_NAME, "MeasurementsControlDefaultsSetCnfUlMsg");
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_UL);
                     }
@@ -4463,7 +4468,7 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                         *ppLog += logTrafficReportDl(*ppLog, pLogSize, pOutBuffer->trafficReportIndUlMsg.numDatagramsDl, pOutBuffer->trafficReportIndUlMsg.numBytesDl,
                                 pOutBuffer->trafficReportIndUlMsg.numDatagramsDlBadChecksum);
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_UL);
                     }
@@ -4494,7 +4499,7 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                         *ppLog += logTrafficReportDl(*ppLog, pLogSize, pOutBuffer->trafficReportGetCnfUlMsg.numDatagramsDl, pOutBuffer->trafficReportGetCnfUlMsg.numBytesDl,
                                 pOutBuffer->trafficReportGetCnfUlMsg.numDatagramsDlBadChecksum);
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_UL);
                     }
@@ -4530,7 +4535,7 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                         *ppLog += logTagWithPresenceAndUint32Value(*ppLog, pLogSize, TAG_TIMEOUT, (pOutBuffer->trafficTestModeParametersSetCnfUlMsg.timeoutSeconds != 0),
                                 pOutBuffer->trafficTestModeParametersSetCnfUlMsg.timeoutSeconds);
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_UL);
                     }
@@ -4566,7 +4571,7 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                         *ppLog += logTagWithPresenceAndUint32Value(*ppLog, pLogSize, TAG_TIMEOUT, (pOutBuffer->trafficTestModeParametersGetCnfUlMsg.timeoutSeconds != 0),
                                 pOutBuffer->trafficTestModeParametersGetCnfUlMsg.timeoutSeconds);
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_UL);
                     }
@@ -4625,7 +4630,7 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                                 pOutBuffer->trafficTestModeReportIndUlMsg.numTrafficTestDlDatagramsBad, pOutBuffer->trafficTestModeReportIndUlMsg.numTrafficTestDlDatagramsMissed);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_TIMED_OUT, getStringBoolean(pOutBuffer->trafficTestModeReportIndUlMsg.timedOut));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_UL);
                     }
@@ -4662,7 +4667,7 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                                 pOutBuffer->trafficTestModeReportGetCnfUlMsg.numTrafficTestDlDatagramsBad, pOutBuffer->trafficTestModeReportGetCnfUlMsg.numTrafficTestDlDatagramsMissed);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_TIMED_OUT, getStringBoolean(pOutBuffer->trafficTestModeReportIndUlMsg.timedOut));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_UL);
                     }
@@ -4720,7 +4725,7 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                                 pOutBuffer->activityReportIndUlMsg.ulMcs);
                         *ppLog += logDlRf(*ppLog, pLogSize, pOutBuffer->activityReportIndUlMsg.dlMcsPresent, pOutBuffer->activityReportIndUlMsg.dlMcs);
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_UL);
                     }
@@ -4778,7 +4783,7 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                                 pOutBuffer->activityReportGetCnfUlMsg.ulMcs);
                         *ppLog += logDlRf(*ppLog, pLogSize, pOutBuffer->activityReportGetCnfUlMsg.dlMcsPresent, pOutBuffer->activityReportGetCnfUlMsg.dlMcs);
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_UL);
                     }
@@ -4810,7 +4815,7 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
                         *ppLog += logDebugInd(*ppLog, pLogSize, &(pOutBuffer->debugIndUlMsg.string[0]), pOutBuffer->debugIndUlMsg.sizeOfString);
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
-                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, pBufferAtStart - *ppInBuffer);
+                        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
                         *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_UL);
                     }

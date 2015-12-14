@@ -24,6 +24,7 @@ var Connected = require('../controls/value_connected.react');
 var TtNumbers = require('../controls/value_tt_numbers.react');
 var TtConfig = require('../controls/value_tt_config.react');
 var AppActions = require('../../actions/app_actions.js');
+var BatteryLevel = require ('../controls/value_battery_level.react');
 var Moment = require('moment');
 var Link = require('react-router-component').Link;
 
@@ -158,7 +159,7 @@ var DisplayRow = React.createClass({
                         </td>
                         <td style={{width: 80}}>
                             <i className="fa fa-floppy-o" /> {device["DiskSpaceLeft"]}<br />
-                            <i className="fa fa-battery-full" /> {device["BatteryLevel"]}<br />
+                            <BatteryLevel Percentage={device["BatteryLevel"]} />
                             <i className="fa fa-clock-o" /> {device["UpDuration"]}<br />
                             <i className="fa fa-arrow-up" /> {device["TxTime"]}<br />
                             <i className="fa fa-arrow-down" /> {device["RxTime"]}<br />

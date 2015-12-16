@@ -21,12 +21,19 @@
 var React = require('react');
 var Link = require('react-router-component').Link;
 var Moment = require('moment');
+var AppStore = require('../../stores/app_store.js');
 
-var Query = React.createClass({
-    render: function() {
-	    var formatDate = function() {
-	        document.getElementById("startDateTime").value = Moment(Date.parse(document.getElementById("startDateTime").value)).format("YYYY-MM-DDTHH:mm");
+var Query = React.createClass({	
+    componentWillMount: function() {
+	    if(!AppStore.getIsLoggedIn()) {
+	    	window.location = "/";
 	    }
+    },
+
+    render: function() {
+        var formatDate = function() {
+            document.getElementById("startDateTime").value = Moment(Date.parse(document.getElementById("startDateTime").value)).format("YYYY-MM-DDTHH:mm");
+        }
 
         return (   
             <div className="row centered-form"><br /><br /><br />

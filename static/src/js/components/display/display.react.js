@@ -19,10 +19,11 @@
 "use strict";
 
 var React = require('react');
-var Settings = require('../panels/settings.react')
-var DisplayRow = require('./display_row.react')
-var Summary = require('../panels/summary.react')
-var Link = require('react-router-component').Link
+var Settings = require('../panels/settings.react');
+var DisplayRow = require('./display_row.react');
+var Summary = require('../panels/summary.react');
+var Link = require('react-router-component').Link;
+var AppStore = require('../../stores/app_store.js');
 
 function pollState(updateState) {
     function pollLoop() {
@@ -49,6 +50,12 @@ var Display = React.createClass({
        	};
     },
 
+    componentWillMount: function() {
+	    if(!AppStore.getIsLoggedIn()) {
+	    	window.location = "/";
+	    }
+    },
+    
     componentDidMount: function() {
         pollState(function(data) {
             // fixup missing state properties to avoid muliple levels of missing attribute tests

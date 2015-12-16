@@ -26,10 +26,16 @@ var _heartbeatSeconds;
 var _heartbeatSnapToRtc;
 var _reportingInterval;
 var _ttParameters = {};
+var _isLoggedIn = true;  // Disable the need to log in until really necessary
 
 //------------------------------------------------------------
 // Private functions
 //------------------------------------------------------------
+
+//Store the isLoggedIn value
+function _storeIsLoggedIn(isLoggedIn) {
+	_isLoggedIn = isLoggedIn;
+}
 
 // Add a UUID to the list as being checked
 function _setUuidChecked(uuid) {
@@ -81,7 +87,7 @@ function _storeTtDlIntervalSeconds(dlIntervalSeconds) {
 	_ttParameters["dlIntervalSeconds"] = dlIntervalSeconds;
 }
 
-// TODO
+// TODO Rob to understand this later 
 function addUser(company, firstName, lastName, email, password) {
  obj = {};
  obj.company = company;
@@ -151,6 +157,10 @@ var AppStore = assign(EventEmitter.prototype, {
         this.removeListener(CHANGE_EVENT, callback)
     },
 
+    getIsLoggedIn: function() {   	
+    	return _isLoggedIn;
+    },
+
     getAllUuidsChecked: function () {
     	return _uuidsCheckedList;
     },
@@ -179,6 +189,9 @@ var AppStore = assign(EventEmitter.prototype, {
         var action = payload.action; // this is our action from handleViewAction
     
         switch(action.actionType) {
+            case AppConstants.STORE_IS_LOGGED_IN:
+            	_storeIsLoggedIn(action.isLoggedIn);
+            break;
             case AppConstants.STORE_SET_UUID_CHECKED:
                 _setUuidChecked(action.uuid);
             break;

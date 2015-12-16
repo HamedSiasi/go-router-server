@@ -23,6 +23,12 @@ var AppActions = {
             password: password
         })
     },
+    setIsLoggedIn: function(isLoggedIn) {
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.STORE_IS_LOGGED_IN,
+            isLoggedIn: isLoggedIn
+        })
+    },
     setUuidChecked: function(uuid) {
         AppDispatcher.handleViewAction({
             actionType: AppConstants.STORE_SET_UUID_CHECKED,

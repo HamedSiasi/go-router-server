@@ -242,14 +242,14 @@ func (msg *ClientSendMsg) Send(response http.ResponseWriter, request *http.Reque
     err := utilities.ValidatePostRequest (request)
     
     if err != nil {
-        response.WriteHeader(404)
+        response.WriteHeader(http.StatusNotFound)
         return
     } else {
         globals.Dbg.PrintfTrace ("%s [sender] --> sendMsg request received from client.\n", globals.LogTag)
         utilities.DumpRequest (request)
         body, err := ioutil.ReadAll(request.Body)
         if err != nil {
-            response.WriteHeader(404)
+            response.WriteHeader(http.StatusNotFound)
             return
         } else {
             globals.Dbg.PrintfTrace ("%s [sender] --> request body is \"%s\".\n", globals.LogTag, body)
@@ -257,7 +257,7 @@ func (msg *ClientSendMsg) Send(response http.ResponseWriter, request *http.Reque
             err = json.Unmarshal(body, &msgContainer)
             if err != nil {
                 globals.Dbg.PrintfTrace("%s [sender] --> received:\n\n%+v\n\n...which is not JSON decodable:\n\n%+v\n", globals.LogTag, body, err.Error())
-                response.WriteHeader(404)
+                response.WriteHeader(http.StatusNotFound)
                 return
             } else {                
                 globals.Dbg.PrintfTrace ("%s [sender] --> JSON says:\n\n%+v\n", globals.LogTag, msgContainer)
@@ -265,14 +265,14 @@ func (msg *ClientSendMsg) Send(response http.ResponseWriter, request *http.Reque
                 
                 if msgEnum == CLIENT_SEND_NULL {
                     globals.Dbg.PrintfTrace ("%s [sender] --> unknown message type: \"%s\".\n", globals.LogTag, msgContainer.SendMsgType)
-                    response.WriteHeader(404)
+                    response.WriteHeader(http.StatusNotFound)
                 } else {
                     msgSender := new (Msg)
                     msgSender.MsgType = msgEnum
                     msgSender.MsgBody = msgContainer.MsgBody
                     err = msgSender.Send (msgContainer.Uuid)
                     if err != nil {
-                        response.WriteHeader(404)
+                        response.WriteHeader(http.StatusNotFound)
                     } else {
                         response.WriteHeader(http.StatusOK)                        
                     }                    

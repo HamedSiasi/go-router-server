@@ -20,6 +20,7 @@
 
 var React = require('react');
 var Link = require('react-router-component').Link;
+var Downloads = require('./downloads.react');
 
 var Header = React.createClass({
     render: function() {
@@ -38,11 +39,10 @@ var Header = React.createClass({
                             <i className="fa fa-user fa-fw" />&nbsp;User&nbsp;<i className="fa fa-caret-down" />
                         </a>
                         <ul className="dropdown-menu dropdown-user">
-                            <li className="disabled"><Link href="#/login"><i className="fa fa-sign-in fa-fw" />&nbsp;Login</Link></li>
-                            <li className="disabled"><Link href="#/logout"><i className="fa fa-sign-out fa-fw" />&nbsp;Logout</Link></li>
+                            <li><Link href="#/login"><i className="fa fa-sign-in fa-fw" />&nbsp;Login</Link></li>
+                            <li><Link href="#/logout"><i className="fa fa-sign-out fa-fw" />&nbsp;Logout</Link></li>
                             <li className="divider" />
                             <li className="disabled"><Link href="#/register"><i className="fa fa-user fa-fw" />&nbsp;Add User</Link></li>
-                            <li className="disabled"><a href="#"><i className="fa fa-user fa-fw" />&nbsp;User Profile</a></li>
                         </ul>
                     </li>
                     {/* /.dropdown Data */}
@@ -51,8 +51,8 @@ var Header = React.createClass({
                             <i className="fa fa-bar-chart-o" />&nbsp;Data&nbsp;<i className="fa fa-caret-down" />
                         </a>
                         <ul className="dropdown-menu dropdown-user">
-                            <li><Link href="#/display"><i className="fa fa-tachometer" /> Dash Board</Link></li>
-                            <li className="disabled"><Link href="#/query"><i className="fa fa-database" /> Query</Link></li>
+                            <li><Link href="#/display"><i className="fa fa-tachometer" />&nbsp;Dash Board</Link></li>
+                            <li><Link href="#/query"><i className="fa fa-database" />&nbsp;Query</Link></li>
                         </ul>
                     </li>
                     {/* /.dropdown Downloads */}
@@ -60,14 +60,7 @@ var Header = React.createClass({
                         <a className="dropdown-toggle" data-toggle="dropdown">
                             <i className="fa fa-download" />&nbsp;Downloads&nbsp;<i className="fa fa-caret-down" />
                         </a>
-                        <ul className="dropdown-menu dropdown-user">                        
-                            <li><a href="/downloads/utils.zip"><i className="fa fa-download" /> Download Utilities</a></li>
-                            {/*
-                            <li className="disabled">
-                                <a href="/downloads/UTM-N1_User_Manual.pdf"><i className="fa fa-book" /> Download User Manual</a>
-                            </li>
-                            */}
-                        </ul>
+                        <Downloads />
                     </li>
                 </ul>
                 {/* /.navbar-top-links */}

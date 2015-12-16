@@ -21,6 +21,7 @@ import (
     "github.com/robmeades/utm/service/models"
     "github.com/robmeades/utm/service/utilities"
     "net/http"
+    "io/ioutil"
     "time"
     "strconv"
     "strings"
@@ -45,11 +46,10 @@ func LogoutHandler(response http.ResponseWriter, request *http.Request) {
     globals.Dbg.PrintfTrace("Calling Logout User_id session \n%s\n", spew.Sdump(user_id))
 
     if user_id == nil {
-        response.WriteHeader(403)
-        http.Redirect(response, request, "/", 403)
+        http.Redirect(response, request, "/", http.StatusOK)
     } else {
         session.Delete("user_id")
-        http.Redirect(response, request, "/", 202)
+        http.Redirect(response, request, "/", http.StatusOK)
     }
 }
 
@@ -68,25 +68,35 @@ func ShowDisplayHandler(response http.ResponseWriter, request *http.Request) {
 
 func LoginHandler(response http.ResponseWriter, request *http.Request) {
 
-    email := request.FormValue("email")
-    password := request.FormValue("password")
+    var contents interface{}
+    
+    utilities.DumpRequest (request)
+    body, _ := ioutil.ReadAll(request.Body)
+    json.Unmarshal(body, &contents)
+    
+    stuff := contents.(map[string]interface{})
+    email := stuff["email"].(string)
+    password := stuff["password"].(string)
+        
     session := sessions.GetSession(request)
 
     db := utilities.GetDB(request)
     if db != nil {
         user := new(models.User)
+        globals.Dbg.PrintfTrace("db %s, email \"%s\", password \"%s\"\n", db, email, password)
         err := user.Authenticate(db, email, password)
         globals.Dbg.PrintfTrace("Calling login User session \n%s\n", spew.Sdump(user.ID))
         if err == nil {
             session.Set("user_id", user.ID.Hex())
             session.Set("user_company", user.Company)
             session.Set("user_email", user.Email)
-            http.Redirect(response, request, "/display", 302)
+            response.WriteHeader(http.StatusFound)
         } else {
-            http.Redirect(response, request, "/", 302)
+            response.Write([]byte("Unknown username or password."))
+            response.WriteHeader(http.StatusUnauthorized)        
         }
     } else {
-        response.WriteHeader(404)        
+        response.WriteHeader(http.StatusNotFound)        
     }            
 }
 
@@ -104,9 +114,9 @@ func RegisterHandler(response http.ResponseWriter, request *http.Request) {
     
         user.NewUser(db, company, firstName, lastName, email, password)
     
-        http.Redirect(response, request, "/display", 302)
+        http.Redirect(response, request, "/display", http.StatusOK)
     } else {
-        response.WriteHeader(404)        
+        response.WriteHeader(http.StatusNotFound)        
     }            
 }
 
@@ -160,7 +170,7 @@ func QueryHandler(response http.ResponseWriter, request *http.Request) {
                 response.WriteHeader(http.StatusNoContent)
             }
         } else {
-            response.WriteHeader(404)        
+            response.WriteHeader(http.StatusNotFound)       
         }
     } else {
         response.WriteHeader(http.StatusNoContent)

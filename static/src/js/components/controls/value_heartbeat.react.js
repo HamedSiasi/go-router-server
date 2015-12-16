@@ -26,7 +26,7 @@ var AppStore = require('../../stores/app_store.js');
 var ValueHeartbeat = React.createClass({
     getInitialState: function() {
         AppActions.setHeartbeatSeconds(AppConstants.HEARTBEAT_DEFAULT);
-        // This shouldn't really be here but it need to go somewhere until I have a tick box
+        // This shouldn't really be here but it needs to go somewhere until I have a tick box
         AppActions.setHeartbeatSnapToRtc(AppConstants.HEARTBEAT_SNAP_TO_RTC_DEFAULT);
         return {value: AppConstants.HEARTBEAT_DEFAULT};
     },

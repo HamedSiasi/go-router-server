@@ -19,6 +19,7 @@
 "use strict";
 
 var React = require('react');
+var Login = require('./user/login.react');
 
 var Index = React.createClass({
     render:function(){
@@ -30,7 +31,7 @@ var Index = React.createClass({
                              <div className="dataTable_wrapper">
                                  <div>
                                      <div>
-                                         This page intentionally left blank.
+                                         <Login />
                                     </div>
                                 </div>
                             </div>

@@ -26,7 +26,7 @@ var _heartbeatSeconds;
 var _heartbeatSnapToRtc;
 var _reportingInterval;
 var _ttParameters = {};
-var _isLoggedIn = true;  // Disable the need to log in until really necessary
+var _isLoggedIn = false;
 
 //------------------------------------------------------------
 // Private functions

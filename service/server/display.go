@@ -16,7 +16,7 @@ import (
     "time"
     "sort"
     "fmt"
-    "github.com/robmeades/utm/service/globals"
+    "github.com/u-blox/utm/service/globals"
 )
 
 //--------------------------------------------------------------------

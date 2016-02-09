@@ -48,20 +48,20 @@ var BatteryLevel = React.createClass({
 	        );
 	    } else if (this.props.Percentage.search("> 10") >= 0) {
 	        return (
-                <div>
+                <div style={{color: 'red'}}>
 	                <i className="fa fa-battery-empty" /> {this.props.Percentage}
                 </div>
 	        );
 	    } else if (this.props.Percentage.search("< 10") >= 0) {
 	        return (
-                <div>
-                    <i className="fa fa-battery-empty" /> <p style="color:red">{this.props.Percentage} </p>
+                <div style={{color: 'red'}}>
+                    <i className="fa fa-battery-empty" /> {this.props.Percentage}
                 </div>
 	        );
 	    } else if (this.props.Percentage.search("< 5") >= 0) {
 	        return (
-                <div>
-                    <i className="fa fa-battery-empty" /> <b><p style="color:red">{this.props.Percentage} </p></b>
+                <div style={{color: 'red'}}>
+                    <i className="fa fa-battery-empty" /> <b>{this.props.Percentage}</b>
                 </div>
 	        );
         } else { // Just in case

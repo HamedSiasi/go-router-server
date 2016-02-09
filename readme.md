@@ -49,7 +49,7 @@ You should now be able to browse to the server at http://ciot.it-sgn.u-blox.com:
 
 # Mongo DB And Security
 
-In Mongo on the Sgonico server a single set of web log-in details have been created.  They are username (actually e-mail, but we never e-mail to it): "one@astellia", password: "crazy8".  If you ever need to create new ones, this can be done through the Add User menu on the wev interface.  If you ever need to disable security for any reason, find the file app_store.js in static/src/js/stores and change the line:
+In Mongo on the Sgonico server a single set of web log-in details have been created.  They are username (actually e-mail, but we never e-mail to it): "one@astellia", password: "crazy8".  If you ever need to create new ones, this can be done through the Add User menu on the web interface.  If you ever need to disable security for any reason, find the file app_store.js in static/src/js/stores and change the line:
 
 var _isLoggedIn = false;
 
@@ -70,3 +70,5 @@ Useful mongo commands are:
 * Show the collections in a database: show collections.
 * Display the contents of a collection (e.g. users) after "use"ing the relevant database: db.users.find().
 * Remove the an entire collection (e.g. users) after "use"ing the relevant database: db.users.remove({}).
+
+Mongo is not SQL, everything is coded as json.  It's quite logical, just a bit more programming-oriented and verbose than SQL.  Go look at their website for how to code queries etc.

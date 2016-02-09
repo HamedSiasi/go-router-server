@@ -17,9 +17,9 @@ import (
     "io"
     "github.com/davecgh/go-spew/spew"
     "github.com/goincremental/negroni-sessions"
-    "github.com/robmeades/utm/service/globals"
-    "github.com/robmeades/utm/service/models"
-    "github.com/robmeades/utm/service/utilities"
+    "github.com/u-blox/utm/service/globals"
+    "github.com/u-blox/utm/service/models"
+    "github.com/u-blox/utm/service/utilities"
     "net/http"
     "io/ioutil"
     "time"
@@ -72,32 +72,36 @@ func LoginHandler(response http.ResponseWriter, request *http.Request) {
     
     utilities.DumpRequest (request)
     body, _ := ioutil.ReadAll(request.Body)
-    json.Unmarshal(body, &contents)
+    err := json.Unmarshal(body, &contents)
     
-    stuff := contents.(map[string]interface{})
-    email := stuff["email"].(string)
-    password := stuff["password"].(string)
+    if (err == nil) {
+        stuff := contents.(map[string]interface{})
+        email := stuff["email"].(string)
+        password := stuff["password"].(string)
         
-    session := sessions.GetSession(request)
+        session := sessions.GetSession(request)
 
-    db := utilities.GetDB(request)
-    if db != nil {
-        user := new(models.User)
-        globals.Dbg.PrintfTrace("db %s, email \"%s\", password \"%s\"\n", db, email, password)
-        err := user.Authenticate(db, email, password)
-        globals.Dbg.PrintfTrace("Calling login User session \n%s\n", spew.Sdump(user.ID))
-        if err == nil {
-            session.Set("user_id", user.ID.Hex())
-            session.Set("user_company", user.Company)
-            session.Set("user_email", user.Email)
-            response.WriteHeader(http.StatusFound)
+        db := utilities.GetDB(request)
+        if db != nil {
+            user := new(models.User)
+            globals.Dbg.PrintfTrace("db %s, email \"%s\", password \"%s\"\n", db, email, password)
+            err := user.Authenticate(db, email, password)
+            globals.Dbg.PrintfTrace("Calling login User session \n%s\n", spew.Sdump(user.ID))
+            if err == nil {
+                session.Set("user_id", user.ID.Hex())
+                session.Set("user_company", user.Company)
+                session.Set("user_email", user.Email)
+                response.WriteHeader(http.StatusFound)
+            } else {
+                response.Write([]byte("Unknown username or password."))
+                response.WriteHeader(http.StatusUnauthorized)        
+            }
         } else {
-            response.Write([]byte("Unknown username or password."))
-            response.WriteHeader(http.StatusUnauthorized)        
+            response.WriteHeader(http.StatusNotFound)        
         }
     } else {
         response.WriteHeader(http.StatusNotFound)        
-    }            
+    }
 }
 
 func RegisterHandler(response http.ResponseWriter, request *http.Request) {

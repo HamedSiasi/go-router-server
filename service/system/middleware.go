@@ -13,7 +13,7 @@
 package system
 
 import (
-    "github.com/robmeades/utm/service/utilities"
+    "github.com/u-blox/utm/service/utilities"
     "gopkg.in/mgo.v2"
     "net/http"
 )

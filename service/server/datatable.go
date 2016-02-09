@@ -15,8 +15,8 @@ package server
 import (
     "time"
     "github.com/davecgh/go-spew/spew"
-    "github.com/robmeades/utm/service/globals"
-    "github.com/robmeades/utm/service/utilities"
+    "github.com/u-blox/utm/service/globals"
+    "github.com/u-blox/utm/service/utilities"
 )
 
 //--------------------------------------------------------------------
@@ -66,15 +66,15 @@ type DeviceLatestStateGet struct {
 //--------------------------------------------------------------------
 
 // To update the latest values send a MessageContainer into this channel
-// containing the received message; a copy their contents will be stored
+// containing the received message; a copy of the contents will be stored
 // in the datatable
 
-// To get the latest state for a given UUID, send a '*DeviceLatestStateGet'
+// To get the latest state for a given UUID, send a 'DeviceLatestStateGet'
 // into this channel containing the device UUID and a pointer to a channel
 // down which to send the LatestState struct; a copy of all quantities will
 // be copied into the struct and then the LatestState channel will be closed.
 
-// To get the latest state of all devices, send a '*chan []DevicesLatestState'
+// To get the latest state of all devices, send a 'chan []DevicesLatestState'
 // into this channel and a copy of all quantities for all UUIDs will be
 // copied into the struct and then the channel will be closed.
 

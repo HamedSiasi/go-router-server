@@ -17,7 +17,7 @@ import (
     "encoding/json"
     "fmt"
     "net/http"
-    "github.com/robmeades/utm/service/globals"
+    "github.com/u-blox/utm/service/globals"
 )
 
 func ValidateGetRequest (request *http.Request) *globals.Error {

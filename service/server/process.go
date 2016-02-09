@@ -16,7 +16,7 @@ import (
     "time"
     "reflect"
     "github.com/davecgh/go-spew/spew"
-    "github.com/robmeades/utm/service/globals"
+    "github.com/u-blox/utm/service/globals"
 )
 
 //--------------------------------------------------------------------

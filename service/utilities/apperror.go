@@ -17,7 +17,7 @@ import (
     "log"
     "net/http"
     "runtime"
-    "github.com/robmeades/utm/service/globals"
+    "github.com/u-blox/utm/service/globals"
 )
 
 /// Create a new error

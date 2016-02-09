@@ -174,8 +174,8 @@ import "C"  // There must be no line breaks between this and the commented-out s
 import (
     "encoding/hex"
     "github.com/davecgh/go-spew/spew"
-    "github.com/robmeades/utm/service/globals"
-    "github.com/robmeades/utm/service/utilities"
+    "github.com/u-blox/utm/service/globals"
+    "github.com/u-blox/utm/service/utilities"
     "time"
     "unsafe"
 )

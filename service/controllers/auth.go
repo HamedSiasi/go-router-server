@@ -16,8 +16,8 @@ import (
     "encoding/json"
     "fmt"
     "github.com/goincremental/negroni-sessions"
-    "github.com/robmeades/utm/service/models"
-    "github.com/robmeades/utm/service/utilities"
+    "github.com/u-blox/utm/service/models"
+    "github.com/u-blox/utm/service/utilities"
     "net/http"
 )
 

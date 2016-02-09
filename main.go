@@ -13,7 +13,7 @@
 package main
 
 import (
-    "github.com/robmeades/utm/service/server"
+    "github.com/u-blox/utm/service/server"
 )
 
 func main() {

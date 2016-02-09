@@ -28,8 +28,8 @@ import (
     "errors"
     "github.com/davecgh/go-spew/spew"
     "unsafe"
-    "github.com/robmeades/utm/service/globals"
-    "github.com/robmeades/utm/service/utilities"
+    "github.com/u-blox/utm/service/globals"
+    "github.com/u-blox/utm/service/utilities"
 )
 
 //--------------------------------------------------------------------

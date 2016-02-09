@@ -14,8 +14,8 @@ package routes
 
 import (
     "github.com/gorilla/mux"
-    "github.com/robmeades/utm/service/controllers"
-    "github.com/robmeades/utm/service/utilities"
+    "github.com/u-blox/utm/service/controllers"
+    "github.com/u-blox/utm/service/utilities"
 )
 
 func LoadRoutes() *mux.Router {

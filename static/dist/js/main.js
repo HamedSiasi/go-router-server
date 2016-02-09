@@ -26956,20 +26956,20 @@ var BatteryLevel = React.createClass({displayName: "BatteryLevel",
 	        );
 	    } else if (this.props.Percentage.search("> 10") >= 0) {
 	        return (
-                React.createElement("div", null, 
+                React.createElement("div", {style: {color: 'red'}}, 
 	                React.createElement("i", {className: "fa fa-battery-empty"}), " ", this.props.Percentage
                 )
 	        );
 	    } else if (this.props.Percentage.search("< 10") >= 0) {
 	        return (
-                React.createElement("div", null, 
-                    React.createElement("i", {className: "fa fa-battery-empty"}), " ", React.createElement("p", {style: "color:red"}, this.props.Percentage, " ")
+                React.createElement("div", {style: {color: 'red'}}, 
+                    React.createElement("i", {className: "fa fa-battery-empty"}), " ", this.props.Percentage
                 )
 	        );
 	    } else if (this.props.Percentage.search("< 5") >= 0) {
 	        return (
-                React.createElement("div", null, 
-                    React.createElement("i", {className: "fa fa-battery-empty"}), " ", React.createElement("b", null, React.createElement("p", {style: "color:red"}, this.props.Percentage, " "))
+                React.createElement("div", {style: {color: 'red'}}, 
+                    React.createElement("i", {className: "fa fa-battery-empty"}), " ", React.createElement("b", null, this.props.Percentage)
                 )
 	        );
         } else { // Just in case

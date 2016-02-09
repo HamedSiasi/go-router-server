@@ -534,6 +534,7 @@ uint32_t encodeMeasurements(char * pBuffer, Measurements_t * pMeasurements, char
     char *pBufferAtStart;
     char *pBytesToFollow;
     uint8_t bitMap = 0;
+    Rssi_t rssi;
 
     pBufferAtStart = pBuffer;
 
@@ -627,13 +628,13 @@ uint32_t encodeMeasurements(char * pBuffer, Measurements_t * pMeasurements, char
                 pMeasurements->rsrp.value = MAX_RSSI_RSRP;
             }
         }
-        pMeasurements->rsrp.value = (int16_t) limitInt((int32_t) pMeasurements->rsrp.value, 15);
+        rssi = (int16_t) limitInt((int32_t) pMeasurements->rsrp.value, 15);
 
         if (pMeasurements->rsrp.isSyncedWithRssi)
         {
-            pMeasurements->rsrp.value |= 0x8000;
+            rssi |= 0x8000;
         }
-        pBuffer += encodeUint16(pBuffer, pMeasurements->rsrp.value);
+        pBuffer += encodeUint16(pBuffer, rssi);
     }
     if (pMeasurements->rssiPresent)
     {
@@ -648,8 +649,8 @@ uint32_t encodeMeasurements(char * pBuffer, Measurements_t * pMeasurements, char
                 pMeasurements->rssi = MAX_RSSI_RSRP;
             }
         }
-        pMeasurements->rssi = (int16_t) limitInt((int32_t) pMeasurements->rssi, 15);
-        pBuffer += encodeUint16(pBuffer, pMeasurements->rssi);
+        rssi = (int16_t) limitInt((int32_t) pMeasurements->rssi, 15);
+        pBuffer += encodeUint16(pBuffer, rssi);
     }
     if (pMeasurements->temperaturePresent)
     {
@@ -3868,11 +3869,11 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                     }
                     if ((ppLog != NULL) && (*ppLog != NULL))
                     {
-                        *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_DL);
+                        *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_UL);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_NAME, "PingReqUlMsg");
                         *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
-                        *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_DL);
+                        *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_UL);
                     }
                 }
                 break;
@@ -3890,11 +3891,11 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                     }
                     if ((ppLog != NULL) && (*ppLog != NULL))
                     {
-                        *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_DL);
+                        *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_UL);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_NAME, "PingCnfUlMsg");
                         *ppLog += logTagWithUint32Value(*ppLog, pLogSize, TAG_MSG_SIZE, *ppInBuffer - pBufferAtStart);
                         *ppLog += logTagWithStringValue(*ppLog, pLogSize, TAG_MSG_CHECKSUM_GOOD, getStringBoolean(decodeResult != DECODE_RESULT_BAD_CHECKSUM));
-                        *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_DL);
+                        *ppLog += logEndTag(*ppLog, pLogSize, TAG_MSG_UL);
                     }
                 }
                 break;

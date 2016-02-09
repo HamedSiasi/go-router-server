@@ -71,9 +71,9 @@
 // If you add anything here, don't forget to update the related logging strings
 typedef enum WakeUpCodeTag_t
 {
-    WAKE_UP_CODE_OK,                          //!< A good wake-up, no problems.
-    WAKE_UP_CODE_WATCHDOG,                    //!< Wake-up due to the watchdog
-                                              //! firing.
+	WAKE_UP_CODE_OK,                          //!< A good wake-up, no problems.
+	WAKE_UP_CODE_WATCHDOG,                    //!< Wake-up due to the watchdog
+									          //! firing.
     WAKE_UP_CODE_NETWORK_PROBLEM,             //!< Wake-up after assert due to
                                               //! problems with the network.
     WAKE_UP_CODE_SD_CARD_PROBLEM,             //!< Wake-up after assert due to
@@ -86,12 +86,12 @@ typedef enum WakeUpCodeTag_t
                                               //! the modem not waking up.
     WAKE_UP_CODE_HW_PROBLEM,                  //!< Wake-up after assert due to
                                               //! problems with the HW.
-    WAKE_UP_CODE_MEMORY_ALLOC_PROBLEM,        //!< Wake-up after assert due to
-                                                 //! memory allocation issues.
-    WAKE_UP_CODE_GENERIC_FAILURE,             //!< Wake-up after a generic failure.
-    WAKE_UP_CODE_REBOOT,                      //!< Waking up after a commanded reboot.
-    MAX_NUM_WAKE_UP_CODES                     //!< The maximum number of
-                                              //! decode results.
+	WAKE_UP_CODE_MEMORY_ALLOC_PROBLEM,        //!< Wake-up after assert due to
+						       			      //! memory allocation issues.
+	WAKE_UP_CODE_GENERIC_FAILURE,             //!< Wake-up after a generic failure.
+	WAKE_UP_CODE_REBOOT,                      //!< Waking up after a commanded reboot.
+	MAX_NUM_WAKE_UP_CODES                     //!< The maximum number of
+									          //! decode results.
 } WakeUpCode_t;
 
 /// The operating modes, most be codeable into 3 bits.

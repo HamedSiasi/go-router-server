@@ -1938,7 +1938,7 @@ uint32_t encodeInitIndUlMsg(char * pBuffer, InitIndUlMsg_t * pMsg, char **ppLog,
         *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
         *ppLog += logTagWithStringValue(*ppLog, pLogSize, "WakeupCode", getStringWakeUpCode(pMsg->wakeUpCode));
         *ppLog += logTagWithUint32Value(*ppLog, pLogSize, "RevisionLevel", REVISION_LEVEL);
-        *ppLog += logTagWithUint32Value(*ppLog, pLogSize, "SdCardRequired", !(pMsg->sdCardNotRequired));
+        *ppLog += logTagWithStringValue(*ppLog, pLogSize, "SdCardRequired", getStringBoolean(!(pMsg->sdCardNotRequired)));
         *ppLog += logTagWithStringValue(*ppLog, pLogSize, "DisableModemDebug", getStringBoolean(pMsg->disableModemDebug));
         *ppLog += logTagWithStringValue(*ppLog, pLogSize, "DisableButton", getStringBoolean(pMsg->disableButton));
         *ppLog += logTagWithStringValue(*ppLog, pLogSize, "DisableServerPing", getStringBoolean(pMsg->disableServerPing));
@@ -3958,7 +3958,7 @@ DecodeResult_t decodeUlMsg(const char ** ppInBuffer, uint32_t sizeInBuffer, UlMs
                             *ppLog += logBeginTag(*ppLog, pLogSize, TAG_MSG_CONTENTS);
                             *ppLog += logTagWithStringValue(*ppLog, pLogSize, "WakeupCode", getStringWakeUpCode(pOutBuffer->initIndUlMsg.wakeUpCode));
                             *ppLog += logTagWithUint32Value(*ppLog, pLogSize, "RevisionLevel", pOutBuffer->initIndUlMsg.revisionLevel);
-                            *ppLog += logTagWithUint32Value(*ppLog, pLogSize, "SdCardRequired", !(pOutBuffer->initIndUlMsg.sdCardNotRequired));
+                            *ppLog += logTagWithStringValue(*ppLog, pLogSize, "SdCardRequired", getStringBoolean(!(pOutBuffer->initIndUlMsg.sdCardNotRequired)));
                             *ppLog += logTagWithStringValue(*ppLog, pLogSize, "DisableModemDebug", getStringBoolean(pOutBuffer->initIndUlMsg.disableModemDebug));
                             *ppLog += logTagWithStringValue(*ppLog, pLogSize, "DisableButton", getStringBoolean(pOutBuffer->initIndUlMsg.disableButton));
                             *ppLog += logTagWithStringValue(*ppLog, pLogSize, "DisableServerPing", getStringBoolean(pOutBuffer->initIndUlMsg.disableServerPing));

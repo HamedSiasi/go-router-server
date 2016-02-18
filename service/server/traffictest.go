@@ -156,7 +156,7 @@ func incrementDlFill (fill byte, overflowCount byte) (byte, byte) {
     return fill, overflowCount
 }
 
-// Increment DL fill wrap with wrap
+// Increment UL fill wrap with wrap
 func incrementUlFill (fill byte, overflowCount byte) (byte, byte) {    
     fill++
     if (fill < UlFillMinValue) {
@@ -167,7 +167,7 @@ func incrementUlFill (fill byte, overflowCount byte) (byte, byte) {
     return fill, overflowCount
 }
 
-// Calc a zero-based fill value, useed when subtracting UL fill values
+// Calc a zero-based fill value, used when subtracting UL fill values
 func calculateAbsZeroBasedFillValue(fill byte, overflowCount byte) byte {
     return fill - UlFillMinValue + overflowCount * byte((256 - int(UlFillMinValue)));
 }
@@ -399,6 +399,7 @@ func operateTrafficTest() {
                         }
                         case *BadTrafficTestModeRuleBreakerUlDatagram:
                         {
+                            context.UlDatagrams++ // We've still received one, so this must be incremented as well
                             context.UlDatagramsBad++
                             context.UlDatagramsMissed++
                             context.UlFill, context.UlFillOverflowCount = incrementDlFill(context.UlFill, context.UlFillOverflowCount)
@@ -408,6 +409,7 @@ func operateTrafficTest() {
                         }
                         case *OutOfSequenceTrafficTestModeRuleBreakerUlDatagram:
                         {
+                            context.UlDatagrams++ // We've still received one, so this must be incremented as well
                             context.UlDatagramsOOS++
                             // Account for the gap in the fill and resynchronise ourselves
                             context.UlDatagramsMissed += uint32(calculateAbsZeroBasedFillValue(utmMsg.Fill, context.UlFillOverflowCount) -

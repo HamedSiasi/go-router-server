@@ -1797,7 +1797,7 @@ uint32_t logActivityReport(char * pBuffer, uint32_t *pBufferSize, uint32_t total
 /// Log some UL RF parameters from the UTM
 uint32_t logUlRf(char * pBuffer, uint32_t *pBufferSize, bool txPowerDbmPresent, int8_t txPowerDbm, bool mcsPresent, uint8_t mcs)
 {
-    uint32_t bytesUsed = snprintf(pBuffer, *pBufferSize, "<UlRf TxPowerPresent=\"%s\" TxPower=\"%d\" Units=\"dBm\" McsPresent=\"%s\", Mcs=\"%d\" />",
+    uint32_t bytesUsed = snprintf(pBuffer, *pBufferSize, "<UlRf TxPowerPresent=\"%s\" TxPower=\"%d\" Units=\"dBm\" McsPresent=\"%s\" Mcs=\"%d\" />",
             getStringBoolean(txPowerDbmPresent), txPowerDbm, getStringBoolean(mcsPresent), mcs);
     return calcBytesUsed(pBufferSize, bytesUsed);
 }
@@ -1805,7 +1805,7 @@ uint32_t logUlRf(char * pBuffer, uint32_t *pBufferSize, bool txPowerDbmPresent, 
 /// Log some DL RF parameters from the UTM
 uint32_t logDlRf(char * pBuffer, uint32_t *pBufferSize, bool mcsPresent, uint8_t mcs)
 {
-    uint32_t bytesUsed = snprintf(pBuffer, *pBufferSize, "<DlRf McsPresent=\"%s\", Mcs=\"%d\" />", getStringBoolean(mcsPresent), mcs);
+    uint32_t bytesUsed = snprintf(pBuffer, *pBufferSize, "<DlRf McsPresent=\"%s\" Mcs=\"%d\" />", getStringBoolean(mcsPresent), mcs);
     return calcBytesUsed(pBufferSize, bytesUsed);
 }
 

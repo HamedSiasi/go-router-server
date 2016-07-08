@@ -1,4 +1,4 @@
-This repository contains the web server and web client for the U-blox Test Mobile project.  The server  (residing in the service directory) is written in Golang and is based on original code provided by Neul as part of the tedI project.  The client (residing in the static directory with all the javascript/HTML code actually piled into the static/dist directory (using Gulp)) is written in Javascript using React/Flux and HTML5, original code created by a contractor (mmanjoura) who worked on the project.
+This repository contains the web server and web client for the U-blox Test Mobile project.  The server  (residing in the service directory) is written in Golang and is based on original code provided by Neul as part of the tedI project.  The client (residing in the static directory with all the javascript/HTML code actually piled into the `static/dist` directory (using Gulp)) is written in Javascript using React/Flux and HTML5, original code created by a contractor (mmanjoura) who worked on the project.
 
 # Setting Up For Windows Development
 
@@ -6,46 +6,46 @@ There is an MS Word document in this directory which explains how to set up for 
 
 # Server Installation
 
-Concerning server installation, the web server is run on a VM in Sgonico (151.9.34.90, http://ciot.it-sgn.u-blox.com/), user account "itadmin"). All files are kept under the directory ~/code/gocode.
+Concerning server installation, the web server is run on a VM in Sgonico (`151.9.34.90`, `http://ciot.it-sgn.u-blox.com/`), user account `itadmin`). All files are kept under the directory `~/code/gocode`.
 
 The bash script is setup to execute these commands before loading the shell:
 
-export GOROOT=$HOME/code/golang/go
-export PATH=$PATH:$GOROOT/bin
-export GOPATH=$HOME/code/gocode
-export PATH=/usr/local/git/bin:$PATH
+`export GOROOT=$HOME/code/golang/go`
+`export PATH=$PATH:$GOROOT/bin`
+`export GOPATH=$HOME/code/gocode`
+`export PATH=/usr/local/git/bin:$PATH`
 
 Mongo database must be installed.
 
 Start mongo with:
 
-sudo mongod --config /etc/mongodb.conf
+`sudo mongod --config /etc/mongodb.conf`
 
 [Probably shouldn't need sudo but I found that mongo couldn't write to the journal file without this].
 
 Fetch and build the UTM code from github with:
 
-go get -u github.com/u-blox/utm
+`go get -u github.com/u-blox/utm-server`
 
 When it has built, copy the static directory into the bin directory:
 
-cp -r ~/code/gocode/src/github.com/u-blox/utm/static ~/code/gocode/bin
+`cp -r ~/code/gocode/src/github.com/u-blox/utm-server/static ~/code/gocode/bin`
 
-Copy config.cfg into the bin directoy:
+Copy `config.cfg` into the bin directoy:
 
-cp ~/code/gocode/src/github.com/u-blox/utm/config.cfg ~/code/gocode/bin
+`cp ~/code/gocode/src/github.com/u-blox/utm-server/config.cfg ~/code/gocode/bin`
 
-Edit config.cfg for the correct port number (default 8080).
+Edit `config.cfg` for the correct port number (default `8080`).
 
 Change directory to the bin directory:
 
-cd ~/code/gocode/bin
+`cd ~/code/gocode/bin`
 
 Start the executable from the bin directory with:
 
-nohup ./utm &
+`nohup ./utm &`
 
-You should now be able to browse to the server at http://ciot.it-sgn.u-blox.com:8080/
+You should now be able to browse to the server at `http://ciot.it-sgn.u-blox.com:8080/`
 
 # Mongo DB And Security
 

@@ -21,7 +21,9 @@ func sendMsg(myname string, destination string, message string) bool {
 	retval := true
 
 	// (1) --- Open a Connection ---
-	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	//conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	conn, err := amqp.Dial("amqp://cwlrqwxr:nB1WPmllNAuf20sFST2Al7yiGq6hXdrg@wildboar.rmq.cloudamqp.com/cwlrqwxr")
+	//
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
 
@@ -58,7 +60,9 @@ func sendMsg(myname string, destination string, message string) bool {
 
 func receiveMsg(myname string) {
 	// (1) --- Open connection ----
-	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	//conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	conn, err := amqp.Dial("amqp://cwlrqwxr:nB1WPmllNAuf20sFST2Al7yiGq6hXdrg@wildboar.rmq.cloudamqp.com/cwlrqwxr")
+	//
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
 

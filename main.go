@@ -1,8 +1,8 @@
 /* Entry point for UTM server.
- * 
+ *
  * Copyright (C) u-blox Melbourn Ltd
  * u-blox Melbourn Ltd, Melbourn, UK
- * 
+ *
  * All rights reserved.
  *
  * This source file is the sole property of u-blox Melbourn Ltd.
@@ -13,11 +13,13 @@
 package main
 
 import (
-    "github.com/u-blox/utm/service/server"
+	"fmt"
+	"github.com/u-blox/utm/service/server"
 )
 
 func main() {
-    server.Run()
+	fmt.Println("... main")
+	server.Run()
 }
 
 /* End Of File */

@@ -1,0 +1,27 @@
+/**
+ * Copyright (C) u-blox Melbourn Ltd
+ * u-blox Melbourn Ltd, Melbourn, UK
+ * 
+ * All rights reserved.
+ *
+ * This source file is the sole property of u-blox Melbourn Ltd.
+ * Reproduction or utilization of this source in whole or part is
+ * forbidden without the written consent of u-blox Melbourn Ltd.
+ */
+"use strict";
+
+module.exports = {
+    STORE_IS_LOGGED_IN: "STORE_IS_LOGGED_IN",
+    STORE_SET_UUID_CHECKED: "STORE_SET_UUID_CHECKED",
+    STORE_SET_UUID_UNCHECKED: "STORE_SET_UUID_UNCHECKED",
+    STORE_HEARTBEAT_SECONDS: "STORE_HEARTBEAT_SECONDS",
+    STORE_HEARTBEAT_SNAP_TO_RTC: "STORE_HEARTBEAT_SNAP_TO_RTC",
+    STORE_REPORTING_INTERVAL: "STORE_REPORTING_INTERVAL",
+    STORE_TT_NUM_UL_DATAGRAMS: "STORE_TT_NUM_UL_DATAGRAMS",
+    STORE_TT_LEN_UL_DATAGRAM: "STORE_TT_LEN_UL_DATAGRAM",
+    STORE_TT_NUM_DL_DATAGRAMS: "STORE_TT_NUM_DL_DATAGRAMS",
+    STORE_TT_LEN_DL_DATAGRAM: "STORE_TT_LEN_DL_DATAGRAM",
+    STORE_TT_TIMEOUT_SECONDS: "STORE_TT_TIMEOUT_SECONDS",
+    STORE_TT_NO_REPORTS_DURING_TEST: "STORE_TT_NO_REPORTS_DURING_TEST",
+    STORE_TT_DL_INTERVAL_SECONDS: "STORE_TT_DL_INTERVAL_SECONDS"
+};

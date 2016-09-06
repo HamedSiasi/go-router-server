@@ -146,12 +146,6 @@ func OpenQueue(username, amqpAddress string) (*Queue, error) {
 						m := AmqpResponseMessage{}
 						err = json.Unmarshal(msg.Body, &m)
 						if err == nil {
-							globals.Dbg.PrintfTrace("%s [amqp] -->   DeviceUuid:    %+v \n", globals.LogTag, m.DeviceUuid)
-							globals.Dbg.PrintfTrace("%s [amqp] -->   EndpointUuid:  %+v \n", globals.LogTag, m.EndpointUuid)
-							globals.Dbg.PrintfTrace("%s [amqp] -->   Payload:       %+v \n", globals.LogTag, m.Payload)
-							globals.Dbg.PrintfTrace("%s [amqp] -->   DeviceName:    %+v \n", globals.LogTag, m.DeviceName)
-							globals.Dbg.PrintfTrace("%s [amqp] -->   Command:       %+v \n", globals.LogTag, m.Command)
-							globals.Dbg.PrintfTrace("%s [amqp] -->   Data:          %+v \n", globals.LogTag, m.Data)
 							q.UlAmqpMsgs <- &m
 						}
 					} else {
@@ -183,9 +177,9 @@ func OpenQueue(username, amqpAddress string) (*Queue, error) {
 
 			if receivedMsg {
 				if err == nil {
-					globals.Dbg.PrintfTrace("%s [amqp] --> received UL:\n\n%+v\n\n", globals.LogTag, string(msg.Body))
+					//globals.Dbg.PrintfTrace("%s --> received: %+v\n\n", globals.LogTag, string(msg.Body))
 				} else {
-					globals.Dbg.PrintfTrace("%s [amqp] --> received UL:\n\n%+v\n\n...which is not JSON decodable: \"%s\".\n", globals.LogTag, string(msg.Body), err.Error())
+					globals.Dbg.PrintfTrace("%s --> received: %+v\n\n...which is not JSON decodable: \"%s\".\n", globals.LogTag, string(msg.Body), err.Error())
 				}
 			}
 		}
@@ -205,6 +199,7 @@ func OpenQueue(username, amqpAddress string) (*Queue, error) {
 			case dlMsg, isOpen := <-q.DlAmqpMsgs:
 				{
 					if isOpen {
+						fmt.Println(dlMsg)
 						serialisedData, err := json.Marshal(dlMsg)
 						if err != nil {
 							globals.Dbg.PrintfError("%s [amqp] --> attempting to JSONify DL AMQP message:\n\n%+v\n\n...results in error: \"%s\".\n", globals.LogTag, dlMsg, err.Error())
@@ -215,7 +210,12 @@ func OpenQueue(username, amqpAddress string) (*Queue, error) {
 								ContentType:  "application/json",
 								Body:         serialisedData,
 							}
-							err = channel.Publish(username, "send", false, false, publishedMsg)
+							err = channel.Publish(
+								username,
+								"send",
+								false,
+								false,
+								publishedMsg)
 							if err != nil {
 								globals.Dbg.PrintfError("%s [amqp] --> unable to publish DL message:\n\n%+v\n\n...due to error: \"%s\".\n", globals.LogTag, publishedMsg, err.Error())
 							} else {
@@ -227,7 +227,7 @@ func OpenQueue(username, amqpAddress string) (*Queue, error) {
 						return
 					}
 				}
-			}
+			} //select
 		}
 	}()
 

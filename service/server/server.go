@@ -15,6 +15,7 @@ package server
 import (
 	"fmt"
 	"github.com/brettlangdon/forge"
+	"github.com/dustin/go-coap"
 	"github.com/u-blox/utm/service/globals"
 	"log"
 	"strings"
@@ -181,7 +182,6 @@ func updateDatatableState(uuid string, decodeState *DeviceTotalsState, recentUl 
 // Process uplink messages from the AMQP queue until it is closed or
 // an error is flagged
 func processUlAmqpMsgs(q *Queue) {
-	fmt.Println("... processUlAmqpMsgs")
 	statusTick := time.NewTicker(time.Minute)
 
 	// Establish the status of the process loop and of traffic test
@@ -207,19 +207,88 @@ func processUlAmqpMsgs(q *Queue) {
 					switch value := msg.(type) {
 					case *AmqpResponseMessage:
 						{
-							globals.Dbg.PrintfTrace("%s [server] --> decoded AMQP JSON msg:\n\n%+v\n\n", globals.LogTag, msg)
 							if value.Command == "UART_data" {
 								// UART data from the UTM-API which needs to be decoded
 								// If the device is not known, add it
-								value.DeviceUuid = strings.ToLower(value.DeviceUuid) // force to lower case from the very beginning
+								value.DeviceUuid = strings.ToLower(value.DeviceUuid)
+								//----------------------------------------------------------------------------------------------
+								// (1) Receive readingData from SoftRadio
+								//receivedStr := string(value.Data)
+								//s := strings.Split(receivedStr, ":")
+								//ip, readingData := s[0]+":"+s[1], s[2]
 
-								// HAMED SIASI
-								globals.Dbg.PrintfTrace("Device UUID: %s\n", value.DeviceUuid)
-								globals.Dbg.PrintfTrace("Device NAME: %s\n", value.DeviceName)
-								globals.Dbg.PrintfTrace("Device DATA: %s\n", value.Data)
-								//gRouter["DestinationIP"]="UUID"
-								//gRouter["0.0.0.0"] = value.DeviceUuid
+								globals.Dbg.PrintfTrace("%s -->  [AMQP] DeviceUUID:     %+v \n", globals.LogTag, value.DeviceUuid)
+								globals.Dbg.PrintfTrace("%s -->  [AMQP] EndpointUUID:   %+v \n", globals.LogTag, value.EndpointUuid)
+								globals.Dbg.PrintfTrace("%s -->  [AMQP] Payload:        %+v \n", globals.LogTag, value.Payload)
+								globals.Dbg.PrintfTrace("%s -->  [AMQP] DeviceName:     %+v \n", globals.LogTag, value.DeviceName)
+								globals.Dbg.PrintfTrace("%s -->  [AMQP] Command:        %+v \n", globals.LogTag, value.Command)
+								globals.Dbg.PrintfTrace("%s -->  [AMQP] CoapData:       %+v \n", globals.LogTag, value.Data)
+								globals.Dbg.PrintfTrace("%s -->  [AMQP] MessageID:      %+v \n", globals.LogTag, amqpMessageCount)
+								//Parsing coap data
+								var x coap.Message
+								err := x.UnmarshalBinary(value.Data)
 
+								globals.Dbg.PrintfTrace("%s -->  [COAP] type:           %+v \n", globals.LogTag, x.Type)
+								globals.Dbg.PrintfTrace("%s -->  [COAP] code:           %+v \n", globals.LogTag, x.Code)
+								globals.Dbg.PrintfTrace("%s -->  [COAP] MessageID:      %+v \n", globals.LogTag, x.MessageID)
+								globals.Dbg.PrintfTrace("%s -->  [COAP] payload:        %+v \n", globals.LogTag, x.Payload)
+								globals.Dbg.PrintfTrace("%s -->  [COAP] Token:          %+v \n", globals.LogTag, string(x.Token))
+								globals.Dbg.PrintfTrace("%s -->  [COAP] Destination:    %+v \n\n", globals.LogTag, x.Option(11))
+								//var dest string
+								ip := x.Option(11).(string)
+								// (2) Send readingData to coap server
+								req := coap.Message{
+									Type:      x.Type,
+									Code:      x.Code,
+									MessageID: x.MessageID,
+									Payload:   []byte(x.Payload),
+									Token:     []byte(x.Token),
+								}
+								//add to gRouter
+								gRouter[string(x.MessageID)] = value.DeviceUuid
+
+								req.SetOption(coap.ETag, "SARA")
+								req.SetOption(coap.MaxAge, 3)
+								req.SetPathString("/test")
+								fmt.Println("COAP Request ---> ", req)
+
+								c, err := coap.Dial("udp", ip)
+								if err != nil {
+									log.Fatalf("Error dialing: %v", err)
+								}
+
+								// (3) Receive coap server reply
+								coapServerReply, err := c.Send(req)
+
+								if err != nil {
+									log.Fatalf("Error sending request: %v", err)
+								}
+								if coapServerReply != nil {
+									fmt.Println("COAP Reply <--- ", coapServerReply, "\n")
+
+									//Finding the UUID ot rge destination device
+									thisUUID, ok := gRouter[string(coapServerReply.MessageID)]
+
+									if !ok {
+										log.Fatalf("deviceUUID not found !!!")
+									} else {
+										delete(gRouter, string(coapServerReply.MessageID))
+									}
+									globals.Dbg.PrintfTrace("%s <--  messageID:   %+v \n", globals.LogTag, coapServerReply.MessageID)
+									globals.Dbg.PrintfTrace("%s <--  DeviceUUID:  %+v \n", globals.LogTag, thisUUID)
+									globals.Dbg.PrintfTrace("%s <--  Payload:     %+v \n\n", globals.LogTag, string(coapServerReply.Payload))
+
+									// (4) Send to the device
+									msgToDevice := AmqpMessage{
+										DeviceUuid:   thisUUID,
+										EndpointUuid: 4,
+									}
+									for _, v := range coapServerReply.Payload {
+										msgToDevice.Payload = append(msgToDevice.Payload, int(v))
+									}
+									// Send the TSW server
+									DlMsgs <- msgToDevice
+								}
 							}
 						}
 					case *error:
@@ -245,7 +314,6 @@ func processUlAmqpMsgs(q *Queue) {
 
 // Handle all the AMQP queues
 func doAmqp(username, amqpAddress string) {
-	fmt.Println("... doAmqp")
 	//fmt.Println("username: ", username)
 	//fmt.Println("amqpAddress: ", amqpAddress)
 
@@ -281,8 +349,6 @@ func doAmqp(username, amqpAddress string) {
 
 // Entry point
 func Run() {
-
-	fmt.Println("... RUN")
 	// First, parse the configuration file
 	settings, err := forge.ParseFile(configurationFile)
 	if err != nil {
@@ -291,8 +357,6 @@ func Run() {
 	amqp, err := settings.GetSection("amqp")
 	username, err := amqp.GetString("uname")
 	amqpAddress, err := amqp.GetString("amqp_address")
-	//host, err := settings.GetSection("host")
-	//port, err := host.GetString("port")
 
 	// Set up the maps here. Do this here so that if we restart
 	// the AMQP queue the data is retained
@@ -306,8 +370,6 @@ func Run() {
 	log.SetFlags(log.LstdFlags)
 
 	// --- HAMED's FOWARDING THINGY ---
-
-	fmt.Println("... forever")
 	forever := make(chan bool)
 	<-forever
 }

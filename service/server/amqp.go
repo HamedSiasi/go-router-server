@@ -17,7 +17,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/streadway/amqp"
-	"github.com/u-blox/utm/service/globals"
+	"github.com/u-blox/utm-server/service/globals"
 	"time"
 )
 

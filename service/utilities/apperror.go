@@ -13,44 +13,44 @@
 package utilities
 
 import (
-    "errors"
-    "log"
-    "net/http"
-    "runtime"
-    "github.com/u-blox/utm/service/globals"
+	"errors"
+	"github.com/u-blox/utm-server/service/globals"
+	"log"
+	"net/http"
+	"runtime"
 )
 
 /// Create a new error
 func NewAppError(optionalMessage string, optionalInnerError error, captureStackTrace bool, contextDependantStatusInt int) *globals.Error {
-    err := globals.Error{
-        InnerError: optionalInnerError,
-        Buf:        nil,
-        Status:     contextDependantStatusInt,
-        Annotation: optionalMessage,
-    }
+	err := globals.Error{
+		InnerError: optionalInnerError,
+		Buf:        nil,
+		Status:     contextDependantStatusInt,
+		Annotation: optionalMessage,
+	}
 
-    if captureStackTrace {
-        err.Buf = make([]byte, 1<<16)
-        runtime.Stack(err.Buf, false)
-    }
+	if captureStackTrace {
+		err.Buf = make([]byte, 1<<16)
+		runtime.Stack(err.Buf, false)
+	}
 
-    return &err
+	return &err
 }
 
 /// Create a server error
 func ServerError(err error) *globals.Error {
-    if err == nil {
-        return nil
-    }
+	if err == nil {
+		return nil
+	}
 
-    apperr := NewAppError("", err, true, 500)
-    return apperr
+	apperr := NewAppError("", err, true, 500)
+	return apperr
 }
 
 /// Create a client error
 func ClientError(message string, status int) *globals.Error {
-    apperr := NewAppError("", errors.New(message), false, status)
-    return apperr
+	apperr := NewAppError("", errors.New(message), false, status)
+	return apperr
 }
 
 /// A handler which takes rest request handler function as an argument
@@ -59,17 +59,17 @@ type Handler func(w http.ResponseWriter, req *http.Request) *globals.Error
 
 /// TODO
 func (handler Handler) ServeHTTP(response http.ResponseWriter, request *http.Request) {
-    apperr := handler(response, request)
-    if apperr != nil {
-        var message string
-        if apperr.Status >= 500 {
-            message = "Internal Server Error"
-        } else {
-            message = apperr.Error()
-        }
-        log.Printf("ERROR (%d): %v\n%s", apperr.Status, apperr.InnerError, apperr.Buf)
-        http.Error(response, message, apperr.Status)
-    }
+	apperr := handler(response, request)
+	if apperr != nil {
+		var message string
+		if apperr.Status >= 500 {
+			message = "Internal Server Error"
+		} else {
+			message = apperr.Error()
+		}
+		log.Printf("ERROR (%d): %v\n%s", apperr.Status, apperr.InnerError, apperr.Buf)
+		http.Error(response, message, apperr.Status)
+	}
 }
 
 /* End Of File */

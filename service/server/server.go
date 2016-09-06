@@ -16,7 +16,7 @@ import (
 	"fmt"
 	"github.com/brettlangdon/forge"
 	"github.com/dustin/go-coap"
-	"github.com/u-blox/utm/service/globals"
+	"github.com/u-blox/utm-server/service/globals"
 	"log"
 	"strings"
 	"time"

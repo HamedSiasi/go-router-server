@@ -13,12 +13,10 @@
 package main
 
 import (
-	"fmt"
 	"github.com/u-blox/utm/service/server"
 )
 
 func main() {
-	fmt.Println("... main")
 	server.Run()
 }
 

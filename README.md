@@ -1,15 +1,27 @@
-# goRabbit
+# Message Router Server
 
-Firstly, download and run the Erlang Windows Binary File.
-http://www.erlang.org/downloads
+This repository contains the web server and web client for the U-blox Test Mobile project.  The server  (residing in the service directory) is written in Golang and is based on original code provided by Neul as part of the tedI project.  The client (residing in the static directory with all the javascript/HTML code actually piled into the `static/dist` directory (using Gulp)) is written in Javascript using React/Flux and HTML5, original code created by a contractor (mmanjoura) who worked on the project.
 
-Then just run the installer, rabbitmq-server-3.6.5.exe.
-https://www.rabbitmq.com/install-windows.html
 
-4369 (epmd), 25672 (Erlang distribution)
-5672, 5671 (AMQP 0-9-1 without and with TLS)
-15672 (if management plugin is enabled)
-61613, 61614 (if STOMP is enabled)
-1883, 8883 (if MQTT is enabled)
+# Server Installation
 
-RabbitMQ
+(1) Fetch and build the code from github:
+
+`go get -u github.com/HamedSiasi/go-router-server`
+
+(2) Copy `config.cfg` into the bin directoy:
+
+`cp ~/code/gocode/src/github.com/u-blox/utm-server/config.cfg ~/code/gocode/bin`
+
+(3) Edit `config.cfg` for the correct port number (default: `3001`)
+
+(4) Edit `config.cfg` for the correct `username` nad `password` (default: `hamed`,`neulneul`)
+
+(5) Change directory to the bin directory:
+
+`cd ~/code/gocode/bin`
+
+(6) Start the executable from the bin directory with:
+
+`go-router-server`
+

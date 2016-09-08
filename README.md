@@ -44,4 +44,4 @@ The server receive AMQP message (which contains the "CoAP package" with all opti
 You can edit the golang code in `src\github.com\HamedSiasi\go-router-server\service\server\server.go`
 and install ther server again by `go install -v github.com/HamedSiasi/go-router-server` command.
 
-Simple example of how the AMQP Broker server works `github.com/HamedSiasi/goRabbit` based on RbbitMQ `www.rabbitmq.com`
+Simple example of how the AMQP Broker server works `github.com/HamedSiasi/goRabbit` based on RabbitMQ `www.rabbitmq.com`

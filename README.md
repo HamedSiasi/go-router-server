@@ -1,6 +1,20 @@
-# Message Router Server
+# Introduction to Message Router Server
 
-This repository contains the web server and web client for the U-blox Test Mobile project.  The server  (residing in the service directory) is written in Golang and is based on original code provided by Neul as part of the tedI project.  The client (residing in the static directory with all the javascript/HTML code actually piled into the `static/dist` directory (using Gulp)) is written in Javascript using React/Flux and HTML5, original code created by a contractor (mmanjoura) who worked on the project.
+This repo contains a broker server for the U-blox Test Mobile project. The server is written in Golang and is based on original utm-server projuect (`github.com/u-blox/utm-server`) provided by u-blox. 
+The server receive AMQP message (which contains the "CoAP package" with all options and payload) from the client (`github.com/HamedSiasi/mbed-os-ublox-coap`) and route them to the CoAP server mentioned in CoAP package. it has also a "non-database memory" to deliver the CoAP server reply to the correct device by mapping "DeviceUUID" to the "AMQPmsgID".
+
+# Prerequisites
+(1) Download a golang binary release suitable for your system `https://golang.org/dl`
+
+(2) Follow the installation instructions `https://golang.org/doc/install`
+
+
+# Working directory structure
+|_ bin
+|_ pkg
+|_ src _
+        |_ github.com
+        
 
 
 # Server Installation
@@ -9,9 +23,7 @@ This repository contains the web server and web client for the U-blox Test Mobil
 
 `go get -u github.com/HamedSiasi/go-router-server`
 
-(2) Copy `config.cfg` into the bin directoy:
-
-`cp ~/code/gocode/src/github.com/u-blox/utm-server/config.cfg ~/code/gocode/bin`
+(2) Copy `config.cfg` into the bin directoy
 
 (3) Edit `config.cfg` for the correct port number (default: `3001`)
 

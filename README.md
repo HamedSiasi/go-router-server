@@ -10,10 +10,15 @@ The server receive AMQP message (which contains the "CoAP package" with all opti
 
 
 # Working directory structure
+
 |_ bin
+
 |_ pkg
+
 |_ src _
+
         |_ github.com
+        
         
 
 
@@ -29,9 +34,7 @@ The server receive AMQP message (which contains the "CoAP package" with all opti
 
 (4) Edit `config.cfg` for the correct `username` nad `password` (default: `hamed`,`neulneul`)
 
-(5) Change directory to the bin directory:
-
-`cd ~/code/gocode/bin`
+(5) Change directory to the bin directory
 
 (6) Start the executable from the bin directory with:
 

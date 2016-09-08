@@ -28,6 +28,7 @@ The server receive AMQP message (which contains the "CoAP package" with all opti
 
 `go get -u github.com/HamedSiasi/go-router-server`
 
+
 (2) Copy `config.cfg` into the bin directoy
 
 (3) Edit `config.cfg` for the correct port number (default: `3001`)
@@ -40,3 +41,5 @@ The server receive AMQP message (which contains the "CoAP package" with all opti
 
 `go-router-server`
 
+You can edit the golang code in `src\github.com\HamedSiasi\go-router-server\service\server\server.go`
+and install ther server again by `go install -v github.com/HamedSiasi/go-router-server` command.
